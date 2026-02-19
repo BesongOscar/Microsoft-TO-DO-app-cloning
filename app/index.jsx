@@ -17,8 +17,8 @@ import { sidebarLists } from "../constants/sideBarLists";
 import { customLists } from "../constants/customLists";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
+
 const App = () => {
-  // Initial task state
   const [tasks, setTasks] = useState([
     {
       id: "1",
@@ -65,24 +65,24 @@ const App = () => {
   ]);
 
   const [currentList, setCurrentList] = useState({ name: "My Day" });
-  const [selectedTaskId, setSelectedTaskId] = useState(tasks[0].id);
+  const [selectedTaskId, setSelectedTaskId] = useState("1");
   const [sidebarVisible, setSidebarVisible] = useState(false);
 
   // Derived selected task
   const selectedTask = tasks.find((task) => task.id === selectedTaskId);
 
-  // Sidebar animation
-  const sidebarAnim = useRef(new Animated.Value(-250)).current; // sidebar width = 250
+  // ─── Sidebar animation ────────────────────────────────────────────────────
+  const sidebarAnim = useRef(new Animated.Value(-250)).current;
+
   const toggleSidebar = () => {
     if (sidebarVisible) {
-      // Slide out
       Animated.timing(sidebarAnim, {
         toValue: -250,
         duration: 250,
         useNativeDriver: true,
       }).start(() => setSidebarVisible(false));
     } else {
-      setSidebarVisible(true); // make visible first
+      setSidebarVisible(true);
       Animated.timing(sidebarAnim, {
         toValue: 0,
         duration: 250,
@@ -91,10 +91,12 @@ const App = () => {
     }
   };
 
-  // Add a new task
+  // ─── Task handlers ────────────────────────────────────────────────────────
+
+  // Use timestamp for unique IDs — avoids collisions after deletions
   const handleAddTask = (text) => {
     const newTask = {
-      id: String(tasks.length + 1),
+      id: Date.now().toString(),
       text,
       completed: false,
       important: false,
@@ -103,25 +105,32 @@ const App = () => {
     setTasks((prev) => [...prev, newTask]);
   };
 
-  // Toggle task completion
   const handleToggleTask = (taskId) => {
     setTasks((prev) =>
       prev.map((task) =>
-        task.id === taskId ? { ...task, completed: !task.completed } : task,
-      ),
+        task.id === taskId ? { ...task, completed: !task.completed } : task
+      )
     );
   };
 
-  // Select a task for RightPanel
+  // Toggle the important/star flag on a task
+  const handleStarToggle = (taskId) => {
+    setTasks((prev) =>
+      prev.map((task) =>
+        task.id === taskId ? { ...task, important: !task.important } : task
+      )
+    );
+  };
+
   const handleSelectTask = (taskId) => {
     setSelectedTaskId(taskId);
   };
 
+  // ─── Render ───────────────────────────────────────────────────────────────
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#0078d4" />
 
-      {/* Header with callbacks */}
       <Header
         onMenuPress={toggleSidebar}
         onSearchPress={() => console.log("Search pressed")}
@@ -129,13 +138,14 @@ const App = () => {
       />
 
       <View style={styles.mainContainer}>
-        {/* Overlay (semi-transparent) */}
+        {/* Overlay behind sidebar */}
         {sidebarVisible && (
           <TouchableWithoutFeedback onPress={toggleSidebar}>
             <View style={styles.overlay} />
           </TouchableWithoutFeedback>
         )}
-        {/* Animated Sidebar */}
+
+        {/* Animated sliding sidebar */}
         {sidebarVisible && (
           <Animated.View
             style={[
@@ -147,22 +157,28 @@ const App = () => {
               sidebarLists={sidebarLists}
               customLists={customLists}
               currentList={currentList}
-              onSelectList={setCurrentList}
+              onSelectList={(list) => {
+                setCurrentList(list);
+                toggleSidebar(); // close sidebar on selection
+              }}
             />
           </Animated.View>
         )}
 
-        {/* Main Content */}
+        {/* Main task list */}
         <MainContent
           currentList={currentList}
           tasks={tasks}
           onAddTask={handleAddTask}
           onToggleTask={handleToggleTask}
           onSelectTask={handleSelectTask}
+          onStarToggle={handleStarToggle}   // ← was missing
         />
 
-        {/* Right Panel */}
-        {/* <RightPanel selectedTask={selectedTask} /> */}
+        {/* Right detail panel — only shown when a task is selected */}
+        {/* {selectedTask && (
+          <RightPanel selectedTask={selectedTask} />
+        )} */}
       </View>
     </SafeAreaView>
   );

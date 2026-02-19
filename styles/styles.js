@@ -5,7 +5,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#ffffff",
   },
-  // Header styles
+
+  // ─── Header ───────────────────────────────────────────────────────────────
   topHeader: {
     backgroundColor: "#0078d4",
     flexDirection: "row",
@@ -41,7 +42,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
 
-  // Sidebar styles
+  // ─── Sidebar ──────────────────────────────────────────────────────────────
   animatedSidebar: {
     position: "absolute",
     left: 0,
@@ -50,14 +51,13 @@ const styles = StyleSheet.create({
     width: 250,
     zIndex: 10,
   },
-
   overlay: {
     position: "absolute",
     left: 0,
     top: 0,
     bottom: 0,
     right: 0,
-    backgroundColor: "rgba(0,0,0,0.4)", // semi-transparent black
+    backgroundColor: "rgba(0,0,0,0.4)",
     zIndex: 5,
   },
   sidebar: {
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   sidebarItemSelected: {
-    backgroundColor: "#e1f3ff", // highlight selected list
+    backgroundColor: "#e1f3ff",
   },
   sidebarItemLeft: {
     flexDirection: "row",
@@ -94,8 +94,8 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   sidebarIconText: {
-    fontSize: 10,
-    color: "white",
+    fontSize: 16,
+    color: "#323130",
   },
   sidebarItemText: {
     fontSize: 14,
@@ -113,7 +113,35 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 
-  // Main container
+  // ─── Lists Section (in Sidebar) ───────────────────────────────────────────
+  listsSection: {
+    marginTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: "#e1e5e9",
+    paddingTop: 8,
+  },
+  listsSectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  listsSectionTitle: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#605e5c",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  addListButton: {
+    fontSize: 22,
+    color: "#0078d4",
+    fontWeight: "300",
+    lineHeight: 24,
+  },
+
+  // ─── Main Layout ──────────────────────────────────────────────────────────
   mainContainer: {
     flex: 1,
     flexDirection: "row",
@@ -123,7 +151,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
 
-  // List header
+  // ─── List Header ──────────────────────────────────────────────────────────
   listHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -132,6 +160,9 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     borderBottomWidth: 1,
     borderBottomColor: "#f3f2f1",
+  },
+  listTitleSection: {
+    flex: 1,
   },
   listTitle: {
     fontSize: 32,
@@ -143,8 +174,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#605e5c",
   },
+  moreOptionsButton: {
+    padding: 8,
+  },
+  moreOptionsIcon: {
+    fontSize: 20,
+    color: "#605e5c",
+    letterSpacing: 1,
+  },
 
-  // Suggestions banner
+  // ─── Suggestions Banner ───────────────────────────────────────────────────
   suggestionsBanner: {
     flexDirection: "row",
     alignItems: "center",
@@ -177,11 +216,11 @@ const styles = StyleSheet.create({
     color: "#605e5c",
   },
 
-  // Add task input
+  // ─── Add Task Input ───────────────────────────────────────────────────────
   addTaskContainer: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal:20,
+    paddingHorizontal: 20,
     paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: "#f3f2f1",
@@ -194,7 +233,7 @@ const styles = StyleSheet.create({
     borderColor: "#0078d4",
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 1,
+    marginRight: 12,
   },
   addTaskIcon: {
     fontSize: 12,
@@ -208,7 +247,10 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
   },
 
-  // Tasks list
+  // ─── Tasks ────────────────────────────────────────────────────────────────
+  tasksContainer: {
+    paddingBottom: 32,
+  },
   taskItem: {
     flexDirection: "row",
     alignItems: "center",
@@ -217,8 +259,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#f8f9fa",
   },
-
-  // Checkbox container
   taskCheckbox: {
     marginRight: 16,
     width: 24,
@@ -229,19 +269,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-
-  // Filled checkbox when task is completed
   taskCheckboxCompleted: {
     backgroundColor: "#0078d4",
   },
-
   checkmark: {
     color: "white",
     fontSize: 14,
     fontWeight: "bold",
   },
-
-  // Task text
   taskText: {
     fontSize: 16,
     color: "#323130",
@@ -253,15 +288,14 @@ const styles = StyleSheet.create({
     textDecorationLine: "line-through",
     flex: 1,
   },
-
-  // Optional touch feedback (can use activeOpacity in component)
-  activeOpacity: {
-    opacity: 0.7,
+  starButton: {
+    padding: 4,
+    marginLeft: 8,
   },
 
-  // Completed section
+  // ─── Completed Section ────────────────────────────────────────────────────
   completedSection: {
-    marginTop: 24,
+    marginTop: 8,
   },
   completedHeader: {
     flexDirection: "row",
@@ -277,7 +311,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 
-  // Right panel
+  // ─── Right Panel ──────────────────────────────────────────────────────────
   rightPanel: {
     width: 320,
     backgroundColor: "#faf9f8",
@@ -285,25 +319,59 @@ const styles = StyleSheet.create({
     borderLeftColor: "#e1e5e9",
     flex: 1,
   },
-  taskDetailContent: {
-    padding: 20,
-    flexGrow: 1,
+  taskDetailHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e1e5e9",
   },
   taskDetailTitle: {
     fontSize: 18,
     fontWeight: "600",
     color: "#323130",
     flex: 1,
+    marginRight: 8,
+  },
+  taskDetailContent: {
+    padding: 20,
+    flexGrow: 1,
+  },
+  taskDetailFooter: {
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderTopWidth: 1,
+    borderTopColor: "#e1e5e9",
   },
   closeDetailPanel: {
     fontSize: 20,
     color: "#605e5c",
     padding: 4,
   },
+  createdDate: {
+    fontSize: 12,
+    color: "#8a8886",
+  },
 
-  // Touch feedback (active opacity can also be applied in components)
-  activeOpacity: {
-    opacity: 0.7,
+  // ─── Detail Options (Right Panel rows) ────────────────────────────────────
+  detailOption: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f3f2f1",
+  },
+  detailIcon: {
+    fontSize: 18,
+    marginRight: 16,
+    width: 24,
+    textAlign: "center",
+  },
+  detailText: {
+    fontSize: 14,
+    color: "#323130",
   },
 });
 

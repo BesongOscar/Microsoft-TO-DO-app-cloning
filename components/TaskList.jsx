@@ -1,7 +1,6 @@
 import React from "react";
-import { View, FlatList } from "react-native";
+import { View, Text, FlatList } from "react-native";
 import TaskItem from "./TaskItem";
-import CompletedSection from "./CompletedSection";
 import styles from "../styles/styles";
 
 const TasksList = ({
@@ -11,14 +10,13 @@ const TasksList = ({
   onSelectTask,
   onStarToggle,
 }) => {
-   const combinedData = [
-    ...pendingTasks.map(task => ({ ...task, section: "pending" })),
-    ...completedTasks.map(task => ({ ...task, section: "completed" })),
+  const combinedData = [
+    ...pendingTasks.map((task) => ({ ...task, section: "pending" })),
+    ...completedTasks.map((task) => ({ ...task, section: "completed" })),
   ];
 
   return (
-    <View>
-      {/* Pending Tasks */}
+    <View style={{ flex: 1 }}>
       <FlatList
         data={combinedData}
         keyExtractor={(item) => item.id.toString()}
@@ -33,15 +31,17 @@ const TasksList = ({
           />
         )}
         ListFooterComponent={
-          completedTasks.length > 0 && (
-            <Text style={styles.completedHeader}>
-              Completed ({completedTasks.length})
-            </Text>
-          )
+          completedTasks.length > 0 ? (
+            <View style={styles.completedHeader}>
+              <Text style={styles.completedTitle}>
+                Completed ({completedTasks.length})
+              </Text>
+            </View>
+          ) : null
         }
       />
     </View>
   );
-}
+};
 
 export default TasksList;
