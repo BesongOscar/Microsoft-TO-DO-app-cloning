@@ -6,6 +6,34 @@ import SuggestionsBanner from "../SuggestionBanner";
 import AddTaskInput from "../AddTaskInput";
 import TasksList from "../TaskList";
 
+// ─── Task filter logic ────────────────────────────────────────────────────────
+// Driven by list.filterKey so renaming a list never silently breaks filtering.
+const filterTasks = (tasks, list) => {
+  switch (list.filterKey) {
+    case "myDay":
+      return tasks.filter((t) => t.myDay);
+    case "important":
+      return tasks.filter((t) => t.important);
+    case "completed":
+      return tasks.filter((t) => t.completed);
+    case "all":
+      return tasks;
+    case "planned":
+      // Ready for when dueDate is added to tasks
+      return tasks.filter((t) => Boolean(t.dueDate));
+    case "tasks":
+      // Default inbox: tasks not pinned to My Day or Important
+      return tasks.filter((t) => !t.myDay && !t.important);
+    case "listId":
+      // Custom lists — match by the list's id stored on the task
+      return tasks.filter((t) => t.listId === list.id);
+    default:
+      return tasks;
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 const MainContent = ({
   currentList,
   tasks,
@@ -16,27 +44,9 @@ const MainContent = ({
 }) => {
   const [showBanner, setShowBanner] = useState(true);
 
-  // Filter tasks based on the currently selected list
-  const filteredTasks = tasks.filter((task) => {
-    switch (currentList.name) {
-      case "My Day":
-        return task.myDay;
-      case "Important":
-        return task.important;
-      case "Completed":
-        return task.completed;
-      case "All":
-        return true;
-      case "Planned":
-        return Boolean(task.dueDate); // ready for when dueDate is added
-      default:
-        // Custom lists matched by id
-        return task.listId === currentList.id;
-    }
-  });
-
-  const pendingTasks = filteredTasks.filter((task) => !task.completed);
-  const completedTasks = filteredTasks.filter((task) => task.completed);
+  const filteredTasks  = filterTasks(tasks, currentList);
+  const pendingTasks   = filteredTasks.filter((t) => !t.completed);
+  const completedTasks = filteredTasks.filter((t) => t.completed);
 
   // Dynamic greeting
   const hour = new Date().getHours();
@@ -68,7 +78,7 @@ const MainContent = ({
         completedTasks={completedTasks}
         onToggleTask={onToggleTask}
         onSelectTask={onSelectTask}
-        onStarToggle={onStarToggle}   // ← was missing
+        onStarToggle={onStarToggle}
       />
     </View>
   );

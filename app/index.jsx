@@ -1,4 +1,3 @@
-import React, { useState, useRef } from "react";
 import {
   View,
   StatusBar,
@@ -7,14 +6,13 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
+import React, { useState, useRef } from "react";
 import styles from "../styles/styles";
 import Header from "../components/Index/header";
 import Sidebar from "../components/SideBar";
 import MainContent from "../components/Index/MainContent";
 import RightPanel from "../components/Index/RightPanel";
-import { sidebarLists } from "../constants/sideBarLists";
-import { customLists } from "../constants/customLists";
+import { sidebarLists, customLists } from "../constants/Lists";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -108,8 +106,8 @@ const App = () => {
   const handleToggleTask = (taskId) => {
     setTasks((prev) =>
       prev.map((task) =>
-        task.id === taskId ? { ...task, completed: !task.completed } : task
-      )
+        task.id === taskId ? { ...task, completed: !task.completed } : task,
+      ),
     );
   };
 
@@ -117,8 +115,8 @@ const App = () => {
   const handleStarToggle = (taskId) => {
     setTasks((prev) =>
       prev.map((task) =>
-        task.id === taskId ? { ...task, important: !task.important } : task
-      )
+        task.id === taskId ? { ...task, important: !task.important } : task,
+      ),
     );
   };
 
@@ -126,10 +124,43 @@ const App = () => {
     setSelectedTaskId(taskId);
   };
 
+  // ─── Dynamic counts ───────────────────────────────────────────────────────
+  // Compute live badge counts from tasks state instead of using hardcoded values.
+  const getCount = (list) => {
+    switch (list.filterKey) {
+      case "myDay":
+        return tasks.filter((t) => t.myDay && !t.completed).length;
+      case "important":
+        return tasks.filter((t) => t.important && !t.completed).length;
+      case "completed":
+        return tasks.filter((t) => t.completed).length;
+      case "all":
+        return tasks.length;
+      case "planned":
+        return tasks.filter((t) => Boolean(t.dueDate)).length;
+      case "tasks":
+        return tasks.filter((t) => !t.myDay && !t.important && !t.completed)
+          .length;
+      case "listId":
+        return tasks.filter((t) => t.listId === list.id && !t.completed).length;
+      default:
+        return 0;
+    }
+  };
+
+  const liveSidebarLists = sidebarLists.map((l) => ({
+    ...l,
+    count: getCount(l),
+  }));
+  const liveCustomLists = customLists.map((l) => ({
+    ...l,
+    count: getCount(l),
+  }));
+
   // ─── Render ───────────────────────────────────────────────────────────────
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#0078d4" />
+      <StatusBar barStyle="light-content" backgroundColor="#0078d4" />
 
       <Header
         onMenuPress={toggleSidebar}
@@ -154,8 +185,8 @@ const App = () => {
             ]}
           >
             <Sidebar
-              sidebarLists={sidebarLists}
-              customLists={customLists}
+              sidebarLists={liveSidebarLists}
+              customLists={liveCustomLists}
               currentList={currentList}
               onSelectList={(list) => {
                 setCurrentList(list);
@@ -172,13 +203,11 @@ const App = () => {
           onAddTask={handleAddTask}
           onToggleTask={handleToggleTask}
           onSelectTask={handleSelectTask}
-          onStarToggle={handleStarToggle}   // ← was missing
+          onStarToggle={handleStarToggle} // ← was missing
         />
 
         {/* Right detail panel — only shown when a task is selected */}
-        {/* {selectedTask && (
-          <RightPanel selectedTask={selectedTask} />
-        )} */}
+        {selectedTask && <RightPanel selectedTask={selectedTask} />}
       </View>
     </SafeAreaView>
   );
