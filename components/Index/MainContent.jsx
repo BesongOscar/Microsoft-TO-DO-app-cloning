@@ -6,33 +6,18 @@ import SuggestionsBanner from "../SuggestionBanner";
 import AddTaskInput from "../AddTaskInput";
 import TasksList from "../TaskList";
 
-// ─── Task filter logic ────────────────────────────────────────────────────────
-// Driven by list.filterKey so renaming a list never silently breaks filtering.
 const filterTasks = (tasks, list) => {
   switch (list.filterKey) {
-    case "myDay":
-      return tasks.filter((t) => t.myDay);
-    case "important":
-      return tasks.filter((t) => t.important);
-    case "completed":
-      return tasks.filter((t) => t.completed);
-    case "all":
-      return tasks;
-    case "planned":
-      // Ready for when dueDate is added to tasks
-      return tasks.filter((t) => Boolean(t.dueDate));
-    case "tasks":
-      // Default inbox: tasks not pinned to My Day or Important
-      return tasks.filter((t) => !t.myDay && !t.important);
-    case "listId":
-      // Custom lists — match by the list's id stored on the task
-      return tasks.filter((t) => t.listId === list.id);
-    default:
-      return tasks;
+    case "myDay":      return tasks.filter((t) => t.myDay);
+    case "important":  return tasks.filter((t) => t.important);
+    case "completed":  return tasks.filter((t) => t.completed);
+    case "all":        return tasks;
+    case "planned":    return tasks.filter((t) => Boolean(t.dueDate));
+    case "tasks":      return tasks.filter((t) => !t.myDay && !t.important);
+    case "listId":     return tasks.filter((t) => t.listId === list.id);
+    default:           return tasks;
   }
 };
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 const MainContent = ({
   currentList,
@@ -41,6 +26,8 @@ const MainContent = ({
   onToggleTask,
   onSelectTask,
   onStarToggle,
+  onEdit,
+  onDelete,
 }) => {
   const [showBanner, setShowBanner] = useState(true);
 
@@ -48,16 +35,10 @@ const MainContent = ({
   const pendingTasks   = filteredTasks.filter((t) => !t.completed);
   const completedTasks = filteredTasks.filter((t) => t.completed);
 
-  // Dynamic greeting
-  const hour = new Date().getHours();
-  const greeting =
-    hour < 12 ? "Good morning!" : hour < 18 ? "Good afternoon!" : "Good evening!";
-
-  // Dynamic date
+  const hour     = new Date().getHours();
+  const greeting = hour < 12 ? "Good morning!" : hour < 18 ? "Good afternoon!" : "Good evening!";
   const todayDate = new Date().toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
+    weekday: "long", month: "long", day: "numeric",
   });
 
   return (
@@ -79,6 +60,8 @@ const MainContent = ({
         onToggleTask={onToggleTask}
         onSelectTask={onSelectTask}
         onStarToggle={onStarToggle}
+        onEdit={onEdit}
+        onDelete={onDelete}
       />
     </View>
   );

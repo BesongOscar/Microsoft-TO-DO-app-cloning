@@ -9,6 +9,8 @@ const TasksList = ({
   onToggleTask,
   onSelectTask,
   onStarToggle,
+  onEdit,
+  onDelete,
 }) => {
   const combinedData = [
     ...pendingTasks.map((task) => ({ ...task, section: "pending" })),
@@ -28,6 +30,8 @@ const TasksList = ({
             onToggle={() => onToggleTask(item.id)}
             onSelect={() => onSelectTask(item.id)}
             onStarToggle={() => onStarToggle(item.id)}
+            onEdit={onEdit}
+            onDelete={onDelete}
           />
         )}
         ListFooterComponent={
