@@ -1,5 +1,7 @@
+import { ListItem } from "../types";
+
 // Each list has a `filterKey` that TasksContext.counts uses to derive live badge numbers.
-export const sidebarLists = [
+export const sidebarLists: ListItem[] = [
   { id: "1", name: "My Day",    icon: "☀️",  color: "#0078d4", filterKey: "myDay"     },
   { id: "2", name: "Important", icon: "⭐",  color: "#d83b01", filterKey: "important" },
   { id: "3", name: "Planned",   icon: "📅",  color: "#107c10", filterKey: "planned"   },
@@ -8,7 +10,7 @@ export const sidebarLists = [
   { id: "6", name: "Tasks",     icon: "🏠",  color: "#0078d4", filterKey: "tasks"     },
 ];
 
-export const customLists = [
+export const customLists: ListItem[] = [
   { id: "7", name: "Work Projects", icon: "📋", color: "#8764b8", filterKey: "listId" },
   { id: "8", name: "Personal",      icon: "🏠", color: "#00bcf2", filterKey: "listId" },
 ];

@@ -7,43 +7,55 @@ import React, {
   useMemo,
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Task, TaskCounts } from "../types";
 
 // ─── Storage key ──────────────────────────────────────────────────────────────
 const STORAGE_KEY = "@tasks";
 
 // ─── Default seed data (only used on very first launch) ───────────────────────
-const DEFAULT_TASKS = [
-  { id: "1", text: "Review quarterly reports",      completed: false, important: true,  myDay: true  },
+const DEFAULT_TASKS: Task[] = [
+  { id: "1", text: "Review quarterly reports",         completed: false, important: true,  myDay: true  },
   { id: "2", text: "Call client about project update", completed: false, important: false, myDay: true  },
-  { id: "3", text: "Prepare presentation slides",   completed: false, important: true,  myDay: true  },
-  { id: "4", text: "Team meeting at 3 PM",          completed: false, important: false, myDay: false },
-  { id: "5", text: "Update project documentation",  completed: true,  important: false, myDay: false },
-  { id: "6", text: "Send weekly status report",     completed: true,  important: false, myDay: false },
+  { id: "3", text: "Prepare presentation slides",      completed: false, important: true,  myDay: true  },
+  { id: "4", text: "Team meeting at 3 PM",             completed: false, important: false, myDay: false },
+  { id: "5", text: "Update project documentation",     completed: true,  important: false, myDay: false },
+  { id: "6", text: "Send weekly status report",        completed: true,  important: false, myDay: false },
 ];
 
+// ─── Context shape ────────────────────────────────────────────────────────────
+interface TasksContextValue {
+  tasks: Task[];
+  loading: boolean;
+  counts: TaskCounts;
+  addTask: (text: string, listName?: string) => void;
+  toggleTask: (taskId: string) => void;
+  toggleImportant: (taskId: string) => void;
+  deleteTask: (taskId: string) => void;
+  updateTask: (taskId: string, updates: Partial<Task>) => void;
+}
+
 // ─── Context ──────────────────────────────────────────────────────────────────
-const TasksContext = createContext(null);
+const TasksContext = createContext<TasksContextValue | null>(null);
 
 // ─── Provider ─────────────────────────────────────────────────────────────────
-export const TasksProvider = ({ children }) => {
-  const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(true); // true while reading from storage
+export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   // ── Load persisted tasks on first mount ──────────────────────────────────
   useEffect(() => {
-    const loadTasks = async () => {
+    const loadTasks = async (): Promise<void> => {
       try {
         const stored = await AsyncStorage.getItem(STORAGE_KEY);
         if (stored !== null) {
-          setTasks(JSON.parse(stored));
+          setTasks(JSON.parse(stored) as Task[]);
         } else {
-          // First launch — seed with defaults
           setTasks(DEFAULT_TASKS);
           await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_TASKS));
         }
       } catch (e) {
         console.warn("Failed to load tasks from storage:", e);
-        setTasks(DEFAULT_TASKS); // graceful fallback
+        setTasks(DEFAULT_TASKS);
       } finally {
         setLoading(false);
       }
@@ -54,7 +66,7 @@ export const TasksProvider = ({ children }) => {
 
   // ── Persist to AsyncStorage whenever tasks change (after initial load) ───
   useEffect(() => {
-    if (loading) return; // don't overwrite storage during initial hydration
+    if (loading) return;
     AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)).catch((e) =>
       console.warn("Failed to persist tasks:", e),
     );
@@ -62,46 +74,41 @@ export const TasksProvider = ({ children }) => {
 
   // ── Task actions ─────────────────────────────────────────────────────────
 
-  /** Add a new task to the list */
-  const addTask = useCallback((text, listName = "My Day") => {
-    const newTask = {
+  const addTask = useCallback((text: string, listName = "My Day"): void => {
+    const newTask: Task = {
       id: Date.now().toString(),
       text: text.trim(),
       completed: false,
       important: false,
       myDay: listName === "My Day",
     };
-    setTasks((prev) => [newTask, ...prev]); // prepend so it appears at the top
+    setTasks((prev) => [newTask, ...prev]);
   }, []);
 
-  /** Toggle completed state */
-  const toggleTask = useCallback((taskId) => {
+  const toggleTask = useCallback((taskId: string): void => {
     setTasks((prev) =>
       prev.map((t) => (t.id === taskId ? { ...t, completed: !t.completed } : t)),
     );
   }, []);
 
-  /** Toggle important / star state */
-  const toggleImportant = useCallback((taskId) => {
+  const toggleImportant = useCallback((taskId: string): void => {
     setTasks((prev) =>
       prev.map((t) => (t.id === taskId ? { ...t, important: !t.important } : t)),
     );
   }, []);
 
-  /** Delete a task permanently */
-  const deleteTask = useCallback((taskId) => {
+  const deleteTask = useCallback((taskId: string): void => {
     setTasks((prev) => prev.filter((t) => t.id !== taskId));
   }, []);
 
-  /** Update any field(s) on a task */
-  const updateTask = useCallback((taskId, updates) => {
+  const updateTask = useCallback((taskId: string, updates: Partial<Task>): void => {
     setTasks((prev) =>
       prev.map((t) => (t.id === taskId ? { ...t, ...updates } : t)),
     );
   }, []);
 
-  // ── Derived counts (memoised so they only recompute when tasks change) ───
-  const counts = useMemo(
+  // ── Derived counts ───────────────────────────────────────────────────────
+  const counts = useMemo<TaskCounts>(
     () => ({
       myDay:     tasks.filter((t) => t.myDay && !t.completed).length,
       important: tasks.filter((t) => t.important && !t.completed).length,
@@ -113,8 +120,7 @@ export const TasksProvider = ({ children }) => {
     [tasks],
   );
 
-  // ─── Context value ────────────────────────────────────────────────────────
-  const value = {
+  const value: TasksContextValue = {
     tasks,
     loading,
     counts,
@@ -129,12 +135,7 @@ export const TasksProvider = ({ children }) => {
 };
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
-/**
- * Call inside any component that needs task data or actions.
- *
- * const { tasks, addTask, toggleTask, toggleImportant, counts } = useTasks();
- */
-export const useTasks = () => {
+export const useTasks = (): TasksContextValue => {
   const ctx = useContext(TasksContext);
   if (!ctx) {
     throw new Error("useTasks must be used inside a <TasksProvider>");

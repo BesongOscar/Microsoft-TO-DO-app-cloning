@@ -2,8 +2,19 @@ import React from "react";
 import { View, TouchableOpacity, Text } from "react-native";
 import styles from "../styles/styles";
 import { SidebarItem } from "./SideBarItem";
+import { ListItem } from "../types";
 
-const ListsSection = ({ customLists, currentList, onSelectList }) => {
+interface ListsSectionProps {
+  customLists: ListItem[];
+  currentList: ListItem | null;
+  onSelectList: (item: ListItem) => void;
+}
+
+const ListsSection: React.FC<ListsSectionProps> = ({
+  customLists,
+  currentList,
+  onSelectList,
+}) => {
   return (
     <View style={styles.listsSection}>
       {/* Section header */}
@@ -20,7 +31,7 @@ const ListsSection = ({ customLists, currentList, onSelectList }) => {
           key={list.id}
           item={list}
           isSelected={currentList?.name === list.name}
-          onSelectList={onSelectList}   // ← was incorrectly passed as onPress
+          onSelectList={onSelectList}
         />
       ))}
     </View>

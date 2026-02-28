@@ -1,8 +1,19 @@
 import React from "react";
 import { View, TouchableOpacity, Text } from "react-native";
 import styles from "../styles/styles";
+import { ListItem } from "../types";
 
-export const SidebarItem = ({ item, onSelectList, isSelected }) => {
+interface SidebarItemProps {
+  item: ListItem;
+  isSelected: boolean;
+  onSelectList: (item: ListItem) => void;
+}
+
+export const SidebarItem: React.FC<SidebarItemProps> = ({
+  item,
+  onSelectList,
+  isSelected,
+}) => {
   if (!item) return null;
 
   return (

@@ -3,8 +3,21 @@ import { View, FlatList, ScrollView } from "react-native";
 import styles from "../styles/styles";
 import ListsSection from "./ListsSection";
 import { SidebarItem } from "./SideBarItem";
+import { ListItem } from "../types";
 
-const Sidebar = ({ sidebarLists, customLists, currentList, onSelectList }) => {
+interface SidebarProps {
+  sidebarLists: ListItem[];
+  customLists: ListItem[];
+  currentList: ListItem | null;
+  onSelectList: (item: ListItem) => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({
+  sidebarLists,
+  customLists,
+  currentList,
+  onSelectList,
+}) => {
   return (
     <View style={styles.sidebar}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -15,7 +28,7 @@ const Sidebar = ({ sidebarLists, customLists, currentList, onSelectList }) => {
           renderItem={({ item }) => (
             <SidebarItem
               item={item}
-              isSelected={currentList?.name === item.name}  // ← was missing
+              isSelected={currentList?.name === item.name}
               onSelectList={onSelectList}
             />
           )}

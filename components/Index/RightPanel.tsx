@@ -2,16 +2,26 @@ import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import styles from "../../styles/styles";
 import DetailOption from "../DetailOption";
+import { Task } from "../../types";
 
-const DETAIL_OPTIONS = [
+interface DetailOptionConfig {
+  icon: string;
+  text: string;
+}
+
+const DETAIL_OPTIONS: DetailOptionConfig[] = [
   { icon: "📅", text: "Add due date" },
   { icon: "🔔", text: "Remind me" },
   { icon: "🔄", text: "Repeat" },
   { icon: "📝", text: "Add note" },
 ];
 
-const RightPanel = ({ selectedTask, onClose }) => {
-  // Guard: nothing selected
+interface RightPanelProps {
+  selectedTask: Task | null;
+  onClose: () => void;
+}
+
+const RightPanel: React.FC<RightPanelProps> = ({ selectedTask, onClose }) => {
   if (!selectedTask) return null;
 
   return (

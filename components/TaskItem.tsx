@@ -10,48 +10,64 @@ import {
 } from "react-native";
 import styles from "../styles/styles";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { Task } from "../types";
 
-const TaskItem = ({ task, onToggle, onSelect, onStarToggle, onEdit, onDelete }) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editText, setEditText] = useState(task.text);
-  const [menuVisible, setMenuVisible] = useState(false);
+interface TaskItemProps {
+  task: Task;
+  onToggle: () => void;
+  onSelect: () => void;
+  onStarToggle: () => void;
+  onEdit: (taskId: string, newText: string) => void;
+  onDelete: (taskId: string) => void;
+}
 
-  //Edit handlers
-  const handleSaveEdit = () => {
+const TaskItem: React.FC<TaskItemProps> = ({
+  task,
+  onToggle,
+  onSelect,
+  onStarToggle,
+  onEdit,
+  onDelete,
+}) => {
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [editText, setEditText] = useState<string>(task.text);
+  const [menuVisible, setMenuVisible] = useState<boolean>(false);
+
+  // Edit handlers
+  const handleSaveEdit = (): void => {
     const trimmed = editText.trim();
     if (trimmed && trimmed !== task.text) {
       onEdit(task.id, trimmed);
     } else {
-      setEditText(task.text); // revert if empty / unchanged
+      setEditText(task.text);
     }
     setIsEditing(false);
   };
 
-  const handleCancelEdit = () => {
+  const handleCancelEdit = (): void => {
     setEditText(task.text);
     setIsEditing(false);
   };
 
-  //Context menu (long-press)
-  const handleLongPress = () => {
+  // Context menu (long-press)
+  const handleLongPress = (): void => {
     setMenuVisible(true);
   };
 
-  const handleMenuEdit = () => {
+  const handleMenuEdit = (): void => {
     setMenuVisible(false);
     setIsEditing(true);
   };
 
-  const handleMenuDelete = () => {
+  const handleMenuDelete = (): void => {
     setMenuVisible(false);
     onDelete(task.id);
   };
 
-  //Render: editing mode
+  // Render: editing mode
   if (isEditing) {
     return (
       <View style={styles.taskItem}>
-        {/* Checkbox – still functional while editing */}
         <TouchableOpacity
           style={[styles.taskCheckbox, task.completed && styles.taskCheckboxCompleted]}
           onPress={onToggle}
@@ -60,7 +76,6 @@ const TaskItem = ({ task, onToggle, onSelect, onStarToggle, onEdit, onDelete }) 
           {task.completed && <Text style={styles.checkmark}>✔</Text>}
         </TouchableOpacity>
 
-        {/* Inline text input */}
         <TextInput
           style={localStyles.editInput}
           value={editText}
@@ -72,12 +87,10 @@ const TaskItem = ({ task, onToggle, onSelect, onStarToggle, onEdit, onDelete }) 
           multiline={false}
         />
 
-        {/* Save */}
         <TouchableOpacity onPress={handleSaveEdit} style={localStyles.editAction} activeOpacity={0.7}>
           <Ionicons name="checkmark" size={20} color="#0078d4" />
         </TouchableOpacity>
 
-        {/* Cancel */}
         <TouchableOpacity onPress={handleCancelEdit} style={localStyles.editAction} activeOpacity={0.7}>
           <Ionicons name="close" size={20} color="#8a8886" />
         </TouchableOpacity>
@@ -85,7 +98,7 @@ const TaskItem = ({ task, onToggle, onSelect, onStarToggle, onEdit, onDelete }) 
     );
   }
 
-  //Render: normal mode
+  // Render: normal mode
   return (
     <>
       <TouchableOpacity
@@ -95,7 +108,6 @@ const TaskItem = ({ task, onToggle, onSelect, onStarToggle, onEdit, onDelete }) 
         delayLongPress={400}
         activeOpacity={0.7}
       >
-        {/* Completion checkbox */}
         <TouchableOpacity
           style={[styles.taskCheckbox, task.completed && styles.taskCheckboxCompleted]}
           onPress={onToggle}
@@ -104,7 +116,6 @@ const TaskItem = ({ task, onToggle, onSelect, onStarToggle, onEdit, onDelete }) 
           {task.completed && <Text style={styles.checkmark}>✔</Text>}
         </TouchableOpacity>
 
-        {/* Task text */}
         <Text
           style={task.completed ? styles.taskTextCompleted : styles.taskText}
           numberOfLines={2}
@@ -112,7 +123,6 @@ const TaskItem = ({ task, onToggle, onSelect, onStarToggle, onEdit, onDelete }) 
           {task.text}
         </Text>
 
-        {/* Star */}
         <TouchableOpacity onPress={onStarToggle} style={styles.starButton} activeOpacity={0.7}>
           <Ionicons
             name={task.important ? "star" : "star-outline"}
@@ -131,20 +141,17 @@ const TaskItem = ({ task, onToggle, onSelect, onStarToggle, onEdit, onDelete }) 
       >
         <Pressable style={localStyles.modalOverlay} onPress={() => setMenuVisible(false)}>
           <View style={localStyles.menuCard}>
-            {/* Task preview */}
             <Text style={localStyles.menuTaskPreview} numberOfLines={1}>
               {task.text}
             </Text>
 
             <View style={localStyles.menuDivider} />
 
-            {/* Edit option */}
             <TouchableOpacity style={localStyles.menuItem} onPress={handleMenuEdit} activeOpacity={0.7}>
               <Ionicons name="pencil-outline" size={18} color="#323130" style={localStyles.menuIcon} />
               <Text style={localStyles.menuItemText}>Edit task</Text>
             </TouchableOpacity>
 
-            {/* Delete option */}
             <TouchableOpacity style={localStyles.menuItem} onPress={handleMenuDelete} activeOpacity={0.7}>
               <Ionicons name="trash-outline" size={18} color="#d13438" style={localStyles.menuIcon} />
               <Text style={[localStyles.menuItemText, localStyles.menuItemDestructive]}>
@@ -154,7 +161,6 @@ const TaskItem = ({ task, onToggle, onSelect, onStarToggle, onEdit, onDelete }) 
 
             <View style={localStyles.menuDivider} />
 
-            {/* Cancel */}
             <TouchableOpacity
               style={localStyles.menuItem}
               onPress={() => setMenuVisible(false)}
@@ -183,8 +189,6 @@ const localStyles = StyleSheet.create({
     padding: 4,
     marginLeft: 4,
   },
-
-  // Context menu modal
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.35)",

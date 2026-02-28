@@ -13,41 +13,49 @@ import Sidebar from "../components/SideBar";
 import MainContent from "../components/Index/MainContent";
 import RightPanel from "../components/Index/RightPanel";
 import { sidebarLists, customLists } from "../constants/Lists";
+import { Task, ListItem } from "../types";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
-const App = () => {
-  const [tasks, setTasks] = useState([
-    { id: "1", text: "Review quarterly reports",       completed: false, important: true,  myDay: true  },
-    { id: "2", text: "Call client about project update",completed: false, important: false, myDay: true  },
-    { id: "3", text: "Prepare presentation slides",     completed: false, important: true,  myDay: true  },
-    { id: "4", text: "Team meeting at 3 PM",            completed: false, important: false, myDay: false },
-    { id: "5", text: "Update project documentation",    completed: true,  important: false, myDay: false },
-    { id: "6", text: "Send weekly status report",       completed: true,  important: false, myDay: false },
+const App: React.FC = () => {
+  const [tasks, setTasks] = useState<Task[]>([
+    { id: "1", text: "Review quarterly reports",        completed: false, important: true,  myDay: true  },
+    { id: "2", text: "Call client about project update", completed: false, important: false, myDay: true  },
+    { id: "3", text: "Prepare presentation slides",      completed: false, important: true,  myDay: true  },
+    { id: "4", text: "Team meeting at 3 PM",             completed: false, important: false, myDay: false },
+    { id: "5", text: "Update project documentation",     completed: true,  important: false, myDay: false },
+    { id: "6", text: "Send weekly status report",        completed: true,  important: false, myDay: false },
   ]);
 
-  const [currentList, setCurrentList]   = useState({ name: "My Day" });
-  const [selectedTaskId, setSelectedTaskId] = useState("1");
-  const [sidebarVisible, setSidebarVisible] = useState(false);
+  const [currentList, setCurrentList]     = useState<ListItem>({ id: "1", name: "My Day", icon: "☀️", color: "#0078d4", filterKey: "myDay" });
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>("1");
+  const [sidebarVisible, setSidebarVisible] = useState<boolean>(false);
 
-  const selectedTask = tasks.find((task) => task.id === selectedTaskId);
+  const selectedTask: Task | undefined = tasks.find((task) => task.id === selectedTaskId);
 
-  //Sidebar animation
+  // Sidebar animation
   const sidebarAnim = useRef(new Animated.Value(-250)).current;
 
-  const toggleSidebar = () => {
+  const toggleSidebar = (): void => {
     if (sidebarVisible) {
-      Animated.timing(sidebarAnim, { toValue: -250, duration: 250, useNativeDriver: true })
-        .start(() => setSidebarVisible(false));
+      Animated.timing(sidebarAnim, {
+        toValue: -250,
+        duration: 250,
+        useNativeDriver: true,
+      }).start(() => setSidebarVisible(false));
     } else {
       setSidebarVisible(true);
-      Animated.timing(sidebarAnim, { toValue: 0, duration: 250, useNativeDriver: true }).start();
+      Animated.timing(sidebarAnim, {
+        toValue: 0,
+        duration: 250,
+        useNativeDriver: true,
+      }).start();
     }
   };
 
-  //Task handlers
-  const handleAddTask = (text) => {
-    const newTask = {
+  // Task handlers
+  const handleAddTask = (text: string): void => {
+    const newTask: Task = {
       id: Date.now().toString(),
       text,
       completed: false,
@@ -57,7 +65,7 @@ const App = () => {
     setTasks((prev) => [...prev, newTask]);
   };
 
-  const handleToggleTask = (taskId) => {
+  const handleToggleTask = (taskId: string): void => {
     setTasks((prev) =>
       prev.map((task) =>
         task.id === taskId ? { ...task, completed: !task.completed } : task,
@@ -65,7 +73,7 @@ const App = () => {
     );
   };
 
-  const handleStarToggle = (taskId) => {
+  const handleStarToggle = (taskId: string): void => {
     setTasks((prev) =>
       prev.map((task) =>
         task.id === taskId ? { ...task, important: !task.important } : task,
@@ -73,33 +81,29 @@ const App = () => {
     );
   };
 
-  const handleSelectTask = (taskId) => {
+  const handleSelectTask = (taskId: string): void => {
     setSelectedTaskId(taskId);
   };
 
-  //Edit: update the text of a task by id
-  const handleEditTask = (taskId, newText) => {
+  const handleEditTask = (taskId: string, newText: string): void => {
     setTasks((prev) =>
       prev.map((task) =>
         task.id === taskId ? { ...task, text: newText } : task,
       ),
     );
-    // If the right panel is showing this task, keep it selected
   };
 
-  //Delete: remove task by id
-  const handleDeleteTask = (taskId) => {
+  const handleDeleteTask = (taskId: string): void => {
     setTasks((prev) => prev.filter((task) => task.id !== taskId));
-    // Clear selection if the deleted task was selected
     if (selectedTaskId === taskId) {
       setSelectedTaskId(null);
     }
   };
 
-  //Dynamic counts for sidebar lists (recomputes whenever tasks change)
-  const getCount = (list) => {
+  // Dynamic counts for sidebar lists
+  const getCount = (list: ListItem): number => {
     switch (list.filterKey) {
-      case "myDay":     return tasks.filter((t) => t.myDay && !t.completed).length; // Only count pending tasks for badges
+      case "myDay":     return tasks.filter((t) => t.myDay && !t.completed).length;
       case "important": return tasks.filter((t) => t.important && !t.completed).length;
       case "completed": return tasks.filter((t) => t.completed).length;
       case "all":       return tasks.length;
@@ -110,10 +114,9 @@ const App = () => {
     }
   };
 
-  const liveSidebarLists = sidebarLists.map((l) => ({ ...l, count: getCount(l) }));
-  const liveCustomLists  = customLists.map((l)  => ({ ...l, count: getCount(l) }));
+  const liveSidebarLists: ListItem[] = sidebarLists.map((l) => ({ ...l, count: getCount(l) }));
+  const liveCustomLists: ListItem[]  = customLists.map((l)  => ({ ...l, count: getCount(l) }));
 
-  //Render 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0078d4" />
@@ -133,13 +136,16 @@ const App = () => {
 
         {sidebarVisible && (
           <Animated.View
-            style={[styles.animatedSidebar, { transform: [{ translateX: sidebarAnim }] }]}
+            style={[
+              styles.animatedSidebar,
+              { transform: [{ translateX: sidebarAnim }] },
+            ]}
           >
             <Sidebar
               sidebarLists={liveSidebarLists}
               customLists={liveCustomLists}
               currentList={currentList}
-              onSelectList={(list) => {
+              onSelectList={(list: ListItem) => {
                 setCurrentList(list);
                 toggleSidebar();
               }}

@@ -6,7 +6,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
   },
 
-  //Header
+  // Header
   topHeader: {
     backgroundColor: "#0078d4",
     flexDirection: "row",
@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
 
-  //Sidebar 
+  // Sidebar
   animatedSidebar: {
     position: "absolute",
     left: 0,
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 
-  //(in Sidebar)
+  // (in Sidebar)
   listsSection: {
     marginTop: 8,
     borderTopWidth: 1,
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
 
-// Main Layout
+  // Main Layout
   mainContainer: {
     flex: 1,
     flexDirection: "row",
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
 
-  //List Header
+  // List Header
   listHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
 
-  //Suggestions Banner
+  // Suggestions Banner
   suggestionsBanner: {
     flexDirection: "row",
     alignItems: "center",
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
     color: "#605e5c",
   },
 
-  //Add Task Input
+  // Add Task Input
   addTaskContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -247,9 +247,10 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
   },
 
-  //Tasks List
+  // Tasks List
   tasksContainer: {
-    paddingBottom: 32,
+    paddingHorizontal: 16,
+    paddingBottom: 40,
   },
   taskItem: {
     flexDirection: "row",
@@ -293,26 +294,20 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   sectionHeader: {
-  flexDirection: "row",
-  justifyContent: "space-between",
-  alignItems: "center",
-  paddingVertical: 12,
-  paddingHorizontal: 4,
-  marginTop: 16,
-},
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 4,
+    marginTop: 16,
+  },
+  sectionHeaderText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#444",
+  },
 
-sectionHeaderText: {
-  fontSize: 16,
-  fontWeight: "600",
-  color: "#444",
-},
-
-tasksContainer: {
-  paddingHorizontal: 16,
-  paddingBottom: 40,
-},
-
-  //Completed Section
+  // Completed Section
   completedSection: {
     marginTop: 8,
   },
@@ -330,7 +325,7 @@ tasksContainer: {
     fontWeight: "600",
   },
 
-  //Right Panel 
+  // Right Panel
   rightPanel: {
     width: 320,
     backgroundColor: "#faf9f8",
@@ -374,7 +369,7 @@ tasksContainer: {
     color: "#8a8886",
   },
 
-  //Detail Options (Right Panel rows)
+  // Detail Options (Right Panel rows)
   detailOption: {
     flexDirection: "row",
     alignItems: "center",

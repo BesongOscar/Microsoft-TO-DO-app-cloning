@@ -1,9 +1,19 @@
-import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import styles from '../../styles/styles';
+import React from "react";
+import { View, Text, TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import styles from "../../styles/styles";
 
-const Header = ({ onMenuPress, onSearchPress, onProfilePress }) => {
+interface HeaderProps {
+  onMenuPress: () => void;
+  onSearchPress: () => void;
+  onProfilePress: () => void;
+}
+
+const Header: React.FC<HeaderProps> = ({
+  onMenuPress,
+  onSearchPress,
+  onProfilePress,
+}) => {
   return (
     <View style={styles.topHeader}>
       {/* Left side: Menu + App Title */}
