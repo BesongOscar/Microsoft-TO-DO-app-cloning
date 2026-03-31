@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { Alert } from "react-native";
 import {
   User,
   onAuthStateChanged,
@@ -8,7 +9,7 @@ import {
   GoogleAuthProvider,
   signInWithCredential,
 } from "firebase/auth";
-import * as Google from "expo-google-app-auth";
+import * as WebBrowser from "expo-web-browser";
 import { auth } from "../firebase/config";
 
 interface AuthContextType {
@@ -35,6 +36,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    WebBrowser.maybeCompleteAuthSession();
+  }, []);
+
   const login = async (email: string, password: string) => {
     await signInWithEmailAndPassword(auth, email, password);
   };
@@ -48,23 +53,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const googleLogin = async () => {
-    try {
-      const result = await Google.logInAsync({
-        androidClientId: "250040465413-8kj9gkjj0l0r8l4k2l4l4l4l4l4l4l4.apps.googleusercontent.com",
-        iosClientId: "250040465413-xxxxxxxxxxxxxx.apps.googleusercontent.com",
-        scopes: ["profile", "email"],
-      });
-
-      if (result.type === "success") {
-        const credential = GoogleAuthProvider.credential(
-          result.idToken || null
-        );
-        await signInWithCredential(auth, credential);
-      }
-    } catch (error: any) {
-      console.error("Google sign in error:", error);
-      throw new Error(error.message || "Google sign in failed");
-    }
+    Alert.alert("Google Sign-In", "Google Sign-In requires additional Firebase setup. Please use email/password for now, or configure Google OAuth in Firebase Console.");
   };
 
   return (
