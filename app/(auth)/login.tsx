@@ -93,7 +93,7 @@ export default function Login() {
           <View style={styles.formContainer}>
             {/* Email Input */}
             <View style={styles.TextInputContainer}>
-              <Ionicons name="person" size={20} color={"#999"} />
+              <Ionicons name="mail" size={20} color={"#999"} />
               <TextInput
                 placeholder="Email"
                 style={styles.input}

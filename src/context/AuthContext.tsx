@@ -6,9 +6,9 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   GoogleAuthProvider,
-  signInWithRedirect,
-  getRedirectResult,
+  signInWithCredential,
 } from "firebase/auth";
+import * as Google from "expo-google-app-auth";
 import { auth } from "../firebase/config";
 
 interface AuthContextType {
@@ -35,20 +35,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => unsubscribe();
   }, []);
 
-  useEffect(() => {
-    const checkRedirectResult = async () => {
-      try {
-        const result = await getRedirectResult(auth);
-        if (result) {
-          setUser(result.user);
-        }
-      } catch (error) {
-        console.log("Redirect result error:", error);
-      }
-    };
-    checkRedirectResult();
-  }, []);
-
   const login = async (email: string, password: string) => {
     await signInWithEmailAndPassword(auth, email, password);
   };
@@ -62,8 +48,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const googleLogin = async () => {
-    const provider = new GoogleAuthProvider();
-    await signInWithRedirect(auth, provider);
+    try {
+      const result = await Google.logInAsync({
+        androidClientId: "250040465413-8kj9gkjj0l0r8l4k2l4l4l4l4l4l4l4.apps.googleusercontent.com",
+        iosClientId: "250040465413-xxxxxxxxxxxxxx.apps.googleusercontent.com",
+        scopes: ["profile", "email"],
+      });
+
+      if (result.type === "success") {
+        const credential = GoogleAuthProvider.credential(
+          result.idToken || null
+        );
+        await signInWithCredential(auth, credential);
+      }
+    } catch (error: any) {
+      console.error("Google sign in error:", error);
+      throw new Error(error.message || "Google sign in failed");
+    }
   };
 
   return (
