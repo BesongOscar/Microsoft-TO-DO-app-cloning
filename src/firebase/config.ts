@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, inMemoryPersistence } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDbT9PXXLn3xpeuPeb3dRlVO6aKroSqslo",
@@ -13,3 +13,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
+
+auth.setPersistence(inMemoryPersistence).catch((e) => {
+  console.log("Persistence error (can be ignored):", e.message);
+});
