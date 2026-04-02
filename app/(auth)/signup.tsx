@@ -14,10 +14,11 @@ import { Link } from "expo-router";
 import { useState, useEffect } from "react";
 import * as Yup from "yup";
 import { Formik } from "formik";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "src/context/AuthContext";
 import { useRouter } from "expo-router";
 
 export const signupValidationSchema = Yup.object().shape({
+  name: Yup.string().required("Name is required"),
   email: Yup.string().email("Invalid email").required("Email is required"),
   password: Yup.string()
     .min(6, "Password must be at least 6 characters")
@@ -51,10 +52,10 @@ export default function Signup() {
     );
    }
 
-  const handleSignup = async (email: string, password: string) => {
+  const handleSignup = async (email: string, password: string, name: string) => {
     try {
       setIsLoading(true);
-      await signup(email, password);
+      await signup(email, password, name);
       router.push("/main");
     } catch (error: any) {
       Alert.alert("Signup Failed", error.message || "An error occurred");
@@ -98,11 +99,12 @@ export default function Signup() {
 
       <Formik
         initialValues={{
+          name: "",
           email: "",
           password: "",
           confirmPassword: "",
         }}
-        onSubmit={(values) => handleSignup(values.email, values.password)}
+        onSubmit={(values) => handleSignup(values.email, values.password, values.name)}
         validationSchema={signupValidationSchema}
       >
         {({
@@ -114,6 +116,22 @@ export default function Signup() {
           touched,
         }) => (
           <View style={styles.formContainer}>
+            {/* Name Input */}
+            <View style={styles.TextInputContainer}>
+              <Ionicons name="person" size={20} color={"#999"} />
+              <TextInput
+                placeholder="Name"
+                style={styles.input}
+                placeholderTextColor="#999"
+                value={values.name}
+                onChangeText={handleChange("name")}
+                onBlur={handleBlur("name")}
+              />
+            </View>
+            {touched.name && errors.name && (
+              <Text style={styles.errorText}>{errors.name}</Text>
+            )}
+
             {/* Email Input */}
             <View style={styles.TextInputContainer}>
               <Ionicons name="mail" size={20} color={"#999"} />

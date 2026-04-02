@@ -1,5 +1,7 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, inMemoryPersistence } from "firebase/auth";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDbT9PXXLn3xpeuPeb3dRlVO6aKroSqslo",
@@ -13,7 +15,5 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
-
-auth.setPersistence(inMemoryPersistence).catch((e) => {
-  console.log("Persistence error (can be ignored):", e.message);
-});
+export const db = getFirestore(app);
+export const storage = getStorage(app);
