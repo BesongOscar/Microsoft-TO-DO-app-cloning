@@ -7,7 +7,6 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
-  signInWithCredential,
 } from "firebase/auth";
 import * as WebBrowser from "expo-web-browser";
 import { auth } from "../firebase/config";
@@ -28,29 +27,16 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    const restoreToken = async () => {
-      try {
-        const token = await AsyncStorage.getItem(AUTH_TOKEN_KEY);
-        if (token) {
-          console.log("Token found in storage, user should be restored by Firebase");
-        }
-      } catch (error) {
-        console.error("Error reading token:", error);
-      }
-      setInitialized(true);
-      setLoading(false);
-    };
-
-    restoreToken();
+    WebBrowser.maybeCompleteAuthSession();
   }, []);
 
   useEffect(() => {
-    if (!initialized) return;
-
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setUser(user);
+      setLoading(false);
+      
       if (user) {
         try {
           const tokenResult = await user.getIdTokenResult();
@@ -61,14 +47,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else {
         await AsyncStorage.removeItem(AUTH_TOKEN_KEY);
       }
-      setUser(user);
     });
 
     return () => unsubscribe();
-  }, [initialized]);
-
-  useEffect(() => {
-    WebBrowser.maybeCompleteAuthSession();
   }, []);
 
   const login = async (email: string, password: string) => {
