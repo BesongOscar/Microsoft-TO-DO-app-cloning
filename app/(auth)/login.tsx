@@ -11,7 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { AuthButton } from "@/components/(auth)/authButton";
 import { Link } from "expo-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "expo-router";
 import * as Yup from "yup";
 import { Formik } from "formik";
@@ -29,7 +29,21 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
-  const { login, googleLogin } = useAuth();
+  const { login, googleLogin, user, loading: authLoading } = useAuth();
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.replace("/main");
+    }
+  }, [authLoading, user]);
+
+  if (authLoading){
+    return (
+      <SafeAreaView style={styles.container}>
+        <ActivityIndicator size={"large"} color={"#0078d4"}/>
+      </SafeAreaView>
+    )
+  }
 
   const handleLogin = async (email: string, password: string) => {
     try {

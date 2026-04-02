@@ -41,7 +41,7 @@ const App: React.FC = () => {
   useEffect(() => {
     if (!authLoading && !user) {
       router.replace("/login");
-    }
+    }           ` `
   }, [authLoading, user]);
 
   if (authLoading || !user) {

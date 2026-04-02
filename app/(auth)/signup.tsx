@@ -5,12 +5,13 @@ import {
   TextInput,
   useWindowDimensions,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { AuthButton } from "@/components/(auth)/authButton";
 import { Link } from "expo-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import { useAuth } from "@/context/AuthContext";
@@ -34,7 +35,21 @@ export default function Signup() {
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
-  const { signup, googleLogin } = useAuth();
+  const { signup, googleLogin, user, loading: authLoading } = useAuth();
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.replace("/main");
+    }
+  }, [authLoading, user]);
+   
+   if (authLoading){
+    return (
+      <SafeAreaView style={styles.container}>
+        <ActivityIndicator size="large" color="#0078d4" />
+      </SafeAreaView>
+    );
+   }
 
   const handleSignup = async (email: string, password: string) => {
     try {
