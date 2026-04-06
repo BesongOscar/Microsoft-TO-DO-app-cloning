@@ -16,6 +16,7 @@ import Header from "../components/Index/header";
 import Sidebar from "../components/SideBar";
 import MainContent from "../components/Index/MainContent";
 import RightPanel from "../components/Index/RightPanel";
+import BottomSheet from "../components/Index/BottomSheet";
 import { sidebarLists } from "../constants/Lists";
 import { ListItem } from "../types";
 import { useTasks } from "../context/TasksContext";
@@ -226,37 +227,41 @@ const App: React.FC = () => {
         )}
 
         <Pressable onPress={Keyboard.dismiss} style={{ flex: 1 }}>
-          <View style={{ flex: 1, flexDirection: "row" }}>
-            <MainContent
-              currentList={
-                searchVisible
-                  ? {
-                      id: "search",
-                      name: "Search Results",
-                      icon: "🔍",
-                      color: "#0078d4",
-                      filterKey: "all",
-                    }
-                  : currentList
-              }
-              tasks={searchVisible ? filteredTasks : tasks}
-              onAddTask={handleAddTask}
-              onToggleTask={handleToggleTask}
-              onSelectTask={handleSelectTask}
-              onStarToggle={handleStarToggle}
-              onEdit={handleEditTask}
-              onDelete={handleDeleteTask}
-              refreshing={refreshing}
-              onRefresh={refreshTasks}
-            />
+          <MainContent
+            currentList={
+              searchVisible
+                ? {
+                    id: "search",
+                    name: "Search Results",
+                    icon: "🔍",
+                    color: "#0078d4",
+                    filterKey: "all",
+                  }
+                : currentList
+            }
+            tasks={searchVisible ? filteredTasks : tasks}
+            onAddTask={handleAddTask}
+            onToggleTask={handleToggleTask}
+            onSelectTask={handleSelectTask}
+            onStarToggle={handleStarToggle}
+            onEdit={handleEditTask}
+            onDelete={handleDeleteTask}
+            refreshing={refreshing}
+            onRefresh={refreshTasks}
+          />
 
-            {selectedTaskId && tasks.find((t) => t.id === selectedTaskId) && (
+          <BottomSheet
+            visible={!!selectedTaskId}
+            onClose={() => setSelectedTaskId(null)}
+          >
+            {selectedTask && (
               <RightPanel
-                selectedTask={tasks.find((t) => t.id === selectedTaskId)!}
+                selectedTask={selectedTask}
                 onClose={() => setSelectedTaskId(null)}
+                onUpdateTask={updateTask}
               />
             )}
-          </View>
+          </BottomSheet>
         </Pressable>
       </View>
     </SafeAreaView>

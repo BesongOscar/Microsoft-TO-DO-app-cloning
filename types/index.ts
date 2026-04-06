@@ -1,4 +1,6 @@
 // ─── Task ─────────────────────────────────────────────────────────────────────
+export type RepeatType = "none" | "daily" | "weekly" | "monthly" | "yearly";
+
 export interface Task {
   id: string;
   text: string;
@@ -7,6 +9,9 @@ export interface Task {
   myDay: boolean;
   dueDate?: string;
   listId?: string;
+  reminder?: string;
+  repeat?: RepeatType;
+  note?: string;
 }
 
 // ─── List ─────────────────────────────────────────────────────────────────────
