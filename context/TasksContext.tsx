@@ -11,10 +11,8 @@ import { Task, TaskCounts } from "../types";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "src/firebase/config";
 
-// ─── Storage key ──────────────────────────────────────────────────────────────
 const STORAGE_KEY = (uid: string) => "@tasks_${uid}";
 
-// ─── Default seed data (only used on very first launch) ───────────────────────
 const DEFAULT_TASKS: Task[] = [
   {
     id: "1",
@@ -60,7 +58,6 @@ const DEFAULT_TASKS: Task[] = [
   },
 ];
 
-// ─── Context shape ────────────────────────────────────────────────────────────
 interface TasksContextValue {
   tasks: Task[];
   loading: boolean;
@@ -71,13 +68,12 @@ interface TasksContextValue {
   toggleImportant: (taskId: string) => void;
   deleteTask: (taskId: string) => void;
   updateTask: (taskId: string, updates: Partial<Task>) => void;
+  deleteTasksByListId: (listId: string) => void;
   refreshTasks: () => Promise<void>;
 }
 
-// ─── Context ──────────────────────────────────────────────────────────────────
 const TasksContext = createContext<TasksContextValue | null>(null);
 
-// ─── Provider ─────────────────────────────────────────────────────────────────
 export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
@@ -86,7 +82,6 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
-  // ── Track the signed-in user ──────────────────────────────────────────────
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
@@ -94,13 +89,11 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
     return () => unsubscribe();
   }, []);
 
-  // Load tasks whenever the user changes (including on first mount)
   useEffect(() => {
     const loadTasks = async (): Promise<void> => {
       setLoading(true);
       try {
         if (!currentUser) {
-          // No user signed in — clear tasks so nothing leaks between accounts.
           setTasks([]);
           return;
         }
@@ -112,7 +105,6 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
           const parsed = JSON.parse(stored) as Task[];
           setTasks(Array.isArray(parsed) ? parsed : []);
         } else {
-          // First time this user logs in — start with an empty list.
           setTasks([]);
           await AsyncStorage.setItem(key, JSON.stringify([]));
         }
@@ -127,7 +119,6 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
     loadTasks();
   }, [currentUser]);
 
-  //Persist to AsyncStorage whenever tasks change (after initial load)
   useEffect(() => {
     if (loading || !currentUser) return;
     const key = STORAGE_KEY(currentUser.uid);
@@ -135,8 +126,6 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
       console.warn("Failed to persist tasks:", e),
     );
   }, [tasks, loading, currentUser]);
-
-  // ── Task actions ─────────────────────────────────────────────────────────
 
   const addTask = useCallback(
     (text: string, listName = "My Day", listId?: string): void => {
@@ -173,6 +162,10 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
     setTasks((prev) => prev.filter((t) => t.id !== taskId));
   }, []);
 
+  const deleteTasksByListId = useCallback((listId: string): void => {
+    setTasks((prev) => prev.filter((t) => t.listId !== listId));
+  }, []);
+
   const updateTask = useCallback(
     (taskId: string, updates: Partial<Task>): void => {
       setTasks((prev) =>
@@ -201,7 +194,6 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [currentUser]);
 
-  // ── Derived counts ───────────────────────────────────────────────────────
   const counts = useMemo<TaskCounts>(
     () => ({
       myDay: tasks.filter((t) => t.myDay && !t.completed).length,
@@ -224,6 +216,7 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
     toggleTask,
     toggleImportant,
     deleteTask,
+    deleteTasksByListId,
     updateTask,
     refreshTasks,
   };
@@ -233,7 +226,6 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-// ─── Hook ─────────────────────────────────────────────────────────────────────
 export const useTasks = (): TasksContextValue => {
   const ctx = useContext(TasksContext);
   if (!ctx) {

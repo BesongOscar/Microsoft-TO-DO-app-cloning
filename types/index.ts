@@ -37,3 +37,11 @@ export interface TaskCounts {
   all: number;
   tasks: number;
 }
+
+export interface CustomList{
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  createdAt: number;
+}

@@ -3,13 +3,14 @@ import { View, FlatList, ScrollView } from "react-native";
 import styles from "../styles/styles";
 import ListsSection from "./ListsSection";
 import { SidebarItem } from "./SideBarItem";
-import { ListItem } from "../types";
+import { ListItem, CustomList } from "../types";
 
 interface SidebarProps {
   sidebarLists: ListItem[];
-  customLists: ListItem[];
+  customLists: CustomList[];
   currentList: ListItem | null;
   onSelectList: (item: ListItem) => void;
+  onDeleteList?: (listId: string) => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -17,11 +18,11 @@ const Sidebar: React.FC<SidebarProps> = ({
   customLists,
   currentList,
   onSelectList,
+  onDeleteList,
 }) => {
   return (
     <View style={styles.sidebar}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Default / built-in lists */}
         <FlatList
           data={sidebarLists}
           keyExtractor={(item) => item.id}
@@ -35,11 +36,11 @@ const Sidebar: React.FC<SidebarProps> = ({
           scrollEnabled={false}
         />
 
-        {/* User-created custom lists */}
         <ListsSection
           customLists={customLists}
           currentList={currentList}
           onSelectList={onSelectList}
+          onDeleteList={onDeleteList}
         />
       </ScrollView>
     </View>

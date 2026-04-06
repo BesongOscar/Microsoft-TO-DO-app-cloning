@@ -411,6 +411,122 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#323130",
   },
+
+  // Custom List Modal
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "flex-end",
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    maxHeight: "80%",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+  },
+  modalTitle: {
+    fontSize: 17,
+    fontWeight: "600",
+    color: "#323130",
+  },
+  modalCancelText: {
+    fontSize: 17,
+    color: "#605e5c",
+  },
+  modalSaveText: {
+    fontSize: 17,
+    color: "#0078d4",
+    fontWeight: "600",
+  },
+  modalBody: {
+    padding: 16,
+  },
+  listPreview: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
+    backgroundColor: "#f8f9fa",
+    borderRadius: 12,
+    marginBottom: 20,
+  },
+  listPreviewIcon: {
+    fontSize: 28,
+    marginRight: 12,
+  },
+  listPreviewName: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#323130",
+  },
+  inputLabel: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#605e5c",
+    marginBottom: 8,
+    textTransform: "uppercase",
+  },
+  listNameInput: {
+    borderWidth: 1,
+    borderColor: "#e1dfdd",
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    color: "#323130",
+    marginBottom: 20,
+  },
+  emojiGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginBottom: 20,
+  },
+  emojiOption: {
+    width: 44,
+    height: 44,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 8,
+    margin: 2,
+  },
+  emojiOptionSelected: {
+    backgroundColor: "#f0f0f0",
+  },
+  emojiText: {
+    fontSize: 24,
+  },
+  colorRow: {
+    flexDirection: "row",
+    marginBottom: 20,
+  },
+  colorCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    marginRight: 12,
+  },
+  colorCircleSelected: {
+    borderWidth: 3,
+    borderColor: "#323130",
+  },
+  deleteListButton: {
+    backgroundColor: "#fef0f0",
+    padding: 14,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 10,
+  },
+  deleteListText: {
+    color: "#d13438",
+    fontSize: 16,
+    fontWeight: "600",
+  },
 });
 
 export default styles;

@@ -16,10 +16,11 @@ import Header from "../components/Index/header";
 import Sidebar from "../components/SideBar";
 import MainContent from "../components/Index/MainContent";
 import RightPanel from "../components/Index/RightPanel";
-import { sidebarLists, customLists } from "../constants/Lists";
+import { sidebarLists } from "../constants/Lists";
 import { ListItem } from "../types";
 import { useTasks } from "../context/TasksContext";
 import { useAuth } from "../src/context/AuthContext";
+import { useCustomLists } from "../context/CustomListsContext";
 
 const App: React.FC = () => {
   const {
@@ -31,14 +32,16 @@ const App: React.FC = () => {
     toggleTask,
     toggleImportant,
     deleteTask,
+    deleteTasksByListId,
     updateTask,
     refreshTasks,
   } = useTasks();
 
+  const { customLists, deleteList } = useCustomLists();
+
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
 
-  // ── ALL hooks must be declared before any conditional return ──────────────
   const [currentList, setCurrentList] = useState<ListItem>({
     id: "1",
     name: "My Day",
@@ -59,7 +62,6 @@ const App: React.FC = () => {
     }
   }, [authLoading, user]);
 
-  // ── Early returns AFTER all hooks ─────────────────────────────────────────
   if (authLoading || !user) {
     return (
       <SafeAreaView style={styles.container}>
@@ -80,7 +82,6 @@ const App: React.FC = () => {
     );
   }
 
-  // ── Derived values ────────────────────────────────────────────────────────
   const selectedTask = tasks.find((task) => task.id === selectedTaskId);
 
   const toggleSidebar = (): void => {
@@ -129,6 +130,11 @@ const App: React.FC = () => {
     }
   };
 
+  const handleDeleteListWithTasks = (listId: string): void => {
+    deleteTasksByListId(listId);
+    deleteList(listId);
+  };
+
   const getCount = (list: ListItem): number => {
     switch (list.filterKey) {
       case "myDay":
@@ -154,16 +160,13 @@ const App: React.FC = () => {
     ...l,
     count: getCount(l),
   }));
-  const liveCustomLists: ListItem[] = customLists.map((l) => ({
-    ...l,
-    count: getCount(l),
-  }));
 
   const filteredTasks = searchQuery
     ? tasks.filter((t) =>
         t.text.toLowerCase().includes(searchQuery.toLowerCase()),
       )
     : tasks;
+
   return (
     <SafeAreaView style={styles.container}>
       {searchVisible ? (
@@ -211,12 +214,13 @@ const App: React.FC = () => {
           >
             <Sidebar
               sidebarLists={liveSidebarLists}
-              customLists={liveCustomLists}
+              customLists={customLists}
               currentList={currentList}
               onSelectList={(list: ListItem) => {
                 setCurrentList(list);
                 toggleSidebar();
               }}
+              onDeleteList={handleDeleteListWithTasks}
             />
           </Animated.View>
         )}
