@@ -18,8 +18,8 @@ const EMOJI_OPTIONS = [
 ];
 
 const COLOR_OPTIONS = [
-  "#8764b8", "#00bcf2", "#0078d4", "#107c10",
-  "#d83b01", "#5c2d91", "#e81123", "#ff8c00",
+  "#5b5ea6", "#e8a87c", "#0078d4", "#107c10",
+  "#e74c3c", "#9b59b6", "#1abc9c", "#34495e",
 ];
 
 interface CustomListModalProps {
@@ -68,7 +68,15 @@ const CustomListModal: React.FC<CustomListModalProps> = ({
       "This will also delete all tasks in this list. This cannot be undone.",
       [
         { text: "Cancel", style: "cancel" },
-        { text: "Delete", style: "destructive", onPress: onDelete },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => {
+            // Fix: close the modal after confirming deletion
+            onDelete?.();
+            onClose();
+          },
+        },
       ]
     );
   };
