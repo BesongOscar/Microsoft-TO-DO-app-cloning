@@ -1,21 +1,23 @@
 import {
+  StyleSheet,
   Text,
   View,
   TextInput,
   useWindowDimensions,
   Alert,
   ActivityIndicator,
+  TouchableOpacity,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { AuthButton } from "@/components/(auth)/authButton";
 import { Link } from "expo-router";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "expo-router";
 import * as Yup from "yup";
 import { Formik } from "formik";
-import { useAuth } from "src/context/AuthContext";
-import { loginStyles } from "../../styles/(auth)/login";
+import { useAuth } from "@/context/AuthContext";
+import { loginStyles as styles } from "styles/(auth)/login";
 
 export const loginValidationSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Email is required"),
@@ -29,21 +31,7 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
-  const { login, googleLogin, user, loading: authLoading } = useAuth();
-
-  useEffect(() => {
-    if (!authLoading && user) {
-      router.replace("/main");
-    }
-  }, [authLoading, user]);
-
-  if (authLoading){
-    return (
-      <SafeAreaView style={loginStyles.container}>
-        <ActivityIndicator size={"large"} color={"#0078d4"}/>
-      </SafeAreaView>
-    )
-  }
+  const { login, googleLogin } = useAuth();
 
   const handleLogin = async (email: string, password: string) => {
     try {
@@ -70,11 +58,11 @@ export default function Login() {
   };
 
   return (
-    <SafeAreaView edges={["top", "bottom"]} style={loginStyles.container}>
-      <View style={loginStyles.imageContainer}>
+    <SafeAreaView edges={["top", "bottom"]} style={styles.container}>
+      <View style={styles.imageContainer}>
         <View
           style={[
-            loginStyles.iconCircle,
+            styles.iconCircle,
             {
               width: imageSize,
               height: imageSize,
@@ -85,8 +73,8 @@ export default function Login() {
           <Ionicons name="log-in" size={imageSize * 0.4} color="#fff" />
         </View>
       </View>
-      <Text style={loginStyles.title}>Welcome Back</Text>
-      <Text style={loginStyles.subtitle}>Sign in to continue to your account</Text>
+      <Text style={styles.title}>Welcome Back</Text>
+      <Text style={styles.subtitle}>Sign in to continue to your account</Text>
 
       <Formik
         initialValues={{
@@ -104,12 +92,13 @@ export default function Login() {
           touched,
           errors,
         }) => (
-          <View style={loginStyles.formContainer}>
-            <View style={loginStyles.textInputContainer}>
+          <View style={styles.formContainer}>
+            {/* Email Input */}
+            <View style={styles.textInputContainer}>
               <Ionicons name="mail" size={20} color={"#999"} />
               <TextInput
                 placeholder="Email"
-                style={loginStyles.input}
+                style={styles.input}
                 placeholderTextColor="#999"
                 value={values.email}
                 onChangeText={handleChange("email")}
@@ -119,12 +108,13 @@ export default function Login() {
               />
             </View>
             {touched.email && errors.email && (
-              <Text style={loginStyles.errorText}>{errors.email}</Text>
+              <Text style={styles.errorText}>{errors.email}</Text>
             )}
 
+            {/* Password Input */}
             <View
               style={[
-                loginStyles.textInputContainer,
+                styles.textInputContainer,
                 { justifyContent: "space-between" },
               ]}
             >
@@ -134,7 +124,7 @@ export default function Login() {
                 <Ionicons name="lock-closed" size={20} color={"#999"} />
                 <TextInput
                   placeholder="Password"
-                  style={loginStyles.input}
+                  style={styles.input}
                   placeholderTextColor="#999"
                   value={values.password}
                   onChangeText={handleChange("password")}
@@ -150,7 +140,7 @@ export default function Login() {
               />
             </View>
             {touched.password && errors.password && (
-              <Text style={loginStyles.errorText}>{errors.password}</Text>
+              <Text style={styles.errorText}>{errors.password}</Text>
             )}
 
             <AuthButton
@@ -163,8 +153,9 @@ export default function Login() {
           </View>
         )}
       </Formik>
-
-      <Text style={loginStyles.orText}>Or</Text>
+      
+      V
+      <Text style={styles.orText}>Or</Text>
 
       <AuthButton
         text="Sign In with Google"
@@ -174,12 +165,17 @@ export default function Login() {
         onPress={handleGoogleLogin}
       />
 
-      <Text style={loginStyles.linkText}>
+      <TouchableOpacity onPress={() => router.push("/forgotPassword")}>
+        <Text style={styles.forgotText}>Forgot Password?</Text>
+      </TouchableOpacity>
+
+      <Text style={styles.linkText}>
         Don't have an account?{" "}
-        <Link href="/signup" style={loginStyles.link}>
+        <Link href="/signup" style={styles.link}>
           Signup
         </Link>
       </Text>
     </SafeAreaView>
   );
 }
+

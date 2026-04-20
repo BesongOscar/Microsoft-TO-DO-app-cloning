@@ -1,6 +1,6 @@
-export const fontReg = 'Poppins_400Regular';
-export const fontSemi = 'Poppins_600SemiBold';
-export const fontBold = 'Poppins_700Bold';
+export const fontReg = 'Poppins-Regular';
+export const fontSemi = 'Poppins-SemiBold';
+export const fontBold = 'Poppins-Bold';
 
 export const colors = {
   primary: '#0078d4',

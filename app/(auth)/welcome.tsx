@@ -4,7 +4,7 @@ import { AuthButton } from "@/components/(auth)/authButton";
 import { welcomeStyles } from "../../styles/(auth)/welcome";
 import { useRouter } from "expo-router";
 
-const placeholder = require("../../assets/getStarted.png")
+const placeholder = require("../../assets/getStarted.png");
 
 export default function Welcome() {
   const router = useRouter();
@@ -12,7 +12,7 @@ export default function Welcome() {
     <SafeAreaView edges={["top", "bottom"]} style={welcomeStyles.container}>
       <Image source={placeholder} style={welcomeStyles.image} />
       <View style={welcomeStyles.textContainer}>
-        <Text style={welcomeStyles.title}>Lets Get Started</Text>
+        <Text style={welcomeStyles.title}>Let's Get Started</Text>
         <Text style={welcomeStyles.subtitle}>
           Reliable and Efficient task management Application
         </Text>

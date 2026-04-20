@@ -78,6 +78,8 @@ export const CustomListsProvider: React.FC<{ children: React.ReactNode }> = ({
       id: `list-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       name: name.trim(),
       icon,
+      color: "#0078d4",
+      taskCount: 0,
       createdAt: Date.now(),
     };
     setCustomLists((prev) => [newList, ...prev]);

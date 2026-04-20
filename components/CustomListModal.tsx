@@ -13,9 +13,30 @@ import { customListModalStyles } from "../styles/components/CustomListModal";
 import { CustomList } from "../types";
 
 const EMOJI_OPTIONS = [
-  "📋", "🏠", "💼", "🎯", "📚", "🎮", "🎨", "🎵",
-  "🏋️", "🛒", "💰", "✈️", "🍕", "💊", "📞", "🔧",
-  "🌟", "❤️", "🔥", "💡", "📷", "🎬", "🏆", "🎁",
+  "📋",
+  "🏠",
+  "💼",
+  "🎯",
+  "📚",
+  "🎮",
+  "🎨",
+  "🎵",
+  "🏋️",
+  "🛒",
+  "💰",
+  "✈️",
+  "🍕",
+  "💊",
+  "📞",
+  "🔧",
+  "🌟",
+  "❤️",
+  "🔥",
+  "💡",
+  "📷",
+  "🎬",
+  "🏆",
+  "🎁",
 ];
 
 interface CustomListModalProps {
@@ -69,12 +90,17 @@ const CustomListModal: React.FC<CustomListModalProps> = ({
             onClose();
           },
         },
-      ]
+      ],
     );
   };
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onRequestClose={onClose}
+    >
       <View style={modalCommonStyles.modalOverlay}>
         <View style={modalCommonStyles.modalContent}>
           <View style={modalCommonStyles.modalHeader}>
@@ -92,7 +118,9 @@ const CustomListModal: React.FC<CustomListModalProps> = ({
           <ScrollView style={modalCommonStyles.modalBody}>
             <View style={customListModalStyles.listPreview}>
               <Text style={customListModalStyles.listPreviewIcon}>{icon}</Text>
-              <Text style={customListModalStyles.listPreviewName}>{name || "List Name"}</Text>
+              <Text style={customListModalStyles.listPreviewName}>
+                {name || "List Name"}
+              </Text>
             </View>
 
             <Text style={customListModalStyles.inputLabel}>Name</Text>
@@ -110,7 +138,10 @@ const CustomListModal: React.FC<CustomListModalProps> = ({
               {EMOJI_OPTIONS.map((emoji, i) => (
                 <TouchableOpacity
                   key={i}
-                  style={[customListModalStyles.emojiOption, icon === emoji && customListModalStyles.emojiOptionSelected]}
+                  style={[
+                    customListModalStyles.emojiOption,
+                    icon === emoji && customListModalStyles.emojiOptionSelected,
+                  ]}
                   onPress={() => setIcon(emoji)}
                 >
                   <Text style={customListModalStyles.emojiText}>{emoji}</Text>
@@ -119,8 +150,13 @@ const CustomListModal: React.FC<CustomListModalProps> = ({
             </View>
 
             {initialData && onDelete && (
-              <TouchableOpacity style={customListModalStyles.deleteListButton} onPress={handleDelete}>
-                <Text style={customListModalStyles.deleteListText}>Delete List</Text>
+              <TouchableOpacity
+                style={customListModalStyles.deleteListButton}
+                onPress={handleDelete}
+              >
+                <Text style={customListModalStyles.deleteListText}>
+                  Delete List
+                </Text>
               </TouchableOpacity>
             )}
           </ScrollView>

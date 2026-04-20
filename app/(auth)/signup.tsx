@@ -1,24 +1,23 @@
 import {
+  StyleSheet,
   Text,
   View,
   TextInput,
   useWindowDimensions,
   Alert,
-  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { AuthButton } from "@/components/(auth)/authButton";
 import { Link } from "expo-router";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import * as Yup from "yup";
 import { Formik } from "formik";
-import { useAuth } from "src/context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "expo-router";
-import { signupStyles } from "../../styles/(auth)/signup";
+import { signupStyles as styles } from "styles/(auth)/signup";
 
 export const signupValidationSchema = Yup.object().shape({
-  name: Yup.string().required("Name is required"),
   email: Yup.string().email("Invalid email").required("Email is required"),
   password: Yup.string()
     .min(6, "Password must be at least 6 characters")
@@ -36,27 +35,13 @@ export default function Signup() {
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
-  const { signup, googleLogin, user, loading: authLoading } = useAuth();
+  const { signup, googleLogin } = useAuth();
 
-  useEffect(() => {
-    if (!authLoading && user) {
-      router.replace("/main");
-    }
-  }, [authLoading, user]);
-   
-   if (authLoading){
-     return (
-       <SafeAreaView style={signupStyles.container}>
-         <ActivityIndicator size="large" color="#0078d4" />
-       </SafeAreaView>
-     );
-    }
-
-  const handleSignup = async (email: string, password: string, name: string) => {
+  const handleSignup = async (email: string, password: string) => {
     try {
       setIsLoading(true);
-      await signup(email, password, name);
-      router.push("/main");
+      await signup(email, password);
+      router.push("/emailVerification");
     } catch (error: any) {
       Alert.alert("Signup Failed", error.message || "An error occurred");
     } finally {
@@ -68,7 +53,7 @@ export default function Signup() {
     try {
       setIsLoading(true);
       await googleLogin();
-      router.push("/main");
+      router.push("/emailVerification");
     } catch (error: any) {
       Alert.alert("Google Signup Failed", error.message || "An error occurred");
     } finally {
@@ -77,11 +62,11 @@ export default function Signup() {
   };
 
   return (
-    <SafeAreaView edges={["top", "bottom"]} style={signupStyles.container}>
-      <View style={signupStyles.imageContainer}>
+    <SafeAreaView edges={["top", "bottom"]} style={styles.container}>
+      <View style={styles.imageContainer}>
         <View
           style={[
-            signupStyles.iconCircle,
+            styles.iconCircle,
             {
               width: imageSize,
               height: imageSize,
@@ -92,9 +77,9 @@ export default function Signup() {
           <Ionicons name="person-add" size={imageSize * 0.4} color="#fff" />
         </View>
       </View>
-      <Text style={signupStyles.title}>Sign Up</Text>
-      <Text style={signupStyles.subtitle}>
-        Let's Get Started, fill with your credentials
+      <Text style={styles.title}>Sign Up</Text>
+      <Text style={styles.subtitle}>
+        Please enter the code we just sent to your email
       </Text>
 
       <Formik
@@ -104,7 +89,7 @@ export default function Signup() {
           password: "",
           confirmPassword: "",
         }}
-        onSubmit={(values) => handleSignup(values.email, values.password, values.name)}
+        onSubmit={(values) => handleSignup(values.email, values.password)}
         validationSchema={signupValidationSchema}
       >
         {({
@@ -115,12 +100,12 @@ export default function Signup() {
           errors,
           touched,
         }) => (
-          <View style={signupStyles.formContainer}>
-            <View style={signupStyles.textInputContainer}>
+          <View style={styles.formContainer}>
+            <View style={styles.textInputContainer}>
               <Ionicons name="person" size={20} color={"#999"} />
               <TextInput
                 placeholder="Name"
-                style={signupStyles.input}
+                style={styles.input}
                 placeholderTextColor="#999"
                 value={values.name}
                 onChangeText={handleChange("name")}
@@ -128,14 +113,14 @@ export default function Signup() {
               />
             </View>
             {touched.name && errors.name && (
-              <Text style={signupStyles.errorText}>{errors.name}</Text>
+              <Text style={styles.errorText}>{errors.name}</Text>
             )}
-
-            <View style={signupStyles.textInputContainer}>
+            {/* Email Input */}
+            <View style={styles.textInputContainer}>
               <Ionicons name="mail" size={20} color={"#999"} />
               <TextInput
                 placeholder="Email"
-                style={signupStyles.input}
+                style={styles.input}
                 placeholderTextColor="#999"
                 value={values.email}
                 onChangeText={handleChange("email")}
@@ -145,12 +130,13 @@ export default function Signup() {
               />
             </View>
             {touched.email && errors.email && (
-              <Text style={signupStyles.errorText}>{errors.email}</Text>
+              <Text style={styles.errorText}>{errors.email}</Text>
             )}
 
+            {/* Password Input */}
             <View
               style={[
-                signupStyles.textInputContainer,
+                styles.textInputContainer,
                 { justifyContent: "space-between" },
               ]}
             >
@@ -160,7 +146,7 @@ export default function Signup() {
                 <Ionicons name="lock-closed" size={20} color={"#999"} />
                 <TextInput
                   placeholder="Password"
-                  style={signupStyles.input}
+                  style={styles.input}
                   placeholderTextColor="#999"
                   value={values.password}
                   onChangeText={handleChange("password")}
@@ -176,12 +162,13 @@ export default function Signup() {
               />
             </View>
             {touched.password && errors.password && (
-              <Text style={signupStyles.errorText}>{errors.password}</Text>
+              <Text style={styles.errorText}>{errors.password}</Text>
             )}
 
+            {/* Confirm Password Input */}
             <View
               style={[
-                signupStyles.textInputContainer,
+                styles.textInputContainer,
                 { justifyContent: "space-between" },
               ]}
             >
@@ -191,7 +178,7 @@ export default function Signup() {
                 <Ionicons name="lock-closed" size={20} color={"#999"} />
                 <TextInput
                   placeholder="Confirm Password"
-                  style={signupStyles.input}
+                  style={styles.input}
                   value={values.confirmPassword}
                   placeholderTextColor="#999"
                   onChangeText={handleChange("confirmPassword")}
@@ -207,7 +194,7 @@ export default function Signup() {
               />
             </View>
             {touched.confirmPassword && errors.confirmPassword && (
-              <Text style={signupStyles.errorText}>{errors.confirmPassword}</Text>
+              <Text style={styles.errorText}>{errors.confirmPassword}</Text>
             )}
 
             <AuthButton
@@ -221,7 +208,18 @@ export default function Signup() {
         )}
       </Formik>
 
-      <Text style={signupStyles.orText}>Or</Text>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 10,
+        }}
+      >
+        <View style={styles.seperator} />
+        <Text style={styles.orText}>Or</Text>
+        <View style={styles.seperator} />
+      </View>
 
       <AuthButton
         text="Sign Up with Google"
@@ -231,9 +229,9 @@ export default function Signup() {
         onPress={handleGoogleSignup}
       />
 
-      <Text style={signupStyles.linkText}>
+      <Text style={styles.linkText}>
         Already have an account?{" "}
-        <Link href="/login" style={signupStyles.link}>
+        <Link href="/login" style={styles.link}>
           Login
         </Link>
       </Text>

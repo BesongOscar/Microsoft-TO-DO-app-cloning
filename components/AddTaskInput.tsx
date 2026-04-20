@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, TextInput, TouchableOpacity, Text } from "react-native";
-import { addTaskInputStyles } from "../styles/components/AddTaskInput";
+import { addTaskInputStyles as styles } from "../styles/components/AddTaskInput";
 
 interface AddTaskInputProps {
   onAddTask: (text: string) => void;
@@ -17,9 +17,9 @@ const AddTaskInput: React.FC<AddTaskInputProps> = ({ onAddTask }) => {
   };
 
   return (
-    <View style={addTaskInputStyles.addTaskContainer}>
+    <View style={styles.addTaskContainer}>
       <TextInput
-        style={addTaskInputStyles.addTaskInput}
+        style={styles.addTaskInput}
         placeholder="Add a task"
         placeholderTextColor="#8a8886"
         value={taskText}
@@ -27,8 +27,8 @@ const AddTaskInput: React.FC<AddTaskInputProps> = ({ onAddTask }) => {
         onSubmitEditing={handleAddTask}
         returnKeyType="done"
       />
-      <TouchableOpacity style={addTaskInputStyles.addTaskButton} onPress={handleAddTask}>
-        <Text style={addTaskInputStyles.addTaskIcon}>+</Text>
+      <TouchableOpacity style={styles.addTaskButton} onPress={handleAddTask}>
+        <Text style={styles.addTaskIcon}>+</Text>
       </TouchableOpacity>
     </View>
   );

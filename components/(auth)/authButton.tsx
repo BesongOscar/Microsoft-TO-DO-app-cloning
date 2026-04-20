@@ -1,6 +1,5 @@
 import { TouchableOpacity } from "react-native";
 import { Text, StyleSheet } from "react-native";
-import { fontReg, fontBold } from "styles/common";
 
 type AuthButtonProps = {
   text: string;
@@ -50,6 +49,5 @@ const styles = StyleSheet.create({
   buttonText: {
     fontWeight: "500",
     fontSize: 14,
-    fontFamily: fontReg,
   },
 });

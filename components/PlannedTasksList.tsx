@@ -21,17 +21,19 @@ interface TaskGroup {
   isOverdue?: boolean;
 }
 
-const getDateCategory = (dateStr: string): { category: string; isOverdue: boolean } => {
+const getDateCategory = (
+  dateStr: string,
+): { category: string; isOverdue: boolean } => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const taskDate = new Date(dateStr);
   taskDate.setHours(0, 0, 0, 0);
-  
+
   const diffTime = taskDate.getTime() - today.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
+
   const isOverdue = diffDays < 0;
-  
+
   if (diffDays === 0) return { category: "Today", isOverdue: false };
   if (diffDays === 1) return { category: "Tomorrow", isOverdue: false };
   if (diffDays === 2) return { category: "This Week", isOverdue: false };
@@ -43,14 +45,14 @@ const getDateCategory = (dateStr: string): { category: string; isOverdue: boolea
 const groupTasksByDate = (tasks: Task[]): TaskGroup[] => {
   const groups: { [key: string]: Task[] } = {};
   const overdueTasks: Task[] = [];
-  
+
   const pendingTasks = tasks.filter((t) => !t.completed);
   const completedTasks = tasks.filter((t) => t.completed);
-  
+
   pendingTasks.forEach((task) => {
     if (!task.dueDate) return;
     const { category, isOverdue } = getDateCategory(task.dueDate);
-    
+
     if (isOverdue) {
       overdueTasks.push(task);
     } else {
@@ -58,24 +60,31 @@ const groupTasksByDate = (tasks: Task[]): TaskGroup[] => {
       groups[category].push(task);
     }
   });
-  
-  const orderedCategories = ["Overdue", "Today", "Tomorrow", "This Week", "Next Week", "Later"];
+
+  const orderedCategories = [
+    "Overdue",
+    "Today",
+    "Tomorrow",
+    "This Week",
+    "Next Week",
+    "Later",
+  ];
   const result: TaskGroup[] = [];
-  
+
   if (overdueTasks.length > 0) {
     result.push({ title: "Overdue", tasks: overdueTasks, isOverdue: true });
   }
-  
+
   orderedCategories.slice(1).forEach((category) => {
     if (groups[category]?.length > 0) {
       result.push({ title: category, tasks: groups[category] });
     }
   });
-  
+
   if (completedTasks.length > 0) {
     result.push({ title: "Completed", tasks: completedTasks });
   }
-  
+
   return result;
 };
 
@@ -115,10 +124,13 @@ const PlannedTasksList: React.FC<PlannedTasksListProps> = ({
               ]}
             >
               {group.title}
-              <Text style={plannedTasksListStyles.sectionCount}> ({group.tasks.length})</Text>
+              <Text style={plannedTasksListStyles.sectionCount}>
+                {" "}
+                ({group.tasks.length})
+              </Text>
             </Text>
           </View>
-          
+
           {group.tasks.map((task) => (
             <View key={task.id} style={plannedTasksListStyles.taskWrapper}>
               <TaskItem

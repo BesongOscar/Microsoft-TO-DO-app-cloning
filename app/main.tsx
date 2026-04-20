@@ -9,19 +9,16 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useState, useRef, useEffect } from "react";
+import  { useState, useRef, useEffect } from "react";
 import { useRouter } from "expo-router";
-import { mainStyles } from "../styles/app/main";
 import Header from "../components/Index/header";
 import Sidebar from "../components/SideBar";
 import MainContent from "../components/Index/MainContent";
 import RightPanel from "../components/Index/RightPanel";
-import BottomSheet from "../components/Index/BottomSheet";
-import { sidebarLists } from "../constants/Lists";
+import { sidebarLists, customLists } from "../constants/Lists";
 import { ListItem } from "../types";
 import { useTasks } from "../context/TasksContext";
-import { useAuth } from "../src/context/AuthContext";
-import { useCustomLists } from "../context/CustomListsContext";
+import { mainStyles as styles } from "../styles/app/main";
 
 const App: React.FC = () => {
   const {
@@ -33,16 +30,11 @@ const App: React.FC = () => {
     toggleTask,
     toggleImportant,
     deleteTask,
-    deleteTasksByListId,
     updateTask,
     refreshTasks,
   } = useTasks();
 
-  const { customLists, deleteList } = useCustomLists();
-
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
-
   const [currentList, setCurrentList] = useState<ListItem>({
     id: "1",
     name: "My Day",
@@ -55,28 +47,16 @@ const App: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [searchVisible, setSearchVisible] = useState<boolean>(false);
 
-  const sidebarAnimRef = useRef<Animated.Value>(new Animated.Value(-280));
-
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.replace("/login");
-    }
-  }, [authLoading, user]);
-
-  if (authLoading || !user) {
-    return (
-      <SafeAreaView style={mainStyles.container}>
-        <View style={mainStyles.loadingContainer}>
-          <ActivityIndicator size="large" color="#0078d4" />
-        </View>
-      </SafeAreaView>
-    );
+  // Always initialize animation ref - will be used after loading
+  const sidebarAnimRef = useRef<Animated.Value | null>(null);
+  if (!sidebarAnimRef.current) {
+    sidebarAnimRef.current = new Animated.Value(-280);
   }
 
   if (loading) {
     return (
-      <SafeAreaView style={mainStyles.container}>
-        <View style={mainStyles.loadingContainer}>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#0078d4" />
         </View>
       </SafeAreaView>
@@ -87,14 +67,14 @@ const App: React.FC = () => {
 
   const toggleSidebar = (): void => {
     if (sidebarVisible) {
-      Animated.timing(sidebarAnimRef.current, {
+      Animated.timing(sidebarAnimRef.current!, {
         toValue: -280,
         duration: 250,
         useNativeDriver: true,
       }).start(() => setSidebarVisible(false));
     } else {
       setSidebarVisible(true);
-      Animated.timing(sidebarAnimRef.current, {
+      Animated.timing(sidebarAnimRef.current!, {
         toValue: 0,
         duration: 250,
         useNativeDriver: true,
@@ -131,11 +111,6 @@ const App: React.FC = () => {
     }
   };
 
-  const handleDeleteListWithTasks = (listId: string): void => {
-    deleteTasksByListId(listId);
-    deleteList(listId);
-  };
-
   const getCount = (list: ListItem): number => {
     switch (list.filterKey) {
       case "myDay":
@@ -161,6 +136,10 @@ const App: React.FC = () => {
     ...l,
     count: getCount(l),
   }));
+  const liveCustomLists: ListItem[] = customLists.map((l) => ({
+    ...l,
+    count: getCount(l),
+  }));
 
   const filteredTasks = searchQuery
     ? tasks.filter((t) =>
@@ -169,21 +148,21 @@ const App: React.FC = () => {
     : tasks;
 
   return (
-    <SafeAreaView style={mainStyles.container}>
+    <SafeAreaView style={styles.container}>
       {searchVisible ? (
-        <View style={mainStyles.searchHeader}>
+        <View style={styles.searchHeader}>
           <TouchableWithoutFeedback
             onPress={() => {
               setSearchVisible(false);
               setSearchQuery("");
             }}
           >
-            <View style={mainStyles.searchBackButton}>
+            <View style={styles.searchBackButton}>
               <Ionicons name="arrow-back" size={24} color="white" />
             </View>
           </TouchableWithoutFeedback>
           <TextInput
-            style={mainStyles.searchInput}
+            style={styles.searchInput}
             placeholder="Search tasks..."
             placeholderTextColor="rgba(255,255,255,0.7)"
             value={searchQuery}
@@ -199,69 +178,64 @@ const App: React.FC = () => {
         />
       )}
 
-      <View style={mainStyles.mainContainer}>
+      <View style={styles.mainContainer}>
         {sidebarVisible && (
           <TouchableWithoutFeedback onPress={toggleSidebar}>
-            <View style={mainStyles.overlay} />
+            <View style={styles.overlay} />
           </TouchableWithoutFeedback>
         )}
 
         {sidebarVisible && (
           <Animated.View
             style={[
-              mainStyles.animatedSidebar,
+              styles.animatedSidebar,
               { transform: [{ translateX: sidebarAnimRef.current! }] },
             ]}
           >
             <Sidebar
               sidebarLists={liveSidebarLists}
-              customLists={customLists}
+              customLists={liveCustomLists}
               currentList={currentList}
               onSelectList={(list: ListItem) => {
                 setCurrentList(list);
                 toggleSidebar();
               }}
-              onDeleteList={handleDeleteListWithTasks}
             />
           </Animated.View>
         )}
 
         <Pressable onPress={Keyboard.dismiss} style={{ flex: 1 }}>
-          <MainContent
-            currentList={
-              searchVisible
-                ? {
-                    id: "search",
-                    name: "Search Results",
-                    icon: "🔍",
-                    color: "#0078d4",
-                    filterKey: "all",
-                  }
-                : currentList
-            }
-            tasks={searchVisible ? filteredTasks : tasks}
-            onAddTask={handleAddTask}
-            onToggleTask={handleToggleTask}
-            onSelectTask={handleSelectTask}
-            onStarToggle={handleStarToggle}
-            onEdit={handleEditTask}
-            onDelete={handleDeleteTask}
-            refreshing={refreshing}
-            onRefresh={refreshTasks}
-          />
+          <View style={{ flex: 1, flexDirection: "row" }}>
+            <MainContent
+              currentList={
+                searchVisible
+                  ? {
+                      id: "search",
+                      name: "Search Results",
+                      icon: "🔍",
+                      color: "#0078d4",
+                      filterKey: "all",
+                    }
+                  : currentList
+              }
+              tasks={searchVisible ? filteredTasks : tasks}
+              onAddTask={handleAddTask}
+              onToggleTask={handleToggleTask}
+              onSelectTask={handleSelectTask}
+              onStarToggle={handleStarToggle}
+              onEdit={handleEditTask}
+              onDelete={handleDeleteTask}
+              refreshing={refreshing}
+              onRefresh={refreshTasks}
+            />
 
-          <BottomSheet
-            visible={!!selectedTaskId}
-            onClose={() => setSelectedTaskId(null)}
-          >
-            {selectedTask && (
+            {selectedTaskId && tasks.find((t) => t.id === selectedTaskId) && (
               <RightPanel
-                selectedTask={selectedTask}
+                selectedTask={tasks.find((t) => t.id === selectedTaskId)!}
                 onClose={() => setSelectedTaskId(null)}
-                onUpdateTask={updateTask}
               />
             )}
-          </BottomSheet>
+          </View>
         </Pressable>
       </View>
     </SafeAreaView>

@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, ScrollView, RefreshControl } from "react-native";
 import TaskItem from "./TaskItem";
-import { taskListStyles } from "../styles/components/TaskList";
+import { taskListStyles as styles } from "../styles/components/TaskList";
 import { Task } from "../types";
 
 interface TasksListProps {
@@ -30,7 +30,7 @@ const TasksList: React.FC<TasksListProps> = ({
   return (
     <ScrollView
       style={{ flex: 1 }}
-      contentContainerStyle={taskListStyles.tasksContainer}
+      contentContainerStyle={styles.tasksContainer}
       refreshControl={
         onRefresh ? (
           <RefreshControl
@@ -54,8 +54,8 @@ const TasksList: React.FC<TasksListProps> = ({
       ))}
 
       {completedTasks.length > 0 && (
-        <View style={taskListStyles.completedHeader}>
-          <Text style={taskListStyles.completedTitle}>
+        <View style={styles.completedHeader}>
+          <Text style={styles.completedTitle}>
             Completed ({completedTasks.length})
           </Text>
         </View>

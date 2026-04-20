@@ -1,83 +1,39 @@
-import React, { useState } from "react";
+import React from "react";
 import { View, TouchableOpacity, Text } from "react-native";
-import { sideBarStyles } from "../styles/components/SideBar";
+import { sideBarStyles as styles } from "../styles/components/SideBar";
 import { SidebarItem } from "./SideBarItem";
-import { ListItem, CustomList } from "../types";
-import CustomListModal from "./CustomListModal";
-import { useCustomLists } from "../context/CustomListsContext";
+import { ListItem } from "../types";
 
 interface ListsSectionProps {
-  customLists: CustomList[];
+  customLists: ListItem[];
   currentList: ListItem | null;
   onSelectList: (item: ListItem) => void;
-  onDeleteList?: (listId: string) => void;
 }
 
 const ListsSection: React.FC<ListsSectionProps> = ({
   customLists,
   currentList,
   onSelectList,
-  onDeleteList,
 }) => {
-  const { addList, updateList } = useCustomLists();
-  const [modalVisible, setModalVisible] = useState(false);
-  const [editingList, setEditingList] = useState<CustomList | null>(null);
-
-  const handleAddPress = () => {
-    setEditingList(null);
-    setModalVisible(true);
-  };
-
-  const handleLongPress = (list: CustomList) => {
-    setEditingList(list);
-    setModalVisible(true);
-  };
-
-  const handleSave = (name: string, icon: string) => {
-    if (editingList) {
-      updateList(editingList.id, { name, icon });
-    } else {
-      addList(name, icon);
-    }
-  };
-
-  const handleDelete = () => {
-    if (editingList && onDeleteList) {
-      onDeleteList(editingList.id);
-    }
-  };
-
   return (
-    <View style={sideBarStyles.listsSection}>
-      <View style={sideBarStyles.listsSectionHeader}>
-        <Text style={sideBarStyles.listsSectionTitle}>Lists</Text>
-        <TouchableOpacity onPress={handleAddPress}>
-          <Text style={sideBarStyles.addListButton}>+</Text>
+    <View style={styles.listsSection}>
+      {/* Section header */}
+      <View style={styles.listsSectionHeader}>
+        <Text style={styles.listsSectionTitle}>Lists</Text>
+        <TouchableOpacity onPress={() => console.log("Add new custom list")}>
+          <Text style={styles.addListButton}>+</Text>
         </TouchableOpacity>
       </View>
 
+      {/* Custom list items */}
       {customLists.map((list) => (
         <SidebarItem
           key={list.id}
-          item={{
-            id: list.id,
-            name: list.name,
-            icon: list.icon,
-            filterKey: "listId",
-          }}
-          isSelected={currentList?.id === list.id}
+          item={list}
+          isSelected={currentList?.name === list.name}
           onSelectList={onSelectList}
-          onLongPress={() => handleLongPress(list)}
         />
       ))}
-
-      <CustomListModal
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-        onSave={handleSave}
-        onDelete={editingList && onDeleteList ? handleDelete : undefined}
-        initialData={editingList}
-      />
     </View>
   );
 };

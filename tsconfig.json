@@ -8,6 +8,7 @@
       "@/components/*": ["./components/*"],
       "@/context/*": ["./src/context/*"],
       "@/firebase/*": ["./src/firebase/*"],
+      "@/src/*": ["./src/*"],
       "assets/*": ["./assets/*"]
     },
     "typeRoots": ["./node_modules/@types", "./types"],

@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
-import { fontReg, fontSemi, fontBold } from "../common";
+import { fontReg, fontSemi, fontBold } from "styles/common";
 
-export const signupStyles = StyleSheet.create({
+export const forgotPasswordStyles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 10,
@@ -24,21 +24,6 @@ export const signupStyles = StyleSheet.create({
   image: {
     height: 200,
     width: 200,
-  },
-  title: {
-    fontSize: 25,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: 8,
-    fontFamily: fontBold,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 20,
-    textAlign: "center",
-    paddingHorizontal: 30,
-    fontFamily: fontReg,
   },
   formContainer: {
     width: "100%",
@@ -64,23 +49,6 @@ export const signupStyles = StyleSheet.create({
     paddingVertical: 0,
     fontFamily: fontReg,
   },
-  orText: {
-    fontSize: 14,
-    color: "#999",
-    fontFamily: fontReg,
-  },
-  linkText: {
-    flexDirection: "row",
-    marginTop: 10,
-    color: "#666",
-    fontFamily: fontReg,
-  },
-  link: {
-    color: "#0078d4",
-    fontWeight: "600",
-    marginLeft: 4,
-    fontFamily: fontSemi,
-  },
   errorText: {
     color: "red",
     fontSize: 12,
@@ -89,9 +57,33 @@ export const signupStyles = StyleSheet.create({
     marginLeft: 16,
     fontFamily: fontReg,
   },
-  seperator: {
-    backgroundColor: "#999",
-    height: 1,
-    width: "45%"
-  }
+  title: {
+    fontSize: 27,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 8,
+    fontFamily: fontBold,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 20,
+    textAlign: "center",
+    paddingHorizontal: 30,
+    fontFamily: fontReg,
+  },
+  buttonContainer: {
+    width: "100%",
+    backgroundColor: "#0078d4",
+    borderRadius: 50,
+    paddingVertical: 15,
+    alignItems: "center",
+    marginTop: 10,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+    fontFamily: fontSemi,
+  },
 });

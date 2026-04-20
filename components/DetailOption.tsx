@@ -1,39 +1,18 @@
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
-import { detailOptionStyles } from "../styles/components/DetailOption";
+import { Text, TouchableOpacity } from "react-native";
+import { detailOptionStyles as styles } from "../styles/components/DetailOption";
 
 interface DetailOptionProps {
   icon: string;
   text: string;
-  subText?: string;
-  isActive?: boolean;
-  onPress: () => void;
+  onPress?: () => void;
 }
 
-const DetailOption: React.FC<DetailOptionProps> = ({
-  icon,
-  text,
-  subText,
-  isActive,
-  onPress,
-}) => {
+const DetailOption: React.FC<DetailOptionProps> = ({ icon, text, onPress }) => {
   return (
-    <TouchableOpacity
-      style={[detailOptionStyles.detailOption, isActive && detailOptionStyles.detailOptionActive]}
-      onPress={onPress}
-    >
-      <Text style={detailOptionStyles.detailIcon}>{icon}</Text>
-      <View style={detailOptionStyles.detailContent}>
-        <Text style={[detailOptionStyles.detailText, isActive && detailOptionStyles.detailTextActive]}>
-          {text}
-        </Text>
-        {subText && (
-          <Text style={detailOptionStyles.detailSubText}>{subText}</Text>
-        )}
-      </View>
-      {isActive && subText && (
-        <Text style={detailOptionStyles.detailActiveIndicator}>✓</Text>
-      )}
+    <TouchableOpacity style={styles.detailOption} onPress={onPress}>
+      <Text style={styles.detailIcon}>{icon}</Text>
+      <Text style={styles.detailText}>{text}</Text>
     </TouchableOpacity>
   );
 };

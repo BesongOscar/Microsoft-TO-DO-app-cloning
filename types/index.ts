@@ -1,6 +1,4 @@
 // ─── Task ─────────────────────────────────────────────────────────────────────
-export type RepeatType = "none" | "daily" | "weekly" | "monthly" | "yearly";
-
 export interface Task {
   id: string;
   text: string;
@@ -8,10 +6,10 @@ export interface Task {
   important: boolean;
   myDay: boolean;
   dueDate?: string;
-  listId?: string;
   reminder?: string;
-  repeat?: RepeatType;
   note?: string;
+  repeat?: RepeatType;
+  listId?: string;
 }
 
 // ─── List ─────────────────────────────────────────────────────────────────────
@@ -19,7 +17,7 @@ export interface ListItem {
   id: string;
   name: string;
   icon: string;
-  color?: string;
+  color: string;
   filterKey: FilterKey;
   count?: number;
 }
@@ -43,9 +41,15 @@ export interface TaskCounts {
   tasks: number;
 }
 
-export interface CustomList{
+// ─── Custom List ──────────────────────────────────────────────────────────────
+export interface CustomList {
   id: string;
   name: string;
+  color: string;
   icon: string;
-  createdAt: number;
+  taskCount: number;
+  createdAt?: number;
 }
+
+// ─── Repeat ───────────────────────────────────────────────────────────────────
+export type RepeatType = "daily" | "weekly" | "monthly" | "yearly" | "none";

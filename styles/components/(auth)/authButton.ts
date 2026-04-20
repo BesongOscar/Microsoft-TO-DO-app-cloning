@@ -1,16 +1,27 @@
 import { StyleSheet } from "react-native";
+import { fontReg } from "../../common";
 
 export const authButtonStyles = StyleSheet.create({
-  button: {
-    paddingVertical: 16,
-    paddingHorizontal: 24,
+ button: {
+    backgroundColor: "blue",
+    padding: 20,
     borderRadius: 50,
+    width: "100%",
     alignItems: "center",
+    margin: 5,
     justifyContent: "center",
-    marginBottom: 12,
+    shadowColor: "red",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.65,
+    shadowRadius: 3.84,
+    elevation: 1,
   },
   buttonText: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "500",
+    fontSize: 15,
+    fontFamily: fontReg,
   },
 });

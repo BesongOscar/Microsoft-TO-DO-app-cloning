@@ -54,8 +54,7 @@ export default function Settings() {
     if (!result.canceled && result.assets[0]) {
       try {
         setUploading(true);
-        const photoURL = await uploadProfilePhoto(result.assets[0].uri);
-        await updateUserProfile(userProfile?.name || "", photoURL);
+        await uploadProfilePhoto(result.assets[0].uri);
         Alert.alert("Success", "Profile photo updated!");
       } catch (error: any) {
         Alert.alert("Error", error.message || "Failed to upload photo");
@@ -72,7 +71,7 @@ export default function Settings() {
     }
 
     try {
-      await updateUserProfile(editedName.trim());
+      await updateUserProfile({ name: editedName.trim() });
       setIsEditingName(false);
       Alert.alert("Success", "Name updated!");
     } catch (error: any) {

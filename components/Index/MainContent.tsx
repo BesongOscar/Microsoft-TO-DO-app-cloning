@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { View } from "react-native";
-import { mainContentStyles } from "../../styles/components/Index/MainContent";
+import { mainContentStyles as styles } from "../../styles/components/Index/MainContent";
 import ListHeader from "../ListHeader";
 import SuggestionsBanner from "../SuggestionBanner";
 import AddTaskInput from "../AddTaskInput";
 import TasksList from "../TaskList";
-import PlannedTasksList from "../PlannedTasksList";
+import CompletedSection from "../CompletedSection";
 import EmptyState from "../EmptyState";
 import { Task, ListItem } from "../../types";
 
@@ -75,7 +75,7 @@ const MainContent: React.FC<MainContentProps> = ({
   });
 
   return (
-    <View style={mainContentStyles.mainContent}>
+    <View style={styles.mainContent}>
       <ListHeader title={currentList.name} date={todayDate} />
 
       {showBanner && (
@@ -93,29 +93,14 @@ const MainContent: React.FC<MainContentProps> = ({
             currentList.filterKey === "all" &&
             currentList.name === "Search Results"
               ? "No results found"
-              : currentList.filterKey === "planned"
-              ? "No planned tasks"
               : `No tasks in "${currentList.name}"`
           }
           message={
             currentList.filterKey === "all" &&
             currentList.name === "Search Results"
               ? "Try a different search term"
-              : currentList.filterKey === "planned"
-              ? "Add a due date to your tasks to see them here"
               : "Add a task below to get started"
           }
-        />
-      ) : currentList.filterKey === "planned" ? (
-        <PlannedTasksList
-          tasks={filteredTasks}
-          onToggleTask={onToggleTask}
-          onSelectTask={onSelectTask}
-          onStarToggle={onStarToggle}
-          onEdit={onEdit}
-          onDelete={onDelete}
-          refreshing={refreshing}
-          onRefresh={onRefresh}
         />
       ) : (
         <TasksList

@@ -69,6 +69,11 @@ export const loginStyles = StyleSheet.create({
     color: "#999",
     fontFamily: fontReg,
   },
+  seperator: {
+    backgroundColor: "#999",
+    height: 1,
+    width: "45%",
+  },
   linkText: {
     flexDirection: "row",
     marginTop: 30,
@@ -87,6 +92,11 @@ export const loginStyles = StyleSheet.create({
     marginTop: -8,
     marginBottom: 8,
     marginLeft: 16,
+    fontFamily: fontReg,
+  },
+  forgotText: {
+    color: "#0078d4",
+    marginTop: 20,
     fontFamily: fontReg,
   },
 });

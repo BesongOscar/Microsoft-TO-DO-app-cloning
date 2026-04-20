@@ -3,7 +3,7 @@ import { fontReg, fontSemi } from "../../common";
 
 export const rightPanelStyles = StyleSheet.create({
   rightPanel: {
-    width: 320,
+    width: "auto",
     backgroundColor: "#faf9f8",
     borderLeftWidth: 1,
     borderLeftColor: "#e1e5e9",
