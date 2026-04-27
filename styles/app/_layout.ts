@@ -1,5 +1,4 @@
 import { StyleSheet } from "react-native";
-import { fontReg } from "../common";
 
 export const appLayoutStyles = StyleSheet.create({
   container: {

@@ -1,7 +1,6 @@
 import React from "react";
-import { View, FlatList, ScrollView } from "react-native";
+import { View, SectionList, TouchableOpacity, Text } from "react-native";
 import { sideBarStyles as styles } from "../styles/components/SideBar";
-import ListsSection from "./ListsSection";
 import { SidebarItem } from "./SideBarItem";
 import { ListItem } from "../types";
 
@@ -10,38 +9,61 @@ interface SidebarProps {
   customLists: ListItem[];
   currentList: ListItem | null;
   onSelectList: (item: ListItem) => void;
+  onAddCustomList?: () => void;
 }
+
+type SidebarSection = {
+  key: "preset" | "custom";
+  data: ListItem[];
+};
 
 const Sidebar: React.FC<SidebarProps> = ({
   sidebarLists,
   customLists,
   currentList,
   onSelectList,
+  onAddCustomList,
 }) => {
+  const sections: SidebarSection[] = [
+    { key: "preset", data: sidebarLists },
+    { key: "custom", data: customLists },
+  ];
+
   return (
     <View style={styles.sidebar}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Default / built-in lists */}
-        <FlatList
-          data={sidebarLists}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <SidebarItem
-              item={item}
-              isSelected={currentList?.name === item.name}
-              onSelectList={onSelectList}
-            />
-          )}
-          scrollEnabled={false}
-        />
-
-        {/* User-created custom lists */}
-        <ListsSection
-          customLists={customLists}
-          currentList={currentList}
-          onSelectList={onSelectList}
-        />
-      </ScrollView>
+      <SectionList<ListItem, SidebarSection>
+        contentContainerStyle={styles.sidebarContainer}
+        style={styles.sidebarList}
+        sections={sections}
+        keyExtractor={(item) => item.id}
+        stickySectionHeadersEnabled={false}
+        showsVerticalScrollIndicator={false}
+        renderSectionHeader={({ section }) =>
+          section.key === "custom" ? (
+            <View style={styles.listsSection}>
+              <View style={styles.listsSectionHeader}>
+                <Text style={styles.listsSectionTitle}>Custom Lists</Text>
+                <TouchableOpacity onPress={() => onAddCustomList?.()}>
+                  <Text style={styles.addListButton}>+</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ) : (
+            <View style={styles.listsSection}>
+              <View style={styles.listsSectionHeader}>
+                <Text style={styles.listsSectionTitle}>Default Lists</Text>
+              </View>
+            </View>
+          )
+        }
+        renderItem={({ item }) => (
+          <SidebarItem
+            item={item}
+            isSelected={currentList?.id === item.id}
+            onSelectList={onSelectList}
+          />
+        )}
+      />
     </View>
   );
 };

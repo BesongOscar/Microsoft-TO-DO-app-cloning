@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { fontReg } from "../common";
+import { fontReg, androidPoppinsExtras } from "../common";
 
 export const addTaskInputStyles = StyleSheet.create({
   addTaskContainer: {
@@ -31,5 +31,6 @@ export const addTaskInputStyles = StyleSheet.create({
     color: "#323130",
     paddingVertical: 0,
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
 });

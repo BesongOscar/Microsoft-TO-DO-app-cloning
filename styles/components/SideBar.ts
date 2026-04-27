@@ -1,13 +1,16 @@
 import { StyleSheet } from "react-native";
-import { fontReg, fontSemi } from "../common";
+import { fontReg, fontSemi, androidPoppinsExtras } from "../common";
 
 export const sideBarStyles = StyleSheet.create({
-  sidebar: {
+sidebar: {
     flex: 1,
-    width: 280,
     backgroundColor: "#f3f2f1",
-    borderRightWidth: 1,
-    borderRightColor: "#e1e5e9",
+  },
+  sidebarList: {
+    flex: 1,
+  },
+  sidebarContainer: {
+    flexGrow: 1,
   },
   sidebarItem: {
     flexDirection: "row",
@@ -44,6 +47,7 @@ export const sideBarStyles = StyleSheet.create({
     color: "#323130",
     flex: 1,
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
   sidebarCount: {
     fontSize: 12,
@@ -55,6 +59,7 @@ export const sideBarStyles = StyleSheet.create({
     minWidth: 20,
     textAlign: "center",
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
   listsSection: {
     marginTop: 8,
@@ -76,6 +81,7 @@ export const sideBarStyles = StyleSheet.create({
     textTransform: "uppercase",
     letterSpacing: 0.5,
     fontFamily: fontSemi,
+    ...androidPoppinsExtras,
   },
   addListButton: {
     fontSize: 22,

@@ -1,18 +1,23 @@
 import { StyleSheet } from "react-native";
-import { fontReg, fontSemi, fontBold } from "styles/common";
+import {
+  fontReg,
+  fontSemi,
+  fontBold,
+  androidPoppinsExtras,
+} from "styles/common";
 
 export const forgotPasswordStyles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 10,
-    justifyContent: "center",
+    paddingVertical: 15,
     alignItems: "center",
     backgroundColor: "#f8f9fa",
   },
   imageContainer: {
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 20,
+    marginVertical: 20,
     position: "relative",
   },
   iconCircle: {
@@ -48,6 +53,7 @@ export const forgotPasswordStyles = StyleSheet.create({
     color: "#333",
     paddingVertical: 0,
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
   errorText: {
     color: "red",
@@ -56,6 +62,7 @@ export const forgotPasswordStyles = StyleSheet.create({
     marginBottom: 8,
     marginLeft: 16,
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
   title: {
     fontSize: 27,
@@ -63,6 +70,7 @@ export const forgotPasswordStyles = StyleSheet.create({
     color: "#333",
     marginBottom: 8,
     fontFamily: fontBold,
+    ...androidPoppinsExtras,
   },
   subtitle: {
     fontSize: 14,
@@ -71,6 +79,7 @@ export const forgotPasswordStyles = StyleSheet.create({
     textAlign: "center",
     paddingHorizontal: 30,
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
   buttonContainer: {
     width: "100%",
@@ -78,12 +87,13 @@ export const forgotPasswordStyles = StyleSheet.create({
     borderRadius: 50,
     paddingVertical: 15,
     alignItems: "center",
-    marginTop: 10,
+    marginTop: 20,
   },
   buttonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "600",
     fontFamily: fontSemi,
+    ...androidPoppinsExtras,
   },
 });

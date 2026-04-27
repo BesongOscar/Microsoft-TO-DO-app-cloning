@@ -1,11 +1,9 @@
 import {
-  StyleSheet,
   Text,
   View,
   TextInput,
   useWindowDimensions,
   Alert,
-  ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -17,6 +15,7 @@ import { useRouter } from "expo-router";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import { useAuth } from "@/context/AuthContext";
+import { auth } from "@/firebase/config";
 import { loginStyles as styles } from "styles/(auth)/login";
 
 export const loginValidationSchema = Yup.object().shape({
@@ -28,32 +27,31 @@ export default function Login() {
   const { width } = useWindowDimensions();
   const imageSize = Math.min(width * 0.5, 140);
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
   const { login, googleLogin } = useAuth();
 
   const handleLogin = async (email: string, password: string) => {
     try {
-      setIsLoading(true);
       await login(email, password);
-      router.push("/main");
+      if (auth.currentUser && !auth.currentUser.emailVerified) {
+        router.replace("/emailVerification");
+      } else {
+        router.replace("/main");
+      }
     } catch (error: any) {
       Alert.alert("Login Failed", error.message || "An error occurred");
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const handleGoogleLogin = async () => {
     try {
-      setIsLoading(true);
-      await googleLogin();
-      router.push("/main");
+      const success = await googleLogin();
+      if (success) {
+        router.replace("/main");
+      }
     } catch (error: any) {
       Alert.alert("Google Login Failed", error.message || "An error occurred");
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -154,7 +152,6 @@ export default function Login() {
         )}
       </Formik>
       
-      V
       <Text style={styles.orText}>Or</Text>
 
       <AuthButton
@@ -170,7 +167,7 @@ export default function Login() {
       </TouchableOpacity>
 
       <Text style={styles.linkText}>
-        Don't have an account?{" "}
+        {"Don't have an account? "}
         <Link href="/signup" style={styles.link}>
           Signup
         </Link>

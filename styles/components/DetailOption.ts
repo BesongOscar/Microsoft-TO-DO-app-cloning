@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { fontReg } from "../common";
+import { fontReg, androidPoppinsExtras } from "../common";
 
 export const detailOptionStyles = StyleSheet.create({
   detailOption: {
@@ -25,6 +25,7 @@ export const detailOptionStyles = StyleSheet.create({
     fontSize: 14,
     color: "#323130",
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
   detailTextActive: {
     color: "#0078d4",
@@ -35,6 +36,7 @@ export const detailOptionStyles = StyleSheet.create({
     color: "#605e5c",
     marginTop: 2,
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
   detailActiveIndicator: {
     fontSize: 16,

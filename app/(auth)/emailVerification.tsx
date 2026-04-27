@@ -8,60 +8,87 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { emailVerfificationStyles as styles } from "styles/(auth)/emailVerification";
-import OTPInput from "@/components/(auth)/OTP_input";
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
-import { useRouter } from "expo-router";
+import { useCallback, useState } from "react";
+import { Redirect, useRouter, router as expoRouter } from "expo-router";
 import { useAuth } from "@/context/AuthContext";
+import { auth } from "@/firebase/config";
+import { FirebaseError } from "firebase/app";
+import { AuthLoadingScreen } from "@/components/AuthLoadingScreen";
+import ArrowBack from "@/components/arrowBack";
 
 export default function EmailVerification() {
   const { width } = useWindowDimensions();
   const imageSize = Math.min(width * 0.5, 140);
   const router = useRouter();
-  const { user } = useAuth();
-  const [otp, setOtp] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const { user, loading, sendVerificationEmail, reloadUser, logout } =
+    useAuth();
+  const [isChecking, setIsChecking] = useState(false);
   const [isResending, setIsResending] = useState(false);
 
-  const handleVerify = async () => {
-    if (otp.length < 4) {
-      Alert.alert("Error", "Please enter the complete OTP");
-      return;
-    }
-    
-    setIsLoading(true);
+  const handleContinue = useCallback(async () => {
+    setIsChecking(true);
     try {
-      // For now, accept any 4-digit OTP for demo
-      // In production, this would validate against a backend
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      Alert.alert("Success", "Email verified successfully!", [
-        { text: "OK", onPress: () => router.push("/login") }
-      ]);
-    } catch (error: any) {
-      Alert.alert("Error", error.message || "Verification failed");
+      await reloadUser();
+      if (auth.currentUser?.emailVerified) {
+        router.replace("/main");
+      } else {
+        Alert.alert(
+          "Not verified yet",
+          "Open the link in the email we sent you, then try again.",
+        );
+      }
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Could not refresh status";
+      Alert.alert("Error", message);
     } finally {
-      setIsLoading(false);
+      setIsChecking(false);
     }
-  };
+  }, [reloadUser, router]);
 
   const handleResend = async () => {
     setIsResending(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      Alert.alert("Success", "OTP has been resent to your email");
-    } catch (error: any) {
-      Alert.alert("Error", error.message || "Failed to resend OTP");
+      await sendVerificationEmail();
+      Alert.alert("Sent", "Check your inbox for a new verification link.");
+    } catch (error: unknown) {
+      const message =
+        error instanceof FirebaseError
+          ? error.message
+          : "Failed to resend email";
+      Alert.alert("Error", message);
     } finally {
       setIsResending(false);
     }
   };
 
+  const handleSignOut = async () => {
+    try {
+      await logout();
+      expoRouter.dismissTo("/login");
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Could not sign out";
+      Alert.alert("Error", message);
+    }
+  };
+
+  if (loading) {
+    return <AuthLoadingScreen />;
+  }
+
+  if (!user) {
+    return <Redirect href="/login" />;
+  }
+
+  if (user.emailVerified) {
+    return <Redirect href="/main" />;
+  }
+
   return (
     <SafeAreaView edges={["top"]} style={styles.container}>
-      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-        <Ionicons name="arrow-back" color={"#000"} size={25} />
-      </TouchableOpacity>
-      
+      <ArrowBack />
       <View style={styles.imageContainer}>
         <View
           style={[
@@ -76,32 +103,37 @@ export default function EmailVerification() {
           <Ionicons name="mail-open" size={imageSize * 0.4} color="#fff" />
         </View>
       </View>
-      
-      <Text style={styles.title}>Enter OTP Code</Text>
+
+      <Text style={styles.title}>Verify your email</Text>
       <Text style={styles.subtitle}>
-        We sent a 4-digit code to your email
+        We sent a link to{" "}
+        <Text style={styles.emailHighlight}>{user.email}</Text>. Open it on this
+        device or any device, then tap the button below to continue.
       </Text>
 
-      <View style={styles.otpContainer}>
-        <OTPInput value={otp} onChange={setOtp} length={4} />
-      </View>
-
-      {isLoading ? (
+      {isChecking ? (
         <ActivityIndicator size="large" color="#0078d4" style={styles.button} />
       ) : (
-        <TouchableOpacity style={styles.verifyButton} onPress={handleVerify}>
-          <Text style={styles.verifyButtonText}>Verify</Text>
+        <TouchableOpacity style={styles.verifyButton} onPress={handleContinue}>
+          <Text style={styles.verifyButtonText}>I verified my email</Text>
         </TouchableOpacity>
       )}
 
+      <TouchableOpacity
+        style={styles.secondaryButton}
+        onPress={handleResend}
+        disabled={isResending}
+      >
+        {isResending ? (
+          <ActivityIndicator size="small" color="#0078d4" />
+        ) : (
+          <Text style={styles.secondaryButtonText}>Resend email</Text>
+        )}
+      </TouchableOpacity>
+
       <View style={styles.resendRow}>
-        <Text style={styles.resendText}>Didn't get OTP?</Text>
-        <TouchableOpacity onPress={handleResend} disabled={isResending}>
-          {isResending ? (
-            <ActivityIndicator size="small" color="#0078d4" />
-          ) : (
-            <Text style={styles.resendLink}> Resend OTP</Text>
-          )}
+        <TouchableOpacity onPress={handleSignOut}>
+          <Text style={styles.signOutLink}>Use a different account</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

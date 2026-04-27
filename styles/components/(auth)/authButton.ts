@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { fontReg } from "../../common";
+import { fontReg, androidPoppinsExtras } from "../../common";
 
 export const authButtonStyles = StyleSheet.create({
  button: {
@@ -23,5 +23,6 @@ export const authButtonStyles = StyleSheet.create({
     fontWeight: "500",
     fontSize: 15,
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
 });

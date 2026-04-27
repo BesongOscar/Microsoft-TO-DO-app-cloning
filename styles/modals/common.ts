@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { fontReg, fontSemi } from "../common";
+import { fontReg, fontSemi, androidPoppinsExtras } from "../common";
 
 export const modalCommonStyles = StyleSheet.create({
   modalOverlay: {
@@ -26,17 +26,20 @@ export const modalCommonStyles = StyleSheet.create({
     fontWeight: "600",
     color: "#323130",
     fontFamily: fontSemi,
+    ...androidPoppinsExtras,
   },
   modalCancelText: {
     fontSize: 17,
     color: "#605e5c",
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
   modalSaveText: {
     fontSize: 17,
     color: "#0078d4",
     fontWeight: "600",
     fontFamily: fontSemi,
+    ...androidPoppinsExtras,
   },
   modalBody: {
     padding: 16,

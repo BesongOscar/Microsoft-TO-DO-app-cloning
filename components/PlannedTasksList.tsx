@@ -21,9 +21,7 @@ interface TaskGroup {
   isOverdue?: boolean;
 }
 
-const getDateCategory = (
-  dateStr: string,
-): { category: string; isOverdue: boolean } => {
+const getDateCategory = (dateStr: string): { category: string; isOverdue: boolean } => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const taskDate = new Date(dateStr);
@@ -32,14 +30,12 @@ const getDateCategory = (
   const diffTime = taskDate.getTime() - today.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-  const isOverdue = diffDays < 0;
-
   if (diffDays === 0) return { category: "Today", isOverdue: false };
   if (diffDays === 1) return { category: "Tomorrow", isOverdue: false };
   if (diffDays === 2) return { category: "This Week", isOverdue: false };
   if (diffDays <= 7) return { category: "This Week", isOverdue: false };
   if (diffDays <= 14) return { category: "Next Week", isOverdue: false };
-  return { category: "Later", isOverdue: false };
+  return { category: "Later", isOverdue: diffDays < 0 };
 };
 
 const groupTasksByDate = (tasks: Task[]): TaskGroup[] => {

@@ -1,5 +1,10 @@
 import { StyleSheet } from "react-native";
-import { fontReg, fontSemi, fontBold } from "../common";
+import {
+  fontReg,
+  fontSemi,
+  fontBold,
+  androidPoppinsExtras,
+} from "../common";
 
 export const emailVerfificationStyles = StyleSheet.create({
   container: {
@@ -31,6 +36,7 @@ export const emailVerfificationStyles = StyleSheet.create({
     color: "#333",
     marginBottom: 8,
     fontFamily: fontBold,
+    ...androidPoppinsExtras,
   },
   subtitle: {
     fontSize: 14,
@@ -39,26 +45,28 @@ export const emailVerfificationStyles = StyleSheet.create({
     textAlign: "center",
     paddingHorizontal: 30,
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
+  },
+  emailHighlight: {
+    fontFamily: fontSemi,
+    color: "#333",
+    ...androidPoppinsExtras,
   },
   resendRow: {
-    flexDirection: "row",
-    alignSelf: "flex-start",
-    marginTop: 20,
-    marginLeft: 10,
+    marginTop: 28,
+    alignItems: "center",
+    alignSelf: "center",
   },
   resendText: {
     color: "#999",
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
   resendLink: {
     fontFamily: fontReg,
     color: "#0078d4",
     fontWeight: "600",
-  },
-  backButton: {
-    alignSelf: "flex-start",
-    marginBottom: 20,
-    padding: 10,
+    ...androidPoppinsExtras,
   },
   otpContainer: {
     marginVertical: 20,
@@ -77,6 +85,31 @@ export const emailVerfificationStyles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     fontFamily: fontSemi,
+    ...androidPoppinsExtras,
+  },
+  secondaryButton: {
+    width: "100%",
+    marginTop: 14,
+    paddingVertical: 14,
+    alignItems: "center",
+    borderRadius: 50,
+    borderWidth: 1,
+    borderColor: "#0078d4",
+    backgroundColor: "#fff",
+  },
+  secondaryButtonText: {
+    color: "#0078d4",
+    fontSize: 16,
+    fontWeight: "600",
+    fontFamily: fontSemi,
+    ...androidPoppinsExtras,
+  },
+  signOutLink: {
+    color: "#999",
+    fontSize: 14,
+    fontFamily: fontReg,
+    textDecorationLine: "underline",
+    ...androidPoppinsExtras,
   },
   button: {
     marginTop: 15,

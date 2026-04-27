@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { fontReg, fontSemi } from "../../common";
+import { fontReg, fontSemi, androidPoppinsExtras } from "../../common";
 
 export const headerStyles = StyleSheet.create({
   topHeader: {
@@ -28,6 +28,7 @@ export const headerStyles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "600",
     fontFamily: fontSemi,
+    ...androidPoppinsExtras,
   },
   headerRight: {
     flexDirection: "row",

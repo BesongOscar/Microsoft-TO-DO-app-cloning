@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { fontReg, fontSemi } from "../common";
+import { fontReg, fontSemi, androidPoppinsExtras } from "../common";
 
 export const emptyStateStyles = StyleSheet.create({
   container: {
@@ -24,11 +24,13 @@ export const emptyStateStyles = StyleSheet.create({
     marginTop: 20,
     textAlign: "center",
     fontFamily: fontSemi,
+    ...androidPoppinsExtras,
   },
   message: {
     fontSize: 14,
     color: "#605e5c",
     textAlign: "center",
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
 });

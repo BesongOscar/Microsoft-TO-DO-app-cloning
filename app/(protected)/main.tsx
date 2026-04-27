@@ -8,19 +8,23 @@ import {
   Pressable,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { SafeAreaView } from "react-native-safe-area-context";
-import  { useState, useRef, useEffect } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useState, useRef } from "react";
 import { useRouter } from "expo-router";
-import Header from "../components/Index/header";
-import Sidebar from "../components/SideBar";
-import MainContent from "../components/Index/MainContent";
-import RightPanel from "../components/Index/RightPanel";
-import { sidebarLists, customLists } from "../constants/Lists";
-import { ListItem } from "../types";
-import { useTasks } from "../context/TasksContext";
-import { mainStyles as styles } from "../styles/app/main";
+import Header from "../../components/Index/header";
+import Sidebar from "../../components/SideBar";
+import MainContent from "../../components/Index/MainContent";
+import RightPanel from "../../components/Index/RightPanel";
+import BottomSheet from "../../components/Index/BottomSheet";
+import CustomListModal from "../../components/CustomListModal";
+import { sidebarLists } from "../../constants/Lists";
+import { ListItem } from "../../types";
+import { useTasks } from "../../context/TasksContext";
+import { useCustomLists } from "../../context/CustomListsContext";
+import { mainStyles as styles } from "../../styles/app/main";
 
 const App: React.FC = () => {
+  const insets = useSafeAreaInsets();
   const {
     tasks,
     counts,
@@ -33,6 +37,7 @@ const App: React.FC = () => {
     updateTask,
     refreshTasks,
   } = useTasks();
+  const { customLists, addList } = useCustomLists();
 
   const router = useRouter();
   const [currentList, setCurrentList] = useState<ListItem>({
@@ -46,8 +51,9 @@ const App: React.FC = () => {
   const [sidebarVisible, setSidebarVisible] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [searchVisible, setSearchVisible] = useState<boolean>(false);
+  const [customListModalVisible, setCustomListModalVisible] =
+    useState<boolean>(false);
 
-  // Always initialize animation ref - will be used after loading
   const sidebarAnimRef = useRef<Animated.Value | null>(null);
   if (!sidebarAnimRef.current) {
     sidebarAnimRef.current = new Animated.Value(-280);
@@ -55,15 +61,22 @@ const App: React.FC = () => {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#0078d4" />
+      <View style={[styles.container, { paddingBottom: insets.bottom }]}>
+        <View
+          style={[
+            styles.loadingContainer,
+            {
+              flex: 1,
+              backgroundColor: "#0078d4",
+              paddingTop: insets.top,
+            },
+          ]}
+        >
+          <ActivityIndicator size="large" color="#ffffff" />
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
-
-  const selectedTask = tasks.find((task) => task.id === selectedTaskId);
 
   const toggleSidebar = (): void => {
     if (sidebarVisible) {
@@ -136,10 +149,19 @@ const App: React.FC = () => {
     ...l,
     count: getCount(l),
   }));
-  const liveCustomLists: ListItem[] = customLists.map((l) => ({
-    ...l,
-    count: getCount(l),
-  }));
+  const liveCustomLists: ListItem[] = customLists.map((l) => {
+    const listItem: ListItem = {
+      id: l.id,
+      name: l.name,
+      icon: l.icon,
+      color: l.color,
+      filterKey: "listId",
+    };
+    return {
+      ...listItem,
+      count: getCount(listItem),
+    };
+  });
 
   const filteredTasks = searchQuery
     ? tasks.filter((t) =>
@@ -147,36 +169,43 @@ const App: React.FC = () => {
       )
     : tasks;
 
+  const selectedTask =
+    selectedTaskId != null
+      ? (tasks.find((t) => t.id === selectedTaskId) ?? null)
+      : null;
+
   return (
-    <SafeAreaView style={styles.container}>
-      {searchVisible ? (
-        <View style={styles.searchHeader}>
-          <TouchableWithoutFeedback
-            onPress={() => {
-              setSearchVisible(false);
-              setSearchQuery("");
-            }}
-          >
-            <View style={styles.searchBackButton}>
-              <Ionicons name="arrow-back" size={24} color="white" />
-            </View>
-          </TouchableWithoutFeedback>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search tasks..."
-            placeholderTextColor="rgba(255,255,255,0.7)"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            autoFocus
+    <View style={[styles.container, { paddingBottom: insets.bottom }]}>
+      <View style={{ backgroundColor: "#0078d4", paddingTop: insets.top }}>
+        {searchVisible ? (
+          <View style={styles.searchHeader}>
+            <TouchableWithoutFeedback
+              onPress={() => {
+                setSearchVisible(false);
+                setSearchQuery("");
+              }}
+            >
+              <View style={styles.searchBackButton}>
+                <Ionicons name="arrow-back" size={24} color="white" />
+              </View>
+            </TouchableWithoutFeedback>
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search tasks..."
+              placeholderTextColor="rgba(255,255,255,0.7)"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              autoFocus
+            />
+          </View>
+        ) : (
+          <Header
+            onMenuPress={toggleSidebar}
+            onSearchPress={() => setSearchVisible(true)}
+            onProfilePress={() => router.push("/settings")}
           />
-        </View>
-      ) : (
-        <Header
-          onMenuPress={toggleSidebar}
-          onSearchPress={() => setSearchVisible(true)}
-          onProfilePress={() => router.push("/settings")}
-        />
-      )}
+        )}
+      </View>
 
       <View style={styles.mainContainer}>
         {sidebarVisible && (
@@ -189,7 +218,9 @@ const App: React.FC = () => {
           <Animated.View
             style={[
               styles.animatedSidebar,
-              { transform: [{ translateX: sidebarAnimRef.current! }] },
+              {
+                transform: [{ translateX: sidebarAnimRef.current! }],
+              },
             ]}
           >
             <Sidebar
@@ -200,12 +231,13 @@ const App: React.FC = () => {
                 setCurrentList(list);
                 toggleSidebar();
               }}
+              onAddCustomList={() => setCustomListModalVisible(true)}
             />
           </Animated.View>
         )}
 
         <Pressable onPress={Keyboard.dismiss} style={{ flex: 1 }}>
-          <View style={{ flex: 1, flexDirection: "row" }}>
+          <View style={{ flex: 1 }}>
             <MainContent
               currentList={
                 searchVisible
@@ -228,17 +260,37 @@ const App: React.FC = () => {
               refreshing={refreshing}
               onRefresh={refreshTasks}
             />
-
-            {selectedTaskId && tasks.find((t) => t.id === selectedTaskId) && (
-              <RightPanel
-                selectedTask={tasks.find((t) => t.id === selectedTaskId)!}
-                onClose={() => setSelectedTaskId(null)}
-              />
-            )}
           </View>
         </Pressable>
+
+        <BottomSheet
+          visible={selectedTask != null}
+          onClose={() => setSelectedTaskId(null)}
+        >
+          {selectedTask != null && (
+            <RightPanel
+              selectedTask={selectedTask}
+              onClose={() => setSelectedTaskId(null)}
+            />
+          )}
+        </BottomSheet>
+
+        <CustomListModal
+          visible={customListModalVisible}
+          onClose={() => setCustomListModalVisible(false)}
+          onSave={(name, icon) => {
+            const created = addList(name, icon);
+            setCurrentList({
+              id: created.id,
+              name: created.name,
+              icon: created.icon,
+              color: created.color,
+              filterKey: "listId",
+            });
+          }}
+        />
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 

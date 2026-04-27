@@ -1,5 +1,10 @@
 import { StyleSheet } from "react-native";
-import { fontReg, fontSemi, fontBold } from "../common";
+import {
+  fontReg,
+  fontSemi,
+  fontBold,
+  androidPoppinsExtras,
+} from "../common";
 
 export const signupStyles = StyleSheet.create({
   container: {
@@ -31,6 +36,7 @@ export const signupStyles = StyleSheet.create({
     color: "#333",
     marginBottom: 8,
     fontFamily: fontBold,
+    ...androidPoppinsExtras,
   },
   subtitle: {
     fontSize: 14,
@@ -39,6 +45,7 @@ export const signupStyles = StyleSheet.create({
     textAlign: "center",
     paddingHorizontal: 30,
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
   formContainer: {
     width: "100%",
@@ -63,23 +70,27 @@ export const signupStyles = StyleSheet.create({
     color: "#333",
     paddingVertical: 0,
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
   orText: {
     fontSize: 14,
     color: "#999",
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
   linkText: {
     flexDirection: "row",
     marginTop: 10,
     color: "#666",
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
   link: {
     color: "#0078d4",
     fontWeight: "600",
     marginLeft: 4,
     fontFamily: fontSemi,
+    ...androidPoppinsExtras,
   },
   errorText: {
     color: "red",
@@ -88,6 +99,7 @@ export const signupStyles = StyleSheet.create({
     marginBottom: 8,
     marginLeft: 16,
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
   seperator: {
     backgroundColor: "#999",

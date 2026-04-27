@@ -8,7 +8,7 @@ export default function ArrowBack() {
   return (
     <View style={styles.ButtonContainer}>
       <TouchableOpacity onPress={router.back}>
-        <Ionicons name="arrow-back" color={"#000"} size={25} />
+        <Ionicons name="arrow-back" color={"#fff"} size={25} />
       </TouchableOpacity>
     </View>
   );

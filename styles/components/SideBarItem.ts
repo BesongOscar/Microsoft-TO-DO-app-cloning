@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { fontReg } from "../common";
+import { fontReg, androidPoppinsExtras } from "../common";
 
 export const sideBarItemStyles = StyleSheet.create({
   container: {
@@ -36,6 +36,7 @@ export const sideBarItemStyles = StyleSheet.create({
     color: "#323130",
     flex: 1,
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
   count: {
     fontSize: 12,
@@ -47,5 +48,6 @@ export const sideBarItemStyles = StyleSheet.create({
     minWidth: 20,
     textAlign: "center",
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
 });

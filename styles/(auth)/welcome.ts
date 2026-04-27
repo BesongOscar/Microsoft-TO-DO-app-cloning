@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { fontReg, fontBold } from "../common";
+import { fontReg, fontBold, androidPoppinsExtras } from "../common";
 
 export const welcomeStyles = StyleSheet.create({
   container: {
@@ -22,6 +22,7 @@ export const welcomeStyles = StyleSheet.create({
     color: "#666",
     fontFamily: fontReg,
     marginTop: 10,
+    ...androidPoppinsExtras,
   },
   image: {
     height: 250,

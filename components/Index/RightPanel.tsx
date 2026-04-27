@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, Modal } from "react-native";
+import { View, Text, TouchableOpacity, Modal, ScrollView } from "react-native";
 import { rightPanelStyles as styles } from "../../styles/components/Index/RightPanel";
 import DetailOption from "../DetailOption";
 import { Task } from "../../types";
@@ -52,7 +52,11 @@ const RightPanel: React.FC<RightPanelProps> = ({ selectedTask, onClose }) => {
       </View>
 
       {/* Detail option rows */}
-      <View style={styles.taskDetailContent}>
+      <ScrollView
+        style={styles.taskDetailContent}
+        contentContainerStyle={styles.taskDetailContentInner}
+        keyboardShouldPersistTaps="handled"
+      >
         {DETAIL_OPTIONS.map((option) => (
           <DetailOption
             key={option.text}
@@ -61,7 +65,7 @@ const RightPanel: React.FC<RightPanelProps> = ({ selectedTask, onClose }) => {
             onPress={() => handleOptionPress(option.text)}
           />
         ))}
-      </View>
+      </ScrollView>
 
       {/* Footer */}
       <View style={styles.taskDetailFooter}>

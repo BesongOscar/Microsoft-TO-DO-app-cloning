@@ -1,13 +1,11 @@
 import { StyleSheet } from "react-native";
-import { fontReg, fontSemi } from "../../common";
+import { fontReg, fontSemi, androidPoppinsExtras } from "../../common";
 
 export const rightPanelStyles = StyleSheet.create({
   rightPanel: {
-    width: "auto",
-    backgroundColor: "#faf9f8",
-    borderLeftWidth: 1,
-    borderLeftColor: "#e1e5e9",
     flex: 1,
+    backgroundColor: "transparent",
+    minHeight: 0,
   },
   taskDetailHeader: {
     flexDirection: "row",
@@ -25,8 +23,13 @@ export const rightPanelStyles = StyleSheet.create({
     flex: 1,
     marginRight: 8,
     fontFamily: fontSemi,
+    ...androidPoppinsExtras,
   },
   taskDetailContent: {
+    flex: 1,
+    minHeight: 0,
+  },
+  taskDetailContentInner: {
     padding: 20,
     flexGrow: 1,
   },
@@ -45,5 +48,6 @@ export const rightPanelStyles = StyleSheet.create({
     fontSize: 12,
     color: "#8a8886",
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
 });

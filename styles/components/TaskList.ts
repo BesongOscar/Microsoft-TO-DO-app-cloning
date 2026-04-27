@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { fontReg, fontSemi } from "../common";
+import { fontSemi, androidPoppinsExtras } from "../common";
 
 export const taskListStyles = StyleSheet.create({
   tasksContainer: {
@@ -19,6 +19,7 @@ export const taskListStyles = StyleSheet.create({
     fontWeight: "600",
     color: "#444",
     fontFamily: fontSemi,
+    ...androidPoppinsExtras,
   },
   completedSection: {
     marginTop: 8,
@@ -36,5 +37,6 @@ export const taskListStyles = StyleSheet.create({
     color: "#605e5c",
     fontWeight: "600",
     fontFamily: fontSemi,
+    ...androidPoppinsExtras,
   },
 });

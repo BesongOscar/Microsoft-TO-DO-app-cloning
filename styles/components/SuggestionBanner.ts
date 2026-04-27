@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { fontReg } from "../common";
+import { fontReg, androidPoppinsExtras } from "../common";
 
 export const suggestionBannerStyles = StyleSheet.create({
   suggestionsBanner: {
@@ -26,6 +26,7 @@ export const suggestionBannerStyles = StyleSheet.create({
     color: "#323130",
     flex: 1,
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
   suggestionsCloseButton: {
     padding: 8,

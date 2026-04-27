@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { fontReg } from "../common";
+import { fontReg, androidPoppinsExtras } from "../common";
 
 export const mainStyles = StyleSheet.create({
   container: {
@@ -28,6 +28,7 @@ export const mainStyles = StyleSheet.create({
     color: "white",
     paddingHorizontal: 12,
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
   mainContainer: {
     flex: 1,

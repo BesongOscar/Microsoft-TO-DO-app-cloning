@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { fontReg, fontSemi, fontBold } from "../common";
+import { fontReg, fontBold, androidPoppinsExtras } from "../common";
 
 export const listHeaderStyles = StyleSheet.create({
   listHeader: {
@@ -20,11 +20,13 @@ export const listHeaderStyles = StyleSheet.create({
     color: "#323130",
     marginBottom: 4,
     fontFamily: fontBold,
+    ...androidPoppinsExtras,
   },
   listDate: {
     fontSize: 14,
     color: "#605e5c",
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
   moreOptionsButton: {
     padding: 8,

@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { fontReg, fontSemi } from "../common";
+import { fontReg, fontSemi, androidPoppinsExtras } from "../common";
 
 export const plannedTasksListStyles = StyleSheet.create({
   container: {
@@ -21,6 +21,7 @@ export const plannedTasksListStyles = StyleSheet.create({
     fontWeight: "600",
     color: "#323130",
     fontFamily: fontSemi,
+    ...androidPoppinsExtras,
   },
   sectionTitleOverdue: {
     color: "#d13438",
@@ -30,6 +31,7 @@ export const plannedTasksListStyles = StyleSheet.create({
     fontWeight: "400",
     color: "#605e5c",
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
   taskWrapper: {
     backgroundColor: "#fff",
@@ -39,5 +41,6 @@ export const plannedTasksListStyles = StyleSheet.create({
     fontWeight: "600",
     color: "#444",
     fontFamily: fontSemi,
+    ...androidPoppinsExtras,
   },
 });

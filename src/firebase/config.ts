@@ -1,13 +1,32 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp, type FirebaseOptions } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDbT9PXXLn3xpeuPeb3dRlVO6aKroSqslo",
-  authDomain: "todo-app-29822.firebaseapp.com",
-  projectId: "todo-app-29822",
-  storageBucket: "todo-app-29822.firebasestorage.app",
-  messagingSenderId: "250040465413",
-  appId: "1:250040465413:web:5b49d1ac5238607774046c",
+function requireEnv(value: string | undefined, label: string): string {
+  if (typeof value !== "string" || value.trim() === "") {
+    throw new Error(
+      `Missing ${label}. Copy .env.example to .env and set your Firebase web app values.`,
+    );
+  }
+  return value.trim();
+}
+
+const apiKey = process.env.EXPO_PUBLIC_FIREBASE_API_KEY;
+const authDomain = process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN;
+const projectId = process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID;
+const storageBucket = process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET;
+const messagingSenderId = process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID;
+const appId = process.env.EXPO_PUBLIC_FIREBASE_APP_ID;
+
+const firebaseConfig: FirebaseOptions = {
+  apiKey: requireEnv(apiKey, "EXPO_PUBLIC_FIREBASE_API_KEY"),
+  authDomain: requireEnv(authDomain, "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN"),
+  projectId: requireEnv(projectId, "EXPO_PUBLIC_FIREBASE_PROJECT_ID"),
+  storageBucket: requireEnv(storageBucket, "EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET"),
+  messagingSenderId: requireEnv(
+    messagingSenderId,
+    "EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID",
+  ),
+  appId: requireEnv(appId, "EXPO_PUBLIC_FIREBASE_APP_ID"),
 };
 
 const app = initializeApp(firebaseConfig);

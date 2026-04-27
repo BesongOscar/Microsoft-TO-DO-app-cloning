@@ -4,7 +4,6 @@ import {
   Animated,
   TouchableWithoutFeedback,
   Dimensions,
-  StyleSheet,
   PanResponder,
   Keyboard,
 } from "react-native";
@@ -76,7 +75,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({ visible, onClose, children })
         }),
       ]).start();
     }
-  }, [visible]);
+  }, [visible, translateY, backdropOpacity]);
 
   const closeSheet = () => {
     Animated.parallel([

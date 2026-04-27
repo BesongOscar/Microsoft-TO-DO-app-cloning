@@ -8,11 +8,11 @@ import React, {
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Task, TaskCounts } from "../types";
+import { useAuth } from "@/context/AuthContext";
 
-// ─── Storage key ──────────────────────────────────────────────────────────────
-const STORAGE_KEY = "@tasks";
+const LEGACY_STORAGE_KEY = "@tasks";
+const storageKeyForUser = (uid: string) => `@tasks_${uid}`;
 
-// ─── Default seed data (only used on very first launch) ───────────────────────
 const DEFAULT_TASKS: Task[] = [
   { id: "1", text: "Review quarterly reports",         completed: false, important: true,  myDay: true  },
   { id: "2", text: "Call client about project update", completed: false, important: false, myDay: true  },
@@ -22,7 +22,6 @@ const DEFAULT_TASKS: Task[] = [
   { id: "6", text: "Send weekly status report",        completed: true,  important: false, myDay: false },
 ];
 
-// ─── Context shape ────────────────────────────────────────────────────────────
 interface TasksContextValue {
   tasks: Task[];
   loading: boolean;
@@ -36,52 +35,79 @@ interface TasksContextValue {
   refreshTasks: () => Promise<void>;
 }
 
-// ─── Context ──────────────────────────────────────────────────────────────────
 const TasksContext = createContext<TasksContextValue | null>(null);
 
-// ─── Provider ─────────────────────────────────────────────────────────────────
-export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const { user, loading: authLoading } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState<boolean>(false);
 
-  // ── Load persisted tasks on first mount ──────────────────────────────────
   useEffect(() => {
+    if (authLoading) {
+      return;
+    }
+
+    let cancelled = false;
+
     const loadTasks = async (): Promise<void> => {
+      if (!user) {
+        setTasks([]);
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      const key = storageKeyForUser(user.uid);
+
       try {
-        const stored = await AsyncStorage.getItem(STORAGE_KEY);
+        let stored = await AsyncStorage.getItem(key);
+        if (stored === null) {
+          const legacy = await AsyncStorage.getItem(LEGACY_STORAGE_KEY);
+          if (legacy !== null) {
+            await AsyncStorage.setItem(key, legacy);
+            await AsyncStorage.removeItem(LEGACY_STORAGE_KEY);
+            stored = legacy;
+          }
+        }
+
+        if (cancelled) return;
+
         if (stored !== null) {
           const parsed = JSON.parse(stored) as Task[];
           if (Array.isArray(parsed) && parsed.length > 0) {
             setTasks(parsed);
           } else {
             setTasks(DEFAULT_TASKS);
-            await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_TASKS));
+            await AsyncStorage.setItem(key, JSON.stringify(DEFAULT_TASKS));
           }
         } else {
           setTasks(DEFAULT_TASKS);
-          await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_TASKS));
+          await AsyncStorage.setItem(key, JSON.stringify(DEFAULT_TASKS));
         }
       } catch (e) {
         console.warn("Failed to load tasks from storage:", e);
-        setTasks(DEFAULT_TASKS);
+        if (!cancelled) setTasks(DEFAULT_TASKS);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
     loadTasks();
-  }, []);
+    return () => {
+      cancelled = true;
+    };
+  }, [authLoading, user?.uid]);
 
-  // ── Persist to AsyncStorage whenever tasks change (after initial load) ───
   useEffect(() => {
-    if (loading) return;
-    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)).catch((e) =>
+    if (authLoading || !user || loading) return;
+    const key = storageKeyForUser(user.uid);
+    AsyncStorage.setItem(key, JSON.stringify(tasks)).catch((e) =>
       console.warn("Failed to persist tasks:", e),
     );
-  }, [tasks, loading]);
-
-  // ── Task actions ─────────────────────────────────────────────────────────
+  }, [tasks, loading, authLoading, user?.uid]);
 
   const addTask = useCallback((text: string, listName = "My Day", listId?: string): void => {
     const newTask: Task = {
@@ -118,9 +144,11 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, []);
 
   const refreshTasks = useCallback(async (): Promise<void> => {
+    if (!user) return;
     setRefreshing(true);
     try {
-      const stored = await AsyncStorage.getItem(STORAGE_KEY);
+      const key = storageKeyForUser(user.uid);
+      const stored = await AsyncStorage.getItem(key);
       if (stored !== null) {
         const parsed = JSON.parse(stored) as Task[];
         if (Array.isArray(parsed) && parsed.length > 0) {
@@ -132,9 +160,8 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     } finally {
       setRefreshing(false);
     }
-  }, []);
+  }, [user?.uid]);
 
-  // ── Derived counts ───────────────────────────────────────────────────────
   const counts = useMemo<TaskCounts>(
     () => ({
       myDay:     tasks.filter((t) => t.myDay && !t.completed).length,
@@ -163,7 +190,6 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   return <TasksContext.Provider value={value}>{children}</TasksContext.Provider>;
 };
 
-// ─── Hook ─────────────────────────────────────────────────────────────────────
 export const useTasks = (): TasksContextValue => {
   const ctx = useContext(TasksContext);
   if (!ctx) {

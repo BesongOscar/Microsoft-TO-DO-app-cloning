@@ -1,5 +1,4 @@
 import {
-  StyleSheet,
   Text,
   View,
   TextInput,
@@ -29,35 +28,30 @@ export const signupValidationSchema = Yup.object().shape({
 
 export default function Signup() {
   const { width } = useWindowDimensions();
-  const imageSize = Math.min(width * 0.5, 140);
+  const imageSize = Math.min(width * 0.3, 140);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
   const { signup, googleLogin } = useAuth();
 
   const handleSignup = async (email: string, password: string) => {
     try {
-      setIsLoading(true);
       await signup(email, password);
       router.push("/emailVerification");
     } catch (error: any) {
       Alert.alert("Signup Failed", error.message || "An error occurred");
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const handleGoogleSignup = async () => {
     try {
-      setIsLoading(true);
-      await googleLogin();
-      router.push("/emailVerification");
+      const success = await googleLogin();
+      if (success) {
+        router.push("/emailVerification");
+      }
     } catch (error: any) {
       Alert.alert("Google Signup Failed", error.message || "An error occurred");
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -78,9 +72,7 @@ export default function Signup() {
         </View>
       </View>
       <Text style={styles.title}>Sign Up</Text>
-      <Text style={styles.subtitle}>
-        Please enter the code we just sent to your email
-      </Text>
+      <Text style={styles.subtitle}>Create an account to sync your tasks</Text>
 
       <Formik
         initialValues={{

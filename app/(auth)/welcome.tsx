@@ -12,7 +12,7 @@ export default function Welcome() {
     <SafeAreaView edges={["top", "bottom"]} style={welcomeStyles.container}>
       <Image source={placeholder} style={welcomeStyles.image} />
       <View style={welcomeStyles.textContainer}>
-        <Text style={welcomeStyles.title}>Let's Get Started</Text>
+        <Text style={welcomeStyles.title}>{"Let's Get Started"}</Text>
         <Text style={welcomeStyles.subtitle}>
           Reliable and Efficient task management Application
         </Text>

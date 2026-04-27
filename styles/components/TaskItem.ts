@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { fontReg, fontSemi } from "../common";
+import { fontReg, fontSemi, androidPoppinsExtras } from "../common";
 
 export const taskItemStyles = StyleSheet.create({
   taskItem: {
@@ -34,6 +34,7 @@ export const taskItemStyles = StyleSheet.create({
     color: "#323130",
     flex: 1,
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
   taskTextCompleted: {
     fontSize: 16,
@@ -41,6 +42,7 @@ export const taskItemStyles = StyleSheet.create({
     textDecorationLine: "line-through",
     flex: 1,
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
   starButton: {
     padding: 4,
@@ -56,6 +58,7 @@ export const taskItemStyles = StyleSheet.create({
     color: "#107c10",
     marginLeft: 4,
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
   dueDateTextOverdue: {
     color: "#d13438",
@@ -72,6 +75,7 @@ export const taskItemStyles = StyleSheet.create({
     paddingVertical: 2,
     marginRight: 8,
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
   editAction: {
     padding: 4,
@@ -104,6 +108,7 @@ export const taskItemStyles = StyleSheet.create({
     paddingBottom: 12,
     fontStyle: "italic",
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
   menuDivider: {
     height: 1,
@@ -124,6 +129,7 @@ export const taskItemStyles = StyleSheet.create({
     fontSize: 15,
     color: "#323130",
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
   menuItemDestructive: {
     color: "#d13438",
@@ -134,5 +140,6 @@ export const taskItemStyles = StyleSheet.create({
     flex: 1,
     textAlign: "center",
     fontFamily: fontSemi,
+    ...androidPoppinsExtras,
   },
 });

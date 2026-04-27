@@ -1,25 +1,44 @@
 import { Stack } from "expo-router";
-import { StatusBar } from "expo-status-bar";
 import { TasksProvider } from "../context/TasksContext";
+import { CustomListsProvider } from "../context/CustomListsContext";
 import ErrorBoundary from "../components/ErrorBoundary";
 import { AuthProvider } from "../src/context/AuthContext";
-import "@fontsource/poppins/400.css";
-import "@fontsource/poppins/600.css";
-import "@fontsource/poppins/700.css";
+import { useEffect } from "react";
+import {
+  useFonts,
+  Poppins_400Regular,
+  Poppins_600SemiBold,
+  Poppins_700Bold,
+} from "@expo-google-fonts/poppins";
 
 export default function RootLayout() {
+  const [fontsLoaded, fontError] = useFonts({
+    "Poppins-Regular": Poppins_400Regular,
+    "Poppins-SemiBold": Poppins_600SemiBold,
+    "Poppins-Bold": Poppins_700Bold,
+  });
+
+  useEffect(() => {
+    if (fontError && __DEV__) {
+      console.error("[fonts]", fontError);
+    }
+  }, [fontError]);
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   return (
     <ErrorBoundary>
       <AuthProvider>
-        <TasksProvider>
-          <StatusBar backgroundColor="#0078d4" />
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(auth)"/>
-            <Stack.Screen name="main" />
-            <Stack.Screen name="settings"/>
-          </Stack>
-        </TasksProvider>
+        <CustomListsProvider>
+          <TasksProvider>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="(auth)" />
+              <Stack.Screen name="(protected)" />
+            </Stack>
+          </TasksProvider>
+        </CustomListsProvider>
       </AuthProvider>
     </ErrorBoundary>
   );

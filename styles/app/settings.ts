@@ -1,5 +1,10 @@
 import { StyleSheet } from "react-native";
-import { fontReg, fontSemi, fontBold } from "../common";
+import {
+  fontReg,
+  fontSemi,
+  fontBold,
+  androidPoppinsExtras,
+} from "../common";
 
 export const settingsStyles = StyleSheet.create({
   container: {
@@ -14,12 +19,17 @@ export const settingsStyles = StyleSheet.create({
   header: {
     padding: 20,
     backgroundColor: "#0078d4",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 15
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: "bold",
+    marginBottom: 10,
     color: "white",
     fontFamily: fontBold,
+    ...androidPoppinsExtras,
   },
   profileSection: {
     alignItems: "center",
@@ -64,6 +74,7 @@ export const settingsStyles = StyleSheet.create({
     marginTop: 8,
     fontSize: 12,
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
   section: {
     marginTop: 20,
@@ -76,6 +87,7 @@ export const settingsStyles = StyleSheet.create({
     marginBottom: 10,
     textTransform: "uppercase",
     fontFamily: fontSemi,
+    ...androidPoppinsExtras,
   },
   editNameContainer: {
     flexDirection: "row",
@@ -90,6 +102,7 @@ export const settingsStyles = StyleSheet.create({
     fontSize: 16,
     paddingHorizontal: 8,
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
   saveButton: {
     padding: 8,
@@ -113,12 +126,14 @@ export const settingsStyles = StyleSheet.create({
     fontSize: 12,
     color: "#666",
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
   infoValue: {
     fontSize: 16,
     color: "#333",
     marginTop: 2,
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
   menuItem: {
     flexDirection: "row",
@@ -134,6 +149,7 @@ export const settingsStyles = StyleSheet.create({
     color: "#d32f2f",
     marginLeft: 12,
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
   footer: {
     position: "absolute",
@@ -146,5 +162,6 @@ export const settingsStyles = StyleSheet.create({
     fontSize: 12,
     color: "#999",
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
 });

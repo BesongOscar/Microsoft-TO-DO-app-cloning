@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { fontReg, fontSemi, fontBold } from "../common";
+import { fontReg, fontSemi, androidPoppinsExtras } from "../common";
 
 export const customListModalStyles = StyleSheet.create({
   listPreview: {
@@ -19,6 +19,7 @@ export const customListModalStyles = StyleSheet.create({
     fontWeight: "600",
     color: "#323130",
     fontFamily: fontSemi,
+    ...androidPoppinsExtras,
   },
   inputLabel: {
     fontSize: 13,
@@ -27,6 +28,7 @@ export const customListModalStyles = StyleSheet.create({
     marginBottom: 8,
     textTransform: "uppercase",
     fontFamily: fontSemi,
+    ...androidPoppinsExtras,
   },
   listNameInput: {
     borderWidth: 1,
@@ -37,6 +39,7 @@ export const customListModalStyles = StyleSheet.create({
     color: "#323130",
     marginBottom: 20,
     fontFamily: fontReg,
+    ...androidPoppinsExtras,
   },
   emojiGrid: {
     flexDirection: "row",
@@ -71,5 +74,6 @@ export const customListModalStyles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     fontFamily: fontSemi,
+    ...androidPoppinsExtras,
   },
 });
