@@ -18,6 +18,10 @@ import {
   Poppins_600SemiBold,
   Poppins_700Bold,
 } from "@expo-google-fonts/poppins";
+import { configureGoogleSignIn } from "../src/auth/googleAuth";
+
+// Configure Google Sign-In once at app startup
+configureGoogleSignIn();
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({

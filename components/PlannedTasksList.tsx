@@ -71,10 +71,8 @@ const groupTasksByDate = (tasks: Task[]): TaskGroup[] => {
   const pendingTasks = tasks.filter((t) => !t.completed);
   const completedTasks = tasks.filter((t) => t.completed);
 
-  // ── FIX: this loop was accidentally commented out, leaving the Planned
-  //         view perpetually empty. It now runs and populates `groups` and
-  //         `overdueTasks` correctly.
-  pendingTasks.forEach((task) => {
+  
+  pendingTasks.forEach((task) => { // ignore completed tasks in this loop since they all go in the same "Completed" bucket at the end
     if (!task.dueDate) return; // tasks without a due date don't belong here
 
     const { category, isOverdue } = getDateCategory(task.dueDate);

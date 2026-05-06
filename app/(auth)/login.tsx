@@ -5,9 +5,6 @@
  * Supports both email/password and Google OAuth login.
  */
 
-import { maybeCompleteAuthSession } from "expo-web-browser";
-maybeCompleteAuthSession();
-
 import {
   StyleSheet,
   Text,
@@ -27,9 +24,12 @@ import { useRouter } from "expo-router";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import { useAuth } from "@/context/AuthContext";
-import * as Google from "expo-auth-session/providers/google";
 import { loginStyles as styles } from "styles/(auth)/login";
 import { GoogleIcon } from "@/components/(auth)/GoogleIcon";
+import {
+  signInWithGoogle,
+  getGoogleSignInErrorMessage,
+} from "@/src/auth/googleAuth";
 
 export const loginValidationSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Email is required"),
@@ -44,12 +44,6 @@ export default function Login() {
 
   const router = useRouter();
   const { login, googleLogin } = useAuth();
-
-  const [request, _response, promptAsync] = Google.useAuthRequest({
-    webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-    iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
-    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
-  });
 
   const handleLogin = async (email: string, password: string) => {
     try {
@@ -66,20 +60,15 @@ export default function Login() {
   const handleGoogleLogin = async () => {
     try {
       setIsLoading(true);
-      const result = await promptAsync();
-
-      if (result.type === "success") {
-        const { id_token } = result.params;
-        if (!id_token) throw new Error("No ID token returned");
-        const success = await googleLogin(id_token);
-        if (success) router.push("/main");
-      } else if (result.type === "cancel") {
-        console.log("Google Sign-In cancelled");
-      } else {
-        throw new Error("Google Sign-In failed");
+      const { idToken } = await signInWithGoogle();
+      const success = await googleLogin(idToken);
+      if (success) router.replace("/main");
+    } catch (error) {
+      const message = getGoogleSignInErrorMessage(error);
+      // SIGN_IN_CANCELLED is not an error worth alerting
+      if (message !== "Sign-in was cancelled") {
+        Alert.alert("Google Login Failed", message);
       }
-    } catch (error: any) {
-      Alert.alert("Google Login Failed", error.message || "An error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -208,8 +197,8 @@ export default function Login() {
         textColor="#333"
         borderColor="#ccc"
         onPress={handleGoogleLogin}
-        disabled={!request || isLoading}
-        icon={<GoogleIcon size={20}/>}
+        disabled={isLoading}
+        icon={<GoogleIcon size={20} />}
       />
 
       <Text style={styles.linkText}>

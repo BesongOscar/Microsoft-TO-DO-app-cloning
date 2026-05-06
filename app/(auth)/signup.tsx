@@ -1,6 +1,3 @@
-import { maybeCompleteAuthSession } from "expo-web-browser";
-maybeCompleteAuthSession();
-
 import {
   Text,
   View,
@@ -17,9 +14,12 @@ import * as Yup from "yup";
 import { Formik } from "formik";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "expo-router";
-import * as Google from "expo-auth-session/providers/google";
 import { signupStyles as styles } from "styles/(auth)/signup";
 import { GoogleIcon } from "@/components/(auth)/GoogleIcon";
+import {
+  signInWithGoogle,
+  getGoogleSignInErrorMessage,
+} from "@/src/auth/googleAuth";
 
 /**
  * Signup - New user registration screen
@@ -44,15 +44,10 @@ export default function Signup() {
   const imageSize = Math.min(width * 0.3, 140);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
   const { signup, googleLogin } = useAuth();
-
-  const [request, _response, promptAsync] = Google.useAuthRequest({
-    webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-    iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
-    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
-  });
 
   const handleSignup = async (
     email: string,
@@ -69,22 +64,18 @@ export default function Signup() {
 
   const handleGoogleSignup = async () => {
     try {
-      const result = await promptAsync();
-
-      if (result.type === "success") {
-        const { id_token } = result.params;
-        if (!id_token) throw new Error("No ID token returned");
-        const success = await googleLogin(id_token);
-        if (success) {
-          router.push("/main");
-        }
-      } else if (result.type === "cancel") {
-        console.log("Google Sign-Up cancelled");
-      } else {
-        throw new Error("Google Sign-Up failed");
+      setIsLoading(true);
+      const { idToken } = await signInWithGoogle();
+      const success = await googleLogin(idToken);
+      if (success) router.replace("/main");
+    } catch (error) {
+      const message = getGoogleSignInErrorMessage(error);
+      // SIGN_IN_CANCELLED is not an error worth alerting
+      if (message !== "Sign-in was cancelled") {
+        Alert.alert("Google Login Failed", message);
       }
-    } catch (error: any) {
-      Alert.alert("Google Signup Failed", error.message || "An error occurred");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -254,7 +245,7 @@ export default function Signup() {
         textColor="#333"
         borderColor="#ccc"
         onPress={handleGoogleSignup}
-        icon={<GoogleIcon size={20}/>}
+        icon={<GoogleIcon size={20} />}
       />
 
       <Text style={styles.linkText}>

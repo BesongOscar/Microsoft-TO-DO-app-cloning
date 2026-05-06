@@ -26,6 +26,7 @@ import {
   updateUserProfileDoc,
 } from "@/firebase/userProfile";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { signOutGoogle } from "../auth/googleAuth";
 
 interface UserProfile {
   name: string;
@@ -91,7 +92,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const logout = async () => {
-    await signOut(auth);
+    await signOutGoogle(); // clears Google session
+    await signOut(auth); // clears Firebase session
   };
 
   const resetPassword = async (email: string) => {
