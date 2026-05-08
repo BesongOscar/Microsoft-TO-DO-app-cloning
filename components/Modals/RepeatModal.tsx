@@ -1,50 +1,154 @@
+/**
+ * RepeatModal - Task repeat scheduling modal
+ * 
+ * Supports daily, weekly, monthly, yearly, and custom repeat options.
+ * Weekly includes day-of-week toggles; monthly includes last-day support.
+ */
+
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, Modal, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+  StyleSheet,
+  ScrollView,
+} from "react-native";
 import { RepeatType } from "../../types";
+import { RepeatModalStyles as styles } from "../../styles/modals/repeatModal";
 
 interface RepeatOption {
   label: string;
-  description: string;
   value: RepeatType;
 }
 
 const REPEAT_OPTIONS: RepeatOption[] = [
-  { label: "Never", description: "Does not repeat", value: "none" },
-  { label: "Daily", description: "Repeats every day", value: "daily" },
-  { label: "Weekly", description: "Repeats every week", value: "weekly" },
-  { label: "Monthly", description: "Repeats every month", value: "monthly" },
-  { label: "Yearly", description: "Repeats every year", value: "yearly" },
+  { label: "Never", value: "none" },
+  { label: "Daily", value: "daily" },
+  { label: "Weekly", value: "weekly" },
+  { label: "Monthly", value: "monthly" },
+  { label: "Yearly", value: "yearly" },
 ];
+
+const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 interface RepeatModalProps {
   visible: boolean;
   currentRepeat: RepeatType | undefined;
-  onSelect: (repeat: RepeatType) => void;
+  currentRepeatDays?: number[] | undefined; // for weekly repeats
+  currentRepeatOnDay?: number | undefined; // for monthly/yearly repeats
+  currentRepeatOnLastDay?: boolean | undefined; // for monthly repeats
+  currentRepeatEndDate?: string | undefined; // optional end date for repeats
+  dueTime: string | undefined; // for preview display
+  onSelect: (
+    repeat: RepeatType,
+    options?: {
+      repeatDays?: number[];
+      repeatOnDay?: number;
+      repeatOnLastDay?: boolean;
+      repeatEndDate?: string;
+    },
+  ) => void;
   onClose: () => void;
 }
 
 const RepeatModal: React.FC<RepeatModalProps> = ({
   visible,
   currentRepeat,
+  currentRepeatDays,
+  currentRepeatOnDay,
+  currentRepeatOnLastDay,
+  currentRepeatEndDate,
+  dueTime,
   onSelect,
   onClose,
 }) => {
   const [selectedRepeat, setSelectedRepeat] = useState<RepeatType>(
     currentRepeat || "none",
   );
+  const [selectedDays, setSelectedDays] = useState<number[]>(
+    currentRepeatDays || [],
+  );
+  const [monthlyDay, setMonthlyDay] = useState<number>(currentRepeatOnDay || 1);
+  const [isLastDay, setIsLastDay] = useState<boolean>(
+    currentRepeatOnLastDay || false,
+  );
+  // End repeat state
+  const [endRepeatType, setEndRepeatType] = useState<"never" | "onDate">(
+    currentRepeatEndDate ? "onDate" : "never",
+  );
+  const [endDateYear, setEndDateYear] = useState<number>(
+    currentRepeatEndDate
+      ? parseInt(currentRepeatEndDate.split("-")[0], 10)
+      : new Date().getFullYear(),
+  );
+  const [endDateMonth, setEndDateMonth] = useState<number>(
+    currentRepeatEndDate
+      ? parseInt(currentRepeatEndDate.split("-")[1], 10)
+      : new Date().getMonth() + 1,
+  );
+  const [endDateDay, setEndDateDay] = useState<number>(
+    currentRepeatEndDate
+      ? parseInt(currentRepeatEndDate.split("-")[2], 10)
+      : new Date().getDate(),
+  );
+  const [showEndDatePicker, setShowEndDatePicker] = useState(false);
 
-  const handleSelect = (option: RepeatType) => {
-    setSelectedRepeat(option);
+  const timeSuffix = dueTime
+    ? ` at ${dueTime.slice(0, 2)}:${dueTime.slice(3)}`
+    : "";
+
+  const toggleDay = (day: number) => {
+    setSelectedDays((prev) =>
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day],
+    );
+  };
+
+  const getRepeatLabel = (): string => {
+    switch (selectedRepeat) {
+      case "none":
+        return "Never";
+      case "daily":
+        return `Daily${timeSuffix}`;
+      case "weekly": {
+        if (selectedDays.length === 0) return `Weekly${timeSuffix}`;
+        const dayNames = selectedDays.sort().map((d) => DAY_LABELS[d]);
+        return `Weekly on ${dayNames.join(", ")}${timeSuffix}`;
+      }
+      case "monthly": {
+        if (isLastDay) return `Last day of month${timeSuffix}`;
+        return `Monthly on day ${monthlyDay}${timeSuffix}`;
+      }
+      case "yearly":
+        return `Yearly${timeSuffix}`;
+      default:
+        return "";
+    }
   };
 
   const handleSave = () => {
-    onSelect(selectedRepeat);
-    onClose();
-  };
+    const options: Record<string, any> = {};
 
-  const formatRepeatDisplay = (repeat: RepeatType): string => {
-    const option = REPEAT_OPTIONS.find((o) => o.value === repeat);
-    return option?.label || "Never";
+    if (selectedRepeat === "weekly" && selectedDays.length > 0) {
+      options.repeatDays = selectedDays;
+    }
+
+    if (selectedRepeat === "monthly") {
+      options.repeatOnLastDay = isLastDay;
+      if (!isLastDay) {
+        options.repeatOnDay = monthlyDay;
+      }
+    }
+
+    if (endRepeatType === "onDate") {
+      options.repeatEndDate = `${endDateYear}-${String(endDateMonth).padStart(2, "0")}-${String(endDateDay).padStart(2, "0")}`;
+    }
+
+    onSelect(
+      selectedRepeat,
+      Object.keys(options).length > 0 ? options : undefined,
+    );
+    onClose();
   };
 
   return (
@@ -67,7 +171,8 @@ const RepeatModal: React.FC<RepeatModalProps> = ({
           <View style={styles.handle} />
           <Text style={styles.title}>Repeat</Text>
 
-          <View style={styles.optionsList}>
+          <ScrollView style={styles.optionsList}>
+            {/* Repeat Type Selection */}
             {REPEAT_OPTIONS.map((option) => (
               <TouchableOpacity
                 key={option.value}
@@ -75,33 +180,189 @@ const RepeatModal: React.FC<RepeatModalProps> = ({
                   styles.option,
                   selectedRepeat === option.value && styles.optionSelected,
                 ]}
-                onPress={() => handleSelect(option.value)}
+                onPress={() => setSelectedRepeat(option.value)}
               >
-                <View style={styles.optionContent}>
-                  <Text
-                    style={[
-                      styles.optionText,
-                      selectedRepeat === option.value &&
-                        styles.optionTextSelected,
-                    ]}
-                  >
-                    {option.label}
-                  </Text>
-                  <Text style={styles.optionDescription}>
-                    {option.description}
-                  </Text>
-                </View>
+                <Text
+                  style={[
+                    styles.optionText,
+                    selectedRepeat === option.value &&
+                      styles.optionTextSelected,
+                  ]}
+                >
+                  {option.label}
+                  {option.value !== "none" && timeSuffix && (
+                    <Text style={styles.timeHint}> at {dueTime}</Text>
+                  )}
+                </Text>
                 {selectedRepeat === option.value && (
                   <Text style={styles.checkmark}>✓</Text>
                 )}
               </TouchableOpacity>
             ))}
-          </View>
 
+            {/* Weekly Day Picker */}
+            {selectedRepeat === "weekly" && (
+              <View style={styles.dayPickerContainer}>
+                <Text style={styles.sectionLabel}>Repeat on:</Text>
+                <View style={styles.dayRow}>
+                  {DAY_LABELS.map((label, index) => (
+                    <TouchableOpacity
+                      key={index}
+                      style={[
+                        styles.dayButton,
+                        selectedDays.includes(index) &&
+                          styles.dayButtonSelected,
+                      ]}
+                      onPress={() => toggleDay(index)}
+                    >
+                      <Text
+                        style={[
+                          styles.dayButtonText,
+                          selectedDays.includes(index) &&
+                            styles.dayButtonTextSelected,
+                        ]}
+                      >
+                        {label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            )}
+
+            {/* Monthly Options */}
+            {selectedRepeat === "monthly" && (
+              <View style={styles.monthlyContainer}>
+                <Text style={styles.sectionLabel}>Repeat on:</Text>
+                <TouchableOpacity
+                  style={[
+                    styles.monthlyOption,
+                    !isLastDay && styles.monthlyOptionSelected,
+                  ]}
+                  onPress={() => setIsLastDay(false)}
+                >
+                  <Text style={styles.monthlyOptionText}>Day of month</Text>
+                  {!isLastDay && (
+                    <View style={styles.dayNumberRow}>
+                      <TouchableOpacity
+                        onPress={() =>
+                          setMonthlyDay(Math.max(1, monthlyDay - 1))
+                        }
+                      >
+                        <Text style={styles.dayArrow}>−</Text>
+                      </TouchableOpacity>
+                      <Text style={styles.dayNumber}>{monthlyDay}</Text>
+                      <TouchableOpacity
+                        onPress={() =>
+                          setMonthlyDay(Math.min(31, monthlyDay + 1))
+                        }
+                      >
+                        <Text style={styles.dayArrow}>+</Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.monthlyOption,
+                    isLastDay && styles.monthlyOptionSelected,
+                  ]}
+                  onPress={() => setIsLastDay(true)}
+                >
+                  <Text style={styles.monthlyOptionText}>
+                    Last day of month
+                  </Text>
+                  {isLastDay && <Text style={styles.checkmark}>✓</Text>}
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {/* End Repeat Section */}
+            {selectedRepeat !== "none" && (
+              <View style={styles.endRepeatContainer}>
+                <Text style={styles.sectionLabel}>End Repeat</Text>
+                <TouchableOpacity
+                  style={[
+                    styles.endRepeatOption,
+                    endRepeatType === "never" && styles.optionSelected,
+                  ]}
+                  onPress={() => setEndRepeatType("never")}
+                >
+                  <Text style={styles.optionText}>Never</Text>
+                  {endRepeatType === "never" && (
+                    <Text style={styles.checkmark}>✓</Text>
+                  )}
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.endRepeatOption,
+                    endRepeatType === "onDate" && styles.optionSelected,
+                  ]}
+                  onPress={() => setEndRepeatType("onDate")}
+                >
+                  <Text style={styles.optionText}>On Date</Text>
+                  {endRepeatType === "onDate" && (
+                    <Text style={styles.checkmark}>✓</Text>
+                  )}
+                </TouchableOpacity>
+
+                {endRepeatType === "onDate" && (
+                  <View style={styles.endDatePicker}>
+                    <View style={styles.endDateRow}>
+                      <TouchableOpacity
+                        onPress={() =>
+                          setEndDateMonth(Math.max(1, endDateMonth - 1))
+                        }
+                        style={styles.endDateArrow}
+                      >
+                        <Text style={styles.dayArrow}>−</Text>
+                      </TouchableOpacity>
+                      <Text style={styles.endDateValue}>
+                        {endDateYear}/{String(endDateMonth).padStart(2, "0")}/
+                        {String(endDateDay).padStart(2, "0")}
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() =>
+                          setEndDateMonth(Math.min(12, endDateMonth + 1))
+                        }
+                        style={styles.endDateArrow}
+                      >
+                        <Text style={styles.dayArrow}>+</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <View style={styles.endDateRow}>
+                      <TouchableOpacity
+                        onPress={() =>
+                          setEndDateDay(Math.max(1, endDateDay - 1))
+                        }
+                        style={styles.endDateArrow}
+                      >
+                        <Text style={styles.dayArrow}>−</Text>
+                      </TouchableOpacity>
+                      <Text style={styles.endDateHint}>Day</Text>
+                      <TouchableOpacity
+                        onPress={() =>
+                          setEndDateDay(Math.min(31, endDateDay + 1))
+                        }
+                        style={styles.endDateArrow}
+                      >
+                        <Text style={styles.dayArrow}>+</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                )}
+              </View>
+            )}
+          </ScrollView>
+
+          {/* Preview */}
           <View style={styles.preview}>
             <Text style={styles.previewLabel}>Selected:</Text>
             <Text style={styles.previewDate}>
-              {formatRepeatDisplay(selectedRepeat)}
+              {getRepeatLabel()}
+              {endRepeatType === "onDate" &&
+                selectedRepeat !== "none" &&
+                ` until ${endDateYear}/${String(endDateMonth).padStart(2, "0")}/${String(endDateDay).padStart(2, "0")}`}
             </Text>
           </View>
 
@@ -118,120 +379,5 @@ const RepeatModal: React.FC<RepeatModalProps> = ({
     </Modal>
   );
 };
-
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.4)",
-    justifyContent: "flex-end",
-  },
-  sheet: {
-    backgroundColor: "#fff",
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    paddingBottom: 34,
-  },
-  handle: {
-    width: 40,
-    height: 4,
-    backgroundColor: "#d1d0cd",
-    borderRadius: 2,
-    alignSelf: "center",
-    marginTop: 12,
-    marginBottom: 16,
-  },
-  title: {
-    fontSize: 17,
-    fontWeight: "600",
-    color: "#323130",
-    textAlign: "center",
-    marginBottom: 16,
-  },
-  optionsList: {
-    maxHeight: 300,
-  },
-  option: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f3f2f1",
-  },
-  optionSelected: {
-    backgroundColor: "#e1f3ff",
-  },
-  optionContent: {
-    flex: 1,
-  },
-  optionText: {
-    fontSize: 16,
-    color: "#323130",
-  },
-  optionTextSelected: {
-    color: "#0078d4",
-    fontWeight: "600",
-  },
-  optionDescription: {
-    fontSize: 12,
-    color: "#605e5c",
-    marginTop: 2,
-  },
-  checkmark: {
-    fontSize: 18,
-    color: "#0078d4",
-  },
-  preview: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 16,
-    backgroundColor: "#f8f9fa",
-    marginHorizontal: 20,
-    borderRadius: 8,
-    marginTop: 16,
-  },
-  previewLabel: {
-    fontSize: 14,
-    color: "#605e5c",
-    marginRight: 8,
-  },
-  previewDate: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#0078d4",
-  },
-  buttons: {
-    flexDirection: "row",
-    marginTop: 20,
-    marginHorizontal: 20,
-    gap: 12,
-  },
-  cancelButton: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: 8,
-    backgroundColor: "#f3f2f1",
-    alignItems: "center",
-  },
-  cancelText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#605e5c",
-  },
-  saveButton: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: 8,
-    backgroundColor: "#0078d4",
-    alignItems: "center",
-  },
-  saveText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#fff",
-  },
-});
 
 export default RepeatModal;

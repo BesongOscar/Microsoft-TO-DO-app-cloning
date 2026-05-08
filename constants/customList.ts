@@ -1,0 +1,28 @@
+// Emoji options for custom list icons - used in CustomListModal picker
+const EMOJI_OPTIONS = [
+  "📋",
+  "🏠",
+  "💼",
+  "🎯",
+  "📚",
+  "🎮",
+  "🎨",
+  "🎵",
+  "🏋️",
+  "🛒",
+  "💰",
+  "✈️",
+  "🍕",
+  "💊",
+  "📞",
+  "🔧",
+  "🌟",
+  "❤️",
+  "🔥",
+  "💡",
+  "📷",
+  "🎬",
+  "🏆",
+  "🎁",
+];
+export default EMOJI_OPTIONS;

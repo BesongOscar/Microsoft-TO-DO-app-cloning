@@ -3,11 +3,14 @@ React Native TODO app with Firebase - featuring task management, custom lists, d
 
 ## Features
 
-- **Task Management** - Create, edit, delete, and toggle tasks with due dates, reminders, repeat rules, and notes
-- **Custom Lists** - Create, edit, and delete custom task lists with custom icons
-- **Drag & Drop** - Reorder tasks via PanResponder-based drag-and-drop (replaces draggable-flatlist)
+- **Task Management** - Create, edit, delete, and toggle tasks with due dates, due times, reminders, repeat rules (daily/weekly/monthly/yearly), and notes
+- **Task Ordering** - Drag-and-drop reorder via PanResponder; tasks persist their order in Firestore
+- **Smart Repeats** - Advanced repeat options: multi-day weekly, last-day-of-month monthly, repeat end dates
+- **Local Notifications** - Schedule and cancel task reminders with expo-notifications; handles repeat scheduling natively
+- **Time Picker** - Platform-specific time picker (iOS spinner, Android dialog)
+- **Custom Lists** - Create, edit, and delete custom task lists with custom icons and colors
 - **User Profiles** - Firebase Auth with email/password + Google OAuth via @react-native-google-signin, profile photos via Firebase Storage
-- **Smart Task Panel** - BottomPanel with calendar picker, reminder, repeat, and note modals
+- **Bottom Panel** - Slide-up task detail panel with calendar picker, reminder, and note modals
 - **Search** - Filter tasks by keyword across all lists
 - **Pull-to-Refresh** - Sync tasks from Firestore with pull gesture
 
@@ -36,7 +39,7 @@ This project keeps native folders (`android/` and/or `ios/`) and uses `app.json`
 
 ```
 ├── app/                    # Expo Router screens (file-based routing)
-│   ├── (auth)/            # Auth screens (login, signup, forgotPassword, etc.)
+│   ├── (auth)/            # Auth screens (login, signup, forgotPassword, emailVerification)
 │   ├── (protected)/       # Protected screens (main, settings)
 │   └── _layout.tsx       # Root layout
 ├── assets/                # Images and icons
@@ -46,13 +49,16 @@ This project keeps native folders (`android/` and/or `ios/`) and uses `app.json`
 │   ├── (auth)/           # Auth-related components (buttons, GoogleIcon)
 ├── constants/            # App constants (list definitions)
 ├── context/               # React contexts (TasksContext, CustomListsContext)
-├── src/                   # Firebase and auth utilities
+├── src/                   # Firebase, auth, and notification utilities
+│   ├── auth/             # Google Sign-In helper
 │   ├── firebase/         # Firestore CRUD operations
-│   └── context/          # AuthContext
+│   ├── context/          # AuthContext
+│   └── notifications/    # Notification service and useNotifications hook
 ├── styles/               # Style files grouped by feature
 │   ├── app/              # App-level styles
 │   ├── auth/             # Auth styles
-│   └── components/       # Component styles
+│   ├── components/       # Component styles
+│   └── modals/           # Modal-specific styles
 ├── types/                # TypeScript type definitions
 └── android/              # Native Android project
 ```
