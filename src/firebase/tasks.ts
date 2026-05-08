@@ -57,21 +57,30 @@ export const firestoreGetTasks = async (userId: string): Promise<Task[]> => {
 };
 
 export const firestoreSaveTasks = async (
-  // Save entire task list for a user, replacing all existing tasks with the provided set
+  // Save entire task list for a user, safely syncing tasks without delete-all pattern
   userId: string,
   tasks: Task[],
 ): Promise<void> => {
-  const tasksRef = collection(db, "tasks", userId, "userTasks"); // Reference to the user's tasks subcollection
+  const tasksRef = collection(db, "tasks", userId, "userTasks");
   const batch = writeBatch(db);
 
-  // Delete all existing tasks first
+  // Get existing task IDs to find orphans (tasks to delete)
   const snapshot = await getDocs(tasksRef);
-  snapshot.docs.forEach((d) => batch.delete(d.ref));
+  const existingIds = new Set(snapshot.docs.map((d) => d.id));
+  const currentIds = new Set(tasks.map((t) => t.id));
 
-  // Write new task set using task.id as document ID
+  // Set all current tasks (overwrites if exists, creates if new)
   for (const task of tasks) {
-    const taskDoc = doc(tasksRef, task.id); // Use task.id as Firestore document ID for easier updates/deletes later
+    const taskDoc = doc(tasksRef, task.id);
     batch.set(taskDoc, cleanTask(task));
+  }
+
+  // Delete tasks that are no longer in the list
+  for (const existingId of existingIds) {
+    if (!currentIds.has(existingId)) {
+      const taskDoc = doc(tasksRef, existingId);
+      batch.delete(taskDoc);
+    }
   }
 
   await batch.commit();

@@ -25,30 +25,40 @@ import { Task } from "../types";
 const isOverdue = (dueDateStr: string): boolean => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const dueDate = new Date(dueDateStr);
-  dueDate.setHours(0, 0, 0, 0);
+  const [year, month, day] = dueDateStr.split("-").map(Number);
+  const dueDate = new Date(year, month - 1, day);
   return dueDate < today;
 };
 
 // Reusable date formatting for due date badges
-const formatDueDate = (dueDateStr: string): string => {
+const formatDueDate = (dueDateStr: string, dueTime?: string): string => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
-  const dueDate = new Date(dueDateStr);
-  dueDate.setHours(0, 0, 0, 0);
+  const [year, month, day] = dueDateStr.split("-").map(Number);
+  const dueDate = new Date(year, month - 1, day);
 
+  let label: string;
   if (dueDate.getTime() === today.getTime()) {
-    return "Today";
+    label = "Today";
   } else if (dueDate.getTime() === tomorrow.getTime()) {
-    return "Tomorrow";
+    label = "Tomorrow";
   } else {
-    return dueDate.toLocaleDateString("en-US", {
+    label = dueDate.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
     });
   }
+
+  if (dueTime) {
+    const [h, m] = dueTime.split(":");
+    const ampm = parseInt(h, 10) >= 12 ? "PM" : "AM";
+    const hour12 = parseInt(h, 10) % 12 || 12;
+    return `${label} at ${hour12}:${m} ${ampm}`;
+  }
+
+  return label;
 };
 
 interface TaskItemProps {
@@ -215,7 +225,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
                     task.completed && styles.dueDateTextCompleted,
                   ]}
                 >
-                  {formatDueDate(task.dueDate)}
+                  {formatDueDate(task.dueDate, task.dueTime)}
                 </Text>
               </View>
             )}

@@ -1,6 +1,6 @@
 /**
  * BottomPanel - Task detail panel (replaces RightPanel)
- * 
+ *
  * Shows task details and provides access to modals:
  * Calendar (due date), Reminder, Repeat, and Note.
  * Also displays formatted due dates and reminders.
@@ -16,25 +16,36 @@ import ReminderModal from "../Modals/ReminderModal";
 import RepeatModal from "../Modals/RepeatModal";
 import NoteModal from "../Modals/NoteModal";
 
-const formatDueDate = (dateStr: string): string => {
+const formatDueDate = (dateStr: string, timeStr?: string): string => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
 
-  // dueDate strings are YYYY-MM-DD — parse without timezone shift
   const [year, month, day] = dateStr.split("-").map(Number);
   const due = new Date(year, month - 1, day);
 
-  if (due.getTime() === today.getTime()) return "Today";
-  if (due.getTime() === tomorrow.getTime()) return "Tomorrow";
+  let dateLabel: string;
+  if (due.getTime() === today.getTime()) {
+    dateLabel = "Today";
+  } else if (due.getTime() === tomorrow.getTime()) {
+    dateLabel = "Tomorrow";
+  } else {
+    dateLabel = due.toLocaleDateString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+    });
+  }
 
-  return due.toLocaleDateString("en-US", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-  });
+  if (timeStr) {
+    const [h, m] = timeStr.split(":");
+    const ampm = parseInt(h, 10) >= 12 ? "PM" : "AM";
+    const hour12 = parseInt(h, 10) % 12 || 12;
+    return `${dateLabel} at ${hour12}:${m} ${ampm}`;
+  }
+
+  return dateLabel;
 };
 
 const formatReminder = (reminderStr: string): string => {
@@ -94,9 +105,11 @@ const BASE_OPTIONS: DetailOptionConfig[] = [
 
 const getDetailOptions = (isFavorited: boolean): DetailOptionConfig[] => [
   ...BASE_OPTIONS,
-  {icon: "⭐", text: isFavorited ? "Remove from Favorites" : "Add to Favorites"},
-
-]
+  {
+    icon: "⭐",
+    text: isFavorited ? "Remove from Favorites" : "Add to Favorites",
+  },
+];
 interface BottomPanelProps {
   selectedTask: Task | null;
   onClose: () => void;
@@ -171,7 +184,12 @@ const BottomPanel: React.FC<BottomPanelProps> = ({
             key={option.text}
             icon={option.icon}
             text={option.text}
-            isActive= {option.text === (selectedTask.important ? "Remove from Favorites" : "Add to Favorites")}
+            isActive={
+              option.text ===
+              (selectedTask.important
+                ? "Remove from Favorites"
+                : "Add to Favorites")
+            }
             onPress={() => handleOptionPress(option.text)}
           />
         ))}
@@ -188,17 +206,20 @@ const BottomPanel: React.FC<BottomPanelProps> = ({
         transparent
         animationType="slide"
       >
+        {/* Calendar Picker Modal */}
         <CalendarPickerModal
           visible={modalType === "calendar"}
           currentDate={selectedTask.dueDate}
-          onSelect={(date) => {
-            onUpdateTask(selectedTask.id, { dueDate: date });
+          currentTime={selectedTask.dueTime}
+          onSelect={(date, time) => {
+            onUpdateTask(selectedTask.id, { dueDate: date, dueTime: time });
             closeModal();
           }}
           onClose={closeModal}
         />
       </Modal>
 
+      {/* Reminder Modal */}
       <Modal
         visible={modalType === "reminder"}
         transparent
@@ -208,6 +229,7 @@ const BottomPanel: React.FC<BottomPanelProps> = ({
           visible={modalType === "reminder"}
           currentReminder={selectedTask.reminder || undefined}
           dueDate={selectedTask.dueDate}
+          dueTime={selectedTask.dueTime}
           onSelect={(time) => {
             onUpdateTask(selectedTask.id, { reminder: time });
             closeModal();
@@ -216,12 +238,26 @@ const BottomPanel: React.FC<BottomPanelProps> = ({
         />
       </Modal>
 
+      {/* Repeat Modal */}
       <Modal visible={modalType === "repeat"} transparent animationType="slide">
         <RepeatModal
           visible={modalType === "repeat"}
           currentRepeat={selectedTask.repeat || "none"}
-          onSelect={(rule) => {
-            onUpdateTask(selectedTask.id, { repeat: rule });
+          currentRepeatDays={selectedTask.repeatDays}
+          currentRepeatOnDay={selectedTask.repeatOnDay}
+          currentRepeatOnLastDay={selectedTask.repeatOnLastDay}
+          currentRepeatEndDate={selectedTask.repeatEndDate}
+          dueTime={selectedTask.dueTime}
+          onSelect={(rule, options) => {
+            const updates: Partial<Task> = { repeat: rule };
+            if (options?.repeatDays) updates.repeatDays = options.repeatDays;
+            if (options?.repeatOnDay !== undefined)
+              updates.repeatOnDay = options.repeatOnDay;
+            if (options?.repeatOnLastDay !== undefined)
+              updates.repeatOnLastDay = options.repeatOnLastDay;
+            if (options?.repeatEndDate)
+              updates.repeatEndDate = options.repeatEndDate;
+            onUpdateTask(selectedTask.id, updates);
             closeModal();
           }}
           onClose={closeModal}

@@ -6,9 +6,14 @@ export interface Task {
   important: boolean;
   myDay: boolean;
   dueDate?: string;
+  dueTime?: string;
   reminder?: string;
   note?: string;
   repeat?: RepeatType;
+  repeatDays?: number[];
+  repeatOnDay?: number;
+  repeatOnLastDay?: boolean;
+  repeatEndDate?: string;
   listId?: string;
   order?: number;
 }

@@ -23,7 +23,7 @@ const Header: React.FC<HeaderProps> = ({
       {/* Left side: Menu + App Title */}
       <View style={styles.headerLeft}>
         <TouchableOpacity style={styles.menuButton} onPress={onMenuPress} accessibilityLabel="Open menu" accessibilityRole="button">
-          <Ionicons name="menu" size={28} color="white" />
+          <Ionicons name="menu-outline" size={28} color="white" />
         </TouchableOpacity>
         <Text style={styles.appTitle}>To Do</Text>
       </View>

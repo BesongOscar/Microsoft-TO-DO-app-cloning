@@ -1,8 +1,6 @@
 {
   "expo": {
-    "scheme": [
-      "todoapp"
-    ],
+    "scheme": ["todoapp"],
     "name": "TODO App",
     "slug": "TODO-App",
     "version": "1.0.0",
@@ -19,6 +17,13 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.besongoscar.todoapp"
     },
+    "plugins": [
+      "@react-native-google-signin/google-signin",
+      "@react-native-community/datetimepicker",
+      "expo-router",
+      "expo-font",
+      "expo-notifications"
+    ],
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
@@ -26,26 +31,14 @@
       },
       "edgeToEdgeEnabled": true,
       "androidWindowSoftInputMode": "adjustNothing",
-      "package": "com.besong_oscar.TODOApp"
+      "package": "com.besong_oscar.TODOApp",
+      "notification": {
+        "icon": "./assets/icon.png",
+        "color": "#0078d4"
+      }
     },
-    "edgeToEdgeEnabled": true,
-    "package": "com.besong_oscar.TODOApp",
-    "androidWindowSoftInputMode": "adjustResize",
-    "plugins": [
-      "@react-native-google-signin/google-signin"
-    ]
   },
   "web": {
     "favicon": "./assets/favicon.png"
-  },
-  "plugins": [
-      "expo-router",
-      "expo-font",
-      [
-        "@react-native-google-signin/google-signin",
-        {
-          "iosUrlScheme": "com.googleusercontent.apps.YOUR_IOS_CLIENT_ID_REVERSED"
-        }
-      ]
-    ]
+  }
 }

@@ -22,7 +22,7 @@ export const taskItemStyles = StyleSheet.create({
     alignItems: "center",
   },
   taskCheckbox: {
-    marginRight: 16,
+    marginRight: 5,
     width: 24,
     height: 24,
     borderRadius: 12,

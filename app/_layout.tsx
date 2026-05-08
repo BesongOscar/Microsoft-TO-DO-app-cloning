@@ -1,6 +1,6 @@
 /**
  * RootLayout - App entry point with providers
- * 
+ *
  * Wraps app with all context providers and error boundary.
  * Loads Poppins font family before rendering content.
  */
@@ -19,6 +19,7 @@ import {
   Poppins_700Bold,
 } from "@expo-google-fonts/poppins";
 import { configureGoogleSignIn } from "../src/auth/googleAuth";
+import { useNotifications } from "../src/notifications/useNotifications";
 
 // Configure Google Sign-In once at app startup
 configureGoogleSignIn();
@@ -30,9 +31,18 @@ export default function RootLayout() {
     "Poppins-Bold": Poppins_700Bold,
   });
 
+  useNotifications();
+
   if (!fontsLoaded) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#fff" }}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#fff",
+        }}
+      >
         <ActivityIndicator size="large" color="#0078d4" />
       </View>
     );

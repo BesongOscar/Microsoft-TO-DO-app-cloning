@@ -16,8 +16,9 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import Header from "../../components/Index/header";
 import Sidebar from "../../components/SideBar";
 import MainContent from "../../components/Index/MainContent";
@@ -63,11 +64,16 @@ const App: React.FC = () => {
   const [editingList, setEditingList] = useState<ListItem | null>(null);
   const [customListModalVisible, setCustomListModalVisible] =
     useState<boolean>(false);
+  const sidebarAnimRef = useRef<Animated.Value>(new Animated.Value(-280));
 
-  const sidebarAnimRef = useRef<Animated.Value | null>(null);
-  if (!sidebarAnimRef.current) {
-    sidebarAnimRef.current = new Animated.Value(-280);
-  }
+  const { taskId: urlTaskId } = useLocalSearchParams<{ taskId?: string }>();
+
+  useEffect(() => {
+    if (urlTaskId && tasks.length > 0) {
+      setSelectedTaskId(urlTaskId);
+      router.setParams({ taskId: "" });
+    }
+  }, [urlTaskId, tasks]);
 
   if (loading) {
     return (
@@ -184,11 +190,19 @@ const App: React.FC = () => {
       )
     : tasks;
 
-  // Sort tasks: pending by order ascending, completed at bottom
+  // Sort tasks: pending by order ascending (or by dueDate for Planned view), completed at bottom
   const sortedTasks = [...filteredTasks].sort((a, b) => {
     if (a.completed && !b.completed) return 1;
     if (!a.completed && b.completed) return -1;
     if (a.completed && b.completed) return 0;
+
+    // For Planned view, sort by due date (nearest first)
+    if (currentList.filterKey === "planned") {
+      const dateA = a.dueDate ? new Date(a.dueDate).getTime() : Infinity;
+      const dateB = b.dueDate ? new Date(b.dueDate).getTime() : Infinity;
+      return dateA - dateB;
+    }
+
     return (a.order ?? 0) - (b.order ?? 0);
   });
 

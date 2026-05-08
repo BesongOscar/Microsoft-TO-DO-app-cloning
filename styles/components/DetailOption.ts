@@ -33,6 +33,7 @@ export const detailOptionStyles = StyleSheet.create({
     ...androidPoppinsExtras,
   },
   detailTextActive: {
+    marginLeft: 20,
     color: "#0078d4",
     fontFamily: fontSemi,
     ...androidPoppinsExtras,

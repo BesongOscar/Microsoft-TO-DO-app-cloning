@@ -10,34 +10,10 @@ import {
 } from "react-native";
 import { modalCommonStyles } from "../styles/modals/common";
 import { customListModalStyles } from "../styles/components/CustomListModal";
+import EMOJI_OPTIONS from "../constants/customList"
 import { CustomList } from "../types";
 
-const EMOJI_OPTIONS = [
-  "📋",
-  "🏠",
-  "💼",
-  "🎯",
-  "📚",
-  "🎮",
-  "🎨",
-  "🎵",
-  "🏋️",
-  "🛒",
-  "💰",
-  "✈️",
-  "🍕",
-  "💊",
-  "📞",
-  "🔧",
-  "🌟",
-  "❤️",
-  "🔥",
-  "💡",
-  "📷",
-  "🎬",
-  "🏆",
-  "🎁",
-];
+
 
 interface CustomListModalProps {
   visible: boolean;

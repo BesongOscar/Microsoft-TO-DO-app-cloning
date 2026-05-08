@@ -5,7 +5,9 @@ import React, {
   useEffect,
   useCallback,
   useMemo,
+  useRef,
 } from "react";
+import { Alert } from "react-native";
 import { Task, TaskCounts } from "../types";
 import { useAuth } from "@/context/AuthContext";
 import {
@@ -14,6 +16,10 @@ import {
   firestoreDeleteTask,
   firestoreUpdateTask,
 } from "@/src/firebase/tasks";
+import {
+  scheduleTaskReminder,
+  cancelTaskReminder,
+} from "../src/notifications/notificationService";
 
 /**
  * TasksContext - Manages global task state and Firestore persistence
@@ -45,6 +51,13 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState<boolean>(false);
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const tasksRef = useRef<Task[]>([]);
+
+  //keep ref in sync:
+  useEffect(() => {
+    tasksRef.current = tasks;
+  }, [tasks]);
 
   useEffect(() => {
     // Load tasks from Firestore when user logs in or auth state changes, shows loading state while fetching, handles case where user logs out by clearing tasks, uses a cancellation flag to avoid setting state on unmounted component if auth state changes rapidly
@@ -102,22 +115,45 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
     };
   }, [authLoading, user?.uid]);
 
-  const saveTasks = useCallback(
-    // Save entire task list to Firestore, used for bulk updates (e.g. on app close or refresh), ensures local and remote stay in sync, but should be used sparingly for large lists to avoid performance issues
-    async (newTasks: Task[]) => {
+  // Debounced save to Firestore - avoids rapid successive writes
+  const debouncedSaveTasks = useCallback(
+    (newTasks: Task[]) => {
       if (!user) return;
-      try {
-        await firestoreSaveTasks(user.uid, newTasks);
-      } catch (e) {
-        console.warn("Failed to save tasks to Firestore:", e);
+
+      // Clear any pending save
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
       }
+
+      // Debounce: wait 500ms before saving to batch rapid changes
+      saveTimeoutRef.current = setTimeout(async () => {
+        try {
+          await firestoreSaveTasks(user.uid, newTasks);
+        } catch (e) {
+          console.warn("Failed to save tasks to Firestore:", e);
+          Alert.alert(
+            "Save Failed",
+            "Your changes couldn't be saved. Please check your connection and try again.",
+            [{ text: "OK" }],
+          );
+        }
+      }, 500);
     },
     [user?.uid],
   );
 
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  
   const addTask = useCallback(
-    // Add a new task with the given text and optional list association, generates a unique ID client-side for immediate UI responsiveness, then saves to Firestore
-    (text: string, listName = "My Day", listId?: string): void => {
+        (text: string, listName = "My Day", listId?: string): void => {
       const newTask: Task = {
         id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
         text: text.trim(),
@@ -126,33 +162,47 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
         myDay: listName === "My Day",
         listId: listId,
         order: 0,
+        reminder: undefined,
+        dueDate: undefined,
+        dueTime: undefined,
+        repeat: undefined,
+        repeatDays: [],
+        repeatOnDay: 0,
       };
+      if (newTask.reminder) {
+        scheduleTaskReminder(newTask);
+      }
       setTasks((prev) => {
         // Increment order of all existing pending tasks by 1
         const updated = [
           newTask,
-          ...prev.map((t) => (t.completed ? t : { ...t, order: (t.order ?? 0) + 1 })),
+          ...prev.map((t) =>
+            t.completed ? t : { ...t, order: (t.order ?? 0) + 1 },
+          ),
         ];
-        saveTasks(updated);
+        // Schedule debounced save after state update
+        setTimeout(() => debouncedSaveTasks(updated), 0);
         return updated;
       });
     },
-    [saveTasks],
+    [debouncedSaveTasks],
   );
 
+  // Toggle the completed status of a task by ID, updates local state immediately for responsiveness, then saves the change to Firestore
   const toggleTask = useCallback(
-    // Toggle the completed status of a task by ID, updates local state immediately for responsiveness, then saves the change to Firestore
-    (taskId: string): void => {
+      (taskId: string): void => {
+      const prevTask = tasksRef.current.find((t) => t.id === taskId);
+
+      let newTasks: Task[] = [];
       setTasks((prev) => {
         const task = prev.find((t) => t.id === taskId);
         if (!task) return prev;
 
         const willBeCompleted = !task.completed;
-        let updated;
 
         if (willBeCompleted) {
           // Task is being completed - remove order
-          updated = prev.map((t) =>
+          newTasks = prev.map((t) =>
             t.id === taskId ? { ...t, completed: true, order: undefined } : t,
           );
         } else {
@@ -160,70 +210,119 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
           const maxOrder = prev
             .filter((t) => !t.completed && t.order !== undefined)
             .reduce((max, t) => Math.max(max, t.order ?? 0), -1);
-          updated = prev.map((t) =>
+          newTasks = prev.map((t) =>
             t.id === taskId
               ? { ...t, completed: false, order: maxOrder + 1 }
               : t,
           );
         }
 
-        saveTasks(updated);
-        return updated;
+        return newTasks;
       });
+      // Save after state update
+      debouncedSaveTasks(newTasks);
+
+      // Cancel notification when completing; reschedule when uncompleting
+      if (prevTask) {
+        if (prevTask.reminder) {
+          if (!prevTask.completed) {
+            cancelTaskReminder(taskId);
+          } else if (prevTask.completed) {
+            scheduleTaskReminder(prevTask);
+          }
+        }
+      }
     },
-    [saveTasks],
+    [debouncedSaveTasks],
   );
 
+  // Toggle the important status of a task by ID, updates local state immediately for responsiveness, then saves the change to Firestore
   const toggleImportant = useCallback(
-    // Toggle the important status of a task by ID, updates local state immediately for responsiveness, then saves the change to Firestore
-    (taskId: string): void => {
+        (taskId: string): void => {
+      let newTasks: Task[] = [];
       setTasks((prev) => {
-        const updated = prev.map((t) =>
+        newTasks = prev.map((t) =>
           t.id === taskId ? { ...t, important: !t.important } : t,
         );
-        saveTasks(updated);
-        return updated;
+        return newTasks;
       });
+      // Save after state update
+      debouncedSaveTasks(newTasks);
     },
-    [saveTasks],
+    [debouncedSaveTasks],
   );
 
-  const deleteTask = useCallback(
     // Delete a task by ID, removes it from local state immediately for responsiveness, then deletes it from Firestore
-    (taskId: string): void => {
+  const deleteTask = useCallback(
+       (taskId: string): void => {
       setTasks((prev) => prev.filter((t) => t.id !== taskId));
+      cancelTaskReminder(taskId);
       // delete only the one doc
       if (user) {
-        firestoreDeleteTask(user.uid, taskId).catch((e) =>
-          console.warn("Failed to delete task from Firestore:", e),
-        );
+        firestoreDeleteTask(user.uid, taskId).catch((e) => {
+          console.warn("Failed to delete task from Firestore:", e);
+          Alert.alert(
+            "Delete Failed",
+            "Could not delete the task. Please try again.",
+            [{ text: "OK" }],
+          );
+        });
       }
     },
     [user],
   );
 
+  // Update a task by ID with given partial updates, merges updates into existing task, updates local state immediately for responsiveness, then saves changes to Firestore, also handles scheduling or canceling notifications based on reminder changes
   const updateTask = useCallback(
-    // Update specific fields of a task by ID, merges updates with existing task data in local state for responsiveness, then updates only the changed fields in Firestore to minimize write size and latency
     (taskId: string, updates: Partial<Task>): void => {
+      const prevTask = tasksRef.current.find((t) => t.id === taskId);
+
       setTasks((prev) => {
         const updated = prev.map((t) =>
           t.id === taskId ? { ...t, ...updates } : t,
         );
-        // only rewrite the whole list locally — Firestore gets a single doc update
         return updated;
       });
-      // write only the changed doc to Firestore
+      // Notification handling
+      if (prevTask) {
+        const completing = updates.completed === true;
+        const newReminder =
+          "reminder" in updates ? updates.reminder : prevTask.reminder;
+        const newRepeat =
+          "repeat" in updates ? updates.repeat : prevTask.repeat;
+        const hadReminder = !!prevTask.reminder;
+
+        // Cancel if: completing, or reminder removed
+        if (completing || (!newReminder && hadReminder)) {
+          cancelTaskReminder(taskId);
+        }
+        // Reschedule if reminder changed or still set
+        else if (newReminder) {
+          const fullTask: Task = {
+            ...prevTask,
+            ...updates,
+            reminder: newReminder,
+            repeat: newRepeat,
+          };
+          scheduleTaskReminder(fullTask);
+        }
+      }
       if (user) {
-        firestoreUpdateTask(user.uid, taskId, updates).catch((e) =>
-          console.warn("Failed to update task in Firestore:", e),
-        );
+        firestoreUpdateTask(user.uid, taskId, updates).catch((e) => {
+          console.warn("Failed to update task in Firestore:", e);
+          Alert.alert(
+            "Update Failed",
+            "Could not save changes. Please try again.",
+            [{ text: "OK" }],
+          );
+        });
       }
     },
     [user],
   );
 
+  // Manually refresh tasks from Firestore, used for pull-to-refresh or error recovery, shows refreshing state while loading, replaces local state with remote data to ensure consistency
   const refreshTasks = useCallback(async (): Promise<void> => {
-    // Manually refresh tasks from Firestore, used for pull-to-refresh or error recovery, shows refreshing state while loading, replaces local state with remote data to ensure consistency
     if (!user) return;
     setRefreshing(true);
     try {
@@ -247,6 +346,11 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
       setTasks([...pendingWithOrder, ...completedTasks]);
     } catch (e) {
       console.warn("Failed to refresh tasks:", e);
+      Alert.alert(
+        "Refresh Failed",
+        "Could not load tasks. Please check your connection and try again.",
+        [{ text: "OK" }],
+      );
     } finally {
       setRefreshing(false);
     }
@@ -263,11 +367,12 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
       setTasks((prev) => {
         const completedTasks = prev.filter((t) => t.completed);
         const newTasks = [...updatedPending, ...completedTasks];
-        saveTasks(newTasks);
+        // Save after state update
+        debouncedSaveTasks(newTasks);
         return newTasks;
       });
     },
-    [saveTasks],
+    [debouncedSaveTasks],
   );
 
   const counts = useMemo<TaskCounts>( // Compute task counts for different categories (My Day, Important, Completed, Planned, All) based on the current task list, used for displaying badges and summaries in the UI, memoized to avoid unnecessary recalculations on every render
@@ -275,7 +380,7 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
       myDay: tasks.filter((t) => t.myDay && !t.completed).length,
       important: tasks.filter((t) => t.important && !t.completed).length,
       completed: tasks.filter((t) => t.completed).length,
-      planned: tasks.filter((t) => Boolean(t.dueDate)).length,
+      planned: tasks.filter((t) => Boolean(t.dueDate) && !t.completed).length,
       all: tasks.length,
       tasks: tasks.filter((t) => !t.myDay && !t.important && !t.completed)
         .length,
