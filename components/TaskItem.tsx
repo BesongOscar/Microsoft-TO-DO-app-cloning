@@ -69,7 +69,7 @@ interface TaskItemProps {
   onDelete: (taskId: string) => void;
   isActive?: boolean;
   showDueDate?: boolean;
-  onDragStart?: () => void;
+  gripPanHandlers?: object;
 }
 
 const TaskItem: React.FC<TaskItemProps> = ({
@@ -80,7 +80,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
   onDelete,
   isActive = false,
   showDueDate = true,
-  onDragStart,
+  gripPanHandlers,
 }) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [editText, setEditText] = useState<string>(task.text);
@@ -173,16 +173,17 @@ const TaskItem: React.FC<TaskItemProps> = ({
     <>
       <View style={[styles.taskItem, isActive && styles.taskItemDragging]}>
         {/* Drag Handle */}
-        {!task.completed && onDragStart && (
-          <TouchableOpacity
-            style={styles.gripIcon}
-            onPressIn={() => onDragStart?.()}
-            activeOpacity={0.6}
-            accessibilityLabel="Drag to reorder"
-            accessibilityRole="button"
-          >
-            <Ionicons name="reorder-two" size={20} color="#c8c6c4" />
-          </TouchableOpacity>
+        {!task.completed && gripPanHandlers && (
+          <View {...gripPanHandlers}>
+            <TouchableOpacity
+              style={styles.gripIcon}
+              activeOpacity={0.6}
+              accessibilityLabel="Drag to reorder"
+              accessibilityRole="button"
+            >
+              <Ionicons name="reorder-two" size={20} color="#c8c6c4" />
+            </TouchableOpacity>
+          </View>
         )}
 
         {/* Task Text */}

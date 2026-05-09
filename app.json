@@ -37,8 +37,8 @@
         "color": "#0078d4"
       }
     },
-  },
-  "web": {
+    "web": {
     "favicon": "./assets/favicon.png"
   }
+  } 
 }

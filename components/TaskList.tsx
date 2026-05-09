@@ -117,6 +117,7 @@ const TasksList: React.FC<TasksListProps> = ({
     <ScrollView
       style={{ flex: 1 }}
       contentContainerStyle={styles.tasksContainer}
+      keyboardShouldPersistTaps="handled"
       // Disable scroll while dragging so pan gesture takes over
       scrollEnabled={draggingIndex === null}
       refreshControl={
@@ -139,7 +140,6 @@ const TasksList: React.FC<TasksListProps> = ({
           <View
             key={task.id}
             style={isHoverTarget ? { borderTopWidth: 2, borderTopColor: "#0078d4" } : undefined}
-            {...panResponder.panHandlers}
           >
             <TaskItem
               task={task}
@@ -148,8 +148,7 @@ const TasksList: React.FC<TasksListProps> = ({
               onEdit={onEdit}
               onDelete={onDelete}
               isActive={isActive}
-              // Pass a no-op — grip's panResponder is on the wrapper View
-              onDragStart={() => {}}
+              gripPanHandlers={panResponder.panHandlers}
             />
           </View>
         );

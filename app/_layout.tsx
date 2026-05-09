@@ -4,12 +4,13 @@
  * Wraps app with all context providers and error boundary.
  * Loads Poppins font family before rendering content.
  */
-
+import { LogBox } from "react-native";
+LogBox.ignoreLogs(["Unable to activate keep awake"]);
 import { Stack } from "expo-router";
 import { TasksProvider } from "../context/TasksContext";
 import { CustomListsProvider } from "../context/CustomListsContext";
 import ErrorBoundary from "../components/ErrorBoundary";
-import { AuthProvider } from "../src/context/AuthContext";
+import { AuthProvider } from "@/src/context/AuthContext";
 import { ActivityIndicator, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import {
@@ -30,8 +31,6 @@ export default function RootLayout() {
     "Poppins-SemiBold": Poppins_600SemiBold,
     "Poppins-Bold": Poppins_700Bold,
   });
-
-  useNotifications();
 
   if (!fontsLoaded) {
     return (
@@ -54,6 +53,7 @@ export default function RootLayout() {
         <AuthProvider>
           <CustomListsProvider>
             <TasksProvider>
+              <NotificationsInitializer />
               <Stack screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="(auth)" />
                 <Stack.Screen name="(protected)" />
@@ -64,4 +64,9 @@ export default function RootLayout() {
       </ErrorBoundary>
     </GestureHandlerRootView>
   );
+}
+
+function NotificationsInitializer() {
+  useNotifications();
+  return null;
 }

@@ -26,7 +26,6 @@ export const settingsStyles = StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 10,
     color: "white",
     fontFamily: fontBold,
     ...androidPoppinsExtras,

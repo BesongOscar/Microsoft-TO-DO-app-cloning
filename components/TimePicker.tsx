@@ -45,6 +45,7 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, onChange }) => {
       mode="time"
       display="default"
       onChange={handleChange}
+      style={{backgroundColor: "#0078d4"}}
     />
   );
 };

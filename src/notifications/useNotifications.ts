@@ -19,7 +19,8 @@ import { Task } from "../../types";
 
 export function useNotifications() {
   const router = useRouter();
-  const [notificationPermission, setNotificationPermission] = useState<boolean>(false);
+  const [notificationPermission, setNotificationPermission] =
+    useState<boolean>(false);
   const responseListenerRef = useRef<Notifications.Subscription | null>(null);
   const receivedListenerRef = useRef<Notifications.Subscription | null>(null);
 
@@ -43,20 +44,24 @@ export function useNotifications() {
         const data = response.notification.request.content.data;
         const taskId = data?.taskId as string | undefined;
         const type = data?.type as string | undefined;
-
-        if (type === "task_reminder" && taskId) {
-          router.push(`/(protected)/main?taskId=${taskId}`);
+        try {
+          if (type === "task_reminder" && taskId) {
+            router.push(`/(protected)/main?taskId=${taskId}`);
+          }
+        } catch (e) {
+          console.error("Error handling notification response:", e);
         }
       });
 
     // Handle notifications received while app is in foreground
-    receivedListenerRef.current =
-      Notifications.addNotificationReceivedListener(async (notification) => {
+    receivedListenerRef.current = Notifications.addNotificationReceivedListener(
+      async (notification) => {
         const data = notification.request.content.data;
         if (data?.type === "task_reminder") {
           // Could reschedule next occurrence here if needed
         }
-      });
+      },
+    );
 
     return () => {
       isMounted = false;

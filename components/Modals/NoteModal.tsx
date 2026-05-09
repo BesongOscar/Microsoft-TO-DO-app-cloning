@@ -1,4 +1,8 @@
-import React, { useState } from "react";
+/**
+ * NoteModal - Bottom sheet for adding or editing a task note
+ */
+
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -22,6 +26,19 @@ const NoteModal: React.FC<NoteModalProps> = ({
   onClose,
 }) => {
   const [noteText, setNoteText] = useState<string>(currentNote || "");
+
+  /**
+   * Two triggers cover all cases:
+   *   1. `currentNote` changes — different task selected while modal stays
+   *      mounted.
+   *   2. `visible` flips to true — modal re-opens, possibly for a different
+   *      task, so reset to whatever `currentNote` is at that moment.
+   */
+  useEffect(() => {
+    if (visible) {
+      setNoteText(currentNote || "");
+    }
+  }, [visible, currentNote]);
 
   const handleSave = () => {
     onSave(noteText.trim());

@@ -10,9 +10,7 @@ import {
   Animated,
   TouchableWithoutFeedback,
   ActivityIndicator,
-  Keyboard,
   TextInput,
-  Pressable,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -67,9 +65,11 @@ const App: React.FC = () => {
   const sidebarAnimRef = useRef<Animated.Value>(new Animated.Value(-280));
 
   const { taskId: urlTaskId } = useLocalSearchParams<{ taskId?: string }>();
+  const handledUrlTaskId = useRef(false);
 
   useEffect(() => {
-    if (urlTaskId && tasks.length > 0) {
+    if (urlTaskId && tasks.length > 0 && !handledUrlTaskId.current) {
+      handledUrlTaskId.current = true;
       setSelectedTaskId(urlTaskId);
       router.setParams({ taskId: "" });
     }
@@ -277,33 +277,31 @@ const App: React.FC = () => {
           </Animated.View>
         )}
 
-        <Pressable onPress={Keyboard.dismiss} style={{ flex: 1 }}>
-          <View style={{ flex: 1 }}>
-            <MainContent
-              currentList={
-                searchVisible
-                  ? {
-                      id: "search",
-                      name: "Search Results",
-                      icon: "🔍",
-                      color: "#0078d4",
-                      filterKey: "all",
-                    }
-                  : currentList
-              }
-              tasks={sortedTasks}
-              onAddTask={handleAddTask}
-              onToggleTask={handleToggleTask}
-              onSelectTask={handleSelectTask}
-              onStarToggle={handleStarToggle}
-              onEdit={handleEditTask}
-              onDelete={handleDeleteTask}
-              onReorderTasks={reorderTasks}
-              refreshing={refreshing}
-              onRefresh={refreshTasks}
-            />
-          </View>
-        </Pressable>
+        <View style={{ flex: 1 }}>
+          <MainContent
+            currentList={
+              searchVisible
+                ? {
+                    id: "search",
+                    name: "Search Results",
+                    icon: "🔍",
+                    color: "#0078d4",
+                    filterKey: "all",
+                  }
+                : currentList
+            }
+            tasks={sortedTasks}
+            onAddTask={handleAddTask}
+            onToggleTask={handleToggleTask}
+            onSelectTask={handleSelectTask}
+            onStarToggle={handleStarToggle}
+            onEdit={handleEditTask}
+            onDelete={handleDeleteTask}
+            onReorderTasks={reorderTasks}
+            refreshing={refreshing}
+            onRefresh={refreshTasks}
+          />
+        </View>
 
         <BottomSheet
           visible={selectedTask != null}

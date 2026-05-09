@@ -3,14 +3,12 @@ import { fontReg, androidPoppinsExtras } from "../../common";
 
 export const authButtonStyles = StyleSheet.create({
  button: {
-    backgroundColor: "blue",
     padding: 20,
     borderRadius: 50,
     width: "100%",
     alignItems: "center",
     margin: 5,
     justifyContent: "center",
-    shadowColor: "red",
     shadowOffset: {
       width: 0,
       height: 1,

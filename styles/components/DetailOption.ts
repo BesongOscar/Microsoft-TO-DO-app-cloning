@@ -28,6 +28,7 @@ export const detailOptionStyles = StyleSheet.create({
   },
   detailText: {
     fontSize: 14,
+    marginLeft: 20,
     color: "#323130",
     fontFamily: fontReg,
     ...androidPoppinsExtras,

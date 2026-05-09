@@ -1,6 +1,6 @@
 /**
  * CalendarPickerModal - Date and time selection modal
- * 
+ *
  * Custom calendar with month navigation, day selection, and optional
  * time picker. Returns YYYY-MM-DD date and optional HH:MM time.
  */
@@ -11,8 +11,6 @@ import {
   Text,
   TouchableOpacity,
   Modal,
-  StyleSheet,
-  Platform,
 } from "react-native";
 import { CalendarPickerModalStyles as styles } from "../../styles/modals/calendarPickerModal";
 import TimePicker from "../TimePicker";
@@ -34,19 +32,21 @@ interface CalendarPickerModalProps {
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTHS = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
 ];
+
+/**
+ * Parse a "YYYY-MM-DD" string into a local-timezone Date.
+ *
+ * `new Date("YYYY-MM-DD")` treats the input as UTC, which shifts the
+ * resulting date by the local UTC offset. Using the Date constructor with
+ * numeric parts always produces midnight in the local timezone instead.
+ */
+const parseDateString = (dateStr: string): Date => {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  return new Date(year, month - 1, day);
+};
 
 const CalendarPickerModal: React.FC<CalendarPickerModalProps> = ({
   visible,
@@ -56,11 +56,15 @@ const CalendarPickerModal: React.FC<CalendarPickerModalProps> = ({
   onClose,
 }) => {
   const today = new Date();
-  const initialDate = currentDate ? new Date(currentDate) : today;
+
+  // `new Date(currentDate)` — now uses parseDateString so
+  // the initial view month and selected date are correct in all timezones.
+  const initialDate = currentDate ? parseDateString(currentDate) : today;
   const [viewDate, setViewDate] = useState<Date>(initialDate);
   const [selectedDate, setSelectedDate] = useState<Date | null>(
-    currentDate ? new Date(currentDate) : null,
+    currentDate ? parseDateString(currentDate) : null,
   );
+
   const [showTimePicker, setShowTimePicker] = useState<boolean>(false);
   const [timeManuallySet, setTimeManuallySet] = useState<boolean>(!!currentTime);
   const [selectedHour, setSelectedHour] = useState<number>(
@@ -80,34 +84,31 @@ const CalendarPickerModal: React.FC<CalendarPickerModalProps> = ({
 
     const days: CalendarDay[] = [];
 
-    // Add previous month's trailing days
-    const prevMonth = new Date(year, month, 0);
-    const prevMonthDays = prevMonth.getDate();
+    // Previous month's trailing days
+    const prevMonthLastDay = new Date(year, month, 0).getDate();
     for (let i = startDayOfWeek - 1; i >= 0; i--) {
       days.push({
-        date: new Date(year, month - 1, prevMonthDays - i),
+        date: new Date(year, month - 1, prevMonthLastDay - i),
         isCurrentMonth: false,
         isToday: false,
         isSelected: false,
       });
     }
 
-    // Add current month's days
+    // Current month's days
     for (let day = 1; day <= daysInMonth; day++) {
       const dateObj = new Date(year, month, day);
-      const isToday = dateObj.toDateString() === today.toDateString();
-      const isSelected = selectedDate
-        ? dateObj.toDateString() === selectedDate.toDateString()
-        : false;
       days.push({
         date: dateObj,
         isCurrentMonth: true,
-        isToday,
-        isSelected,
+        isToday: dateObj.toDateString() === today.toDateString(),
+        isSelected: selectedDate
+          ? dateObj.toDateString() === selectedDate.toDateString()
+          : false,
       });
     }
 
-    // Add next month's leading days to fill the grid (up to 42 total)
+    // Next month's leading days to fill the 6-row grid (42 cells total)
     const remainingDays = 42 - days.length;
     for (let day = 1; day <= remainingDays; day++) {
       days.push({
@@ -121,20 +122,17 @@ const CalendarPickerModal: React.FC<CalendarPickerModalProps> = ({
     return days;
   };
 
-  const goToPrevMonth = () => {
+  const goToPrevMonth = () =>
     setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1));
-  };
 
-  const goToNextMonth = () => {
+  const goToNextMonth = () =>
     setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1));
-  };
 
   const handleSelectDate = (day: CalendarDay) => {
     if (!day.isCurrentMonth) return;
     setSelectedDate(day.date);
   };
 
-  // Time picker handling
   const handleTimeChange = (hour: number, minute: number) => {
     setSelectedHour(hour);
     setSelectedMinute(minute);
@@ -142,13 +140,17 @@ const CalendarPickerModal: React.FC<CalendarPickerModalProps> = ({
     setShowTimePicker(false);
   };
 
-  // Clear time component but keep date
   const handleSave = () => {
     if (selectedDate) {
-      const dateStr = selectedDate.toISOString().split("T")[0];
+      const year = selectedDate.getFullYear();
+      const month = String(selectedDate.getMonth() + 1).padStart(2, "0");
+      const day = String(selectedDate.getDate()).padStart(2, "0");
+      const dateStr = `${year}-${month}-${day}`;
+
       const timeStr = timeManuallySet
         ? `${String(selectedHour).padStart(2, "0")}:${String(selectedMinute).padStart(2, "0")}`
         : undefined;
+
       onSelect(dateStr, timeStr);
     } else {
       onSelect(undefined);
@@ -156,7 +158,6 @@ const CalendarPickerModal: React.FC<CalendarPickerModalProps> = ({
     onClose();
   };
 
-  // Clear date and time
   const handleClear = () => {
     setSelectedDate(null);
     setTimeManuallySet(false);
@@ -164,10 +165,7 @@ const CalendarPickerModal: React.FC<CalendarPickerModalProps> = ({
     onClose();
   };
 
-  // Remove time but keep date
-  const handleRemoveTime = () => {
-    setTimeManuallySet(false);
-  };
+  const handleRemoveTime = () => setTimeManuallySet(false);
 
   const days = getDaysInMonth(viewDate);
   const hasTime = timeManuallySet;
@@ -195,19 +193,13 @@ const CalendarPickerModal: React.FC<CalendarPickerModalProps> = ({
           {/* Calendar */}
           <View style={styles.calendarContainer}>
             <View style={styles.header}>
-              <TouchableOpacity
-                onPress={goToPrevMonth}
-                style={styles.navButton}
-              >
+              <TouchableOpacity onPress={goToPrevMonth} style={styles.navButton}>
                 <Text style={styles.navText}>‹</Text>
               </TouchableOpacity>
               <Text style={styles.monthYear}>
                 {MONTHS[viewDate.getMonth()]} {viewDate.getFullYear()}
               </Text>
-              <TouchableOpacity
-                onPress={goToNextMonth}
-                style={styles.navButton}
-              >
+              <TouchableOpacity onPress={goToNextMonth} style={styles.navButton}>
                 <Text style={styles.navText}>›</Text>
               </TouchableOpacity>
             </View>
@@ -248,7 +240,7 @@ const CalendarPickerModal: React.FC<CalendarPickerModalProps> = ({
             </View>
           </View>
 
-          {/* Time Picker Section */}
+          {/* Time picker section */}
           {selectedDate && (
             <View style={styles.timeSection}>
               <View style={styles.timeRow}>
@@ -320,6 +312,5 @@ const CalendarPickerModal: React.FC<CalendarPickerModalProps> = ({
     </Modal>
   );
 };
-
 
 export default CalendarPickerModal;
