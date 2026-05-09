@@ -1,8 +1,15 @@
+/**
+ * Header - Top app bar with menu, search, and profile
+ * 
+ * Shows greeting with user's name, list title, and action buttons.
+ * Supports reorder mode toggle for drag-and-drop.
+ */
+
 import React from "react";
 import { View, Text, TouchableOpacity, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { headerStyles as styles } from "../../styles/components/Index/header";
-import {useAuth} from "@/context/AuthContext";
+import {useAuth} from "@/src/context/AuthContext";
 
 interface HeaderProps {
   onMenuPress: () => void;

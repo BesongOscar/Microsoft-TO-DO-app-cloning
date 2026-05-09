@@ -1,3 +1,11 @@
+/**
+ * notificationService - Local notification scheduling for task reminders
+ * 
+ * Uses expo-notifications to schedule, cancel, and manage task reminders.
+ * Supports complex repeat patterns (daily, multi-day weekly, monthly with
+ * last-day handling, yearly) and handles Android notification channels.
+ */
+
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 import { Task } from "../../types";
@@ -29,37 +37,53 @@ export async function requestNotificationPermissions(): Promise<boolean> {
   return finalStatus === "granted";
 }
 
+//  ─── Scheduling ─────────────────────────────────────────────────────────
+async function safeSchedule(
+  request: Notifications.NotificationRequestInput,
+): Promise<void> {
+  try {
+    await Notifications.scheduleNotificationAsync(request);
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : String(error);
+ 
+    if (message.includes("keep awake") || message.includes("keepAwake")) {
+      // Non-fatal: expo-notifications couldn't acquire the wake lock but
+      // the notification was still registered. Safe to ignore.
+      return;
+    }
+ 
+    // Re-throw anything else (permission denied, invalid trigger, etc.)
+    throw error;
+  }
+}
+
 // ─── Helpers ─────────────────────────────────────────────────────────────
 
-/**
- * Calculate the absolute Date for a reminder, given the task's fields.
- * Priority: reminder field > derived from dueDate+dueTime
- */
+// Extracts the reminder date from a task, returns null if no valid reminder is set
 function getReminderDate(task: Task): Date | null {
   if (task.reminder) return new Date(task.reminder);
   return null;
 }
-
-/**
- * Build the notification content for a task
- */
-function buildNotificationContent(task: Task): Notifications.NotificationContentInput {
+// Builds the notification content for a given task 
+function buildNotificationContent(
+  task: Task,
+): Notifications.NotificationContentInput {
   return {
     title: "Task Reminder",
     body: task.text,
     data: { taskId: task.id, type: "task_reminder" },
     sound: "default",
-    ...(Platform.OS === "ios" && { interruptionLevel: "timeSensitive" as any }),
+    ...(Platform.OS === "ios" && {
+      interruptionLevel: "timeSensitive" as any,
+    }),
   };
 }
-
-/**
- * Check if a repeating task has expired (past its end date)
- */
+// Checks if a repeating task's end date has passed, meaning no more notifications should be scheduled 
 export function hasRepeatExpired(task: Task): boolean {
   if (!task.repeatEndDate) return false;
   const endDate = new Date(task.repeatEndDate);
-  endDate.setHours(23, 59, 59, 999); // end of that day
+  endDate.setHours(23, 59, 59, 999);
   return endDate < new Date();
 }
 

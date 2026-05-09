@@ -1,12 +1,22 @@
+/**
+ * MainContent - Central task list area with filtering
+ * 
+ * Renders the appropriate list view based on currentList:
+ * - "planned" -> PlannedTasksList (grouped by date)
+ * - Others -> TasksList (pending + completed sections)
+ * Handles task filtering, drag-and-drop reorder, and empty states.
+ */
+
 import React, { useState, useEffect } from "react";
 import { View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { mainContentStyles as styles } from "../../styles/components/Index/MainContent";
-import { useAuth } from "../../src/context/AuthContext";
+import { useAuth } from "@/src/context/AuthContext";
 import ListHeader from "../ListHeader";
 import SuggestionsBanner from "../SuggestionBanner";
 import AddTaskInput from "../AddTaskInput";
 import TasksList from "../TaskList";
+import PlannedTasksList from "../PlannedTasksList";
 import EmptyState from "../EmptyState";
 import { Task, ListItem } from "../../types";
 
@@ -140,6 +150,16 @@ const MainContent: React.FC<MainContentProps> = ({
               ? "Try a different search term"
               : "Add a task above to get started"
           }
+        />
+      ) : currentList.filterKey === "planned" ? (
+        <PlannedTasksList
+          tasks={filteredTasks}
+          onToggleTask={onToggleTask}
+          onSelectTask={onSelectTask}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
         />
       ) : (
         <TasksList

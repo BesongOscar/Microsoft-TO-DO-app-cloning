@@ -1,5 +1,15 @@
+/**
+ * EmptyState - Placeholder shown when a list has no tasks
+ * 
+ * Displays an image, title, and message to guide the user.
+ * Used across different views (My Day, custom lists, search).
+ */
+
 import React from "react";
 import { View, Text, StyleSheet,Image } from "react-native";
+// Fix: replace inline styles import with:
+import { emptyStateStyles as styles } from "../styles/components/EmptyState";
+// then remove the local StyleSheet.create block
 
 interface EmptyStateProps {
   title: string;
@@ -17,29 +27,6 @@ const EmptyState: React.FC<EmptyStateProps> = ({ title, message }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#323130",
-    marginBottom: 8,
-    marginTop: 20,
-    textAlign: "center",
-  },
-  message: {
-    fontSize: 14,
-    color: "#605e5c",
-    textAlign: "center",
-  },
-  image: {
-    height: 250,
-    width: 250
-  }
-});
+
 
 export default EmptyState;
