@@ -1,10 +1,12 @@
 # TO-DO-app
-React Native TODO app with Firebase - featuring task management, custom lists, drag-and-drop, and user profiles with profile photos.
+React Native TODO app with Firebase - featuring task management, tab-based navigation with dedicated My Day, Lists, Planned, and Profile screens, drag-and-drop reorder, notifications, and Google OAuth.
 
 ## Features
 
 - **Task Management** - Create, edit, delete, and toggle tasks with due dates, due times, reminders, repeat rules (daily/weekly/monthly/yearly), and notes
-- **Task Ordering** - Drag-and-drop reorder via PanResponder; tasks persist their order in Firestore
+- **Tab Navigation** - Bottom tab bar with separate screens for My Day, Lists, Planned, and Profile (replaces sidebar layout)
+- **Dynamic Lists** - Lists tab shows all lists overview; tapping opens a dynamic route for each list's tasks
+- **Drag & Drop Reorder** - Long-press drag handle to reorder tasks; order persists to Firestore
 - **Smart Repeats** - Advanced repeat options: multi-day weekly, last-day-of-month monthly, repeat end dates
 - **Local Notifications** - Schedule and cancel task reminders with expo-notifications; handles repeat scheduling natively
 - **Time Picker** - Platform-specific time picker (iOS spinner, Android dialog)
@@ -48,8 +50,16 @@ This project keeps native folders (`android/` and/or `ios/`) and uses `app.json`
 ```
 ├── app/                    # Expo Router screens (file-based routing)
 │   ├── (auth)/            # Auth screens (login, signup, forgotPassword, emailVerification)
-│   ├── (protected)/       # Protected screens (main, settings)
-│   └── _layout.tsx       # Root layout
+│   ├── (protected)/       # Protected screens with bottom tab navigation
+│   │   ├── myDay.tsx      # My Day task screen
+│   │   ├── Planned.tsx    # Planned tasks grouped by date
+│   │   ├── profile.tsx    # User profile and settings
+│   │   ├── Lists/         # Lists overview + dynamic list detail
+│   │   │   ├── index.tsx  # All lists overview
+│   │   │   ├── [listId].tsx  # Individual list tasks (dynamic route)
+│   │   │   └── _layout.tsx   # Lists stack layout
+│   │   └── _layout.tsx    # Tab layout (My Day, Lists, Planned, Profile)
+│   └── _layout.tsx       # Root layout with providers
 ├── assets/                # Images and icons
 ├── components/            # Reusable React components
 │   ├── Index/             # Components for main index screen
