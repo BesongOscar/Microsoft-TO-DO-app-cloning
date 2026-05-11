@@ -13,6 +13,8 @@ React Native TODO app with Firebase - featuring task management, custom lists, d
 - **Bottom Panel** - Slide-up task detail panel with calendar picker, reminder, and note modals
 - **Search** - Filter tasks by keyword across all lists
 - **Pull-to-Refresh** - Sync tasks from Firestore with pull gesture
+- **EAS Build** - Configured for Expo Application Services (development, preview, production builds)
+- **Optimistic Updates** - UI updates instantly with Firestore sync and rollback on failure
 
 ## Getting Started
 
@@ -23,6 +25,12 @@ React Native TODO app with Firebase - featuring task management, custom lists, d
 
 3. Run the app:
    `npm start`
+
+### Building with EAS
+
+Development build: `eas build --profile development --platform all`
+Preview build: `eas build --profile preview --platform all`
+Production build: `eas build --profile production --platform all`
 
 ## Environment
 

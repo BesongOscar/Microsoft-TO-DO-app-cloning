@@ -1,3 +1,10 @@
+/**
+ * ListHeader - Title bar for each task list view
+ * 
+ * Shows the list name and today's date. Optional "more" button
+ * for custom list options (edit/delete).
+ */
+
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { listHeaderStyles as styles } from "../styles/components/ListHeader";
@@ -5,18 +12,21 @@ import { listHeaderStyles as styles } from "../styles/components/ListHeader";
 interface ListHeaderProps {
   title: string;
   date: string;
+  onMoreOptions?: () => void;
 }
 
-const ListHeader: React.FC<ListHeaderProps> = ({ title, date }) => {
+const ListHeader: React.FC<ListHeaderProps> = ({ title, date, onMoreOptions }) => {
   return (
     <View style={styles.listHeader}>
       <View style={styles.listTitleSection}>
         <Text style={styles.listTitle}>{title}</Text>
         <Text style={styles.listDate}>{date}</Text>
       </View>
-      <TouchableOpacity style={styles.moreOptionsButton}>
-        <Text style={styles.moreOptionsIcon}>⋯</Text>
-      </TouchableOpacity>
+      {onMoreOptions && (
+        <TouchableOpacity style={styles.moreOptionsButton} onPress={onMoreOptions}>
+          <Text style={styles.moreOptionsIcon}>⋯</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
