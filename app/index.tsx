@@ -22,5 +22,5 @@ export default function Index() {
     return <Redirect href="/emailVerification" />;
   }
 
-  return <Redirect href={user ? "/main" : "/login"} />;
+  return <Redirect href={user ? "/(protected)/myDay" : "/login"} />;
 }

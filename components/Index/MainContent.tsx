@@ -67,11 +67,9 @@ const MainContent: React.FC<MainContentProps> = ({
   onAddTask,
   onToggleTask,
   onSelectTask,
-  onStarToggle,
   onEdit,
   onDelete,
   onReorderTasks,
-  showReorderControls = false,
   refreshing = false,
   onRefresh,
 }) => {

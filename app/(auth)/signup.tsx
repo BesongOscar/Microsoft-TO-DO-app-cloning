@@ -67,7 +67,7 @@ export default function Signup() {
       setIsLoading(true);
       const { idToken } = await signInWithGoogle();
       const success = await googleLogin(idToken);
-      if (success) router.replace("/main");
+      if (success) router.replace("/(protected)/myDay");
     } catch (error) {
       const message = getGoogleSignInErrorMessage(error);
       // SIGN_IN_CANCELLED is not an error worth alerting

@@ -15,11 +15,9 @@ const ListHeader: React.FC<ListHeaderProps> = ({ title, date, onMoreOptions }) =
         <Text style={styles.listTitle}>{title}</Text>
         <Text style={styles.listDate}>{date}</Text>
       </View>
-      {onMoreOptions && (
         <TouchableOpacity style={styles.moreOptionsButton} onPress={onMoreOptions}>
           <Text style={styles.moreOptionsIcon}>⋯</Text>
         </TouchableOpacity>
-      )}
     </View>
   );
 };

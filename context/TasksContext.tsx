@@ -41,6 +41,9 @@ interface TasksContextValue {
   updateTask: (taskId: string, updates: Partial<Task>) => void;
   refreshTasks: () => Promise<void>;
   reorderTasks: (reorderedPendingTasks: Task[]) => void;
+  // Shared selected task ID for bottom panel across all tabs
+  selectedTaskId: string | null;
+  setSelectedTaskId: (id: string | null) => void;
 }
 
 const TasksContext = createContext<TasksContextValue | null>(null);
@@ -52,6 +55,7 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const tasksRef = useRef<Task[]>([]);
 
@@ -459,6 +463,8 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
     updateTask,
     refreshTasks,
     reorderTasks,
+    selectedTaskId,
+    setSelectedTaskId,
   };
 
   return (

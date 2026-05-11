@@ -31,7 +31,7 @@ export default function EmailVerification() {
     try {
       await reloadUser();
       if (auth.currentUser?.emailVerified) {
-        router.replace("/main");
+        router.replace("/(protected)/myDay");
       } else {
         Alert.alert(
           "Not verified yet",
@@ -83,7 +83,7 @@ export default function EmailVerification() {
   }
 
   if (user.emailVerified) {
-    return <Redirect href="/main" />;
+    return <Redirect href="/(protected)/myDay" />;
   }
 
   return (

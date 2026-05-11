@@ -5,6 +5,10 @@ export const sideBarStyles = StyleSheet.create({
 sidebar: {
     flex: 1,
     backgroundColor: "#f3f2f1",
+    borderRightWidth: 1,
+    borderRightColor: "#e1e5e9",
+    borderRadius: 8,
+
   },
   sidebarList: {
     flex: 1,
