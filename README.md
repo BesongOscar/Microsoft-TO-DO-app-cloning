@@ -15,6 +15,7 @@ React Native TODO app with Firebase - featuring task management, tab-based navig
 - **Bottom Panel** - Slide-up task detail panel with calendar picker, reminder, and note modals
 - **Search** - Filter tasks by keyword across all lists
 - **Pull-to-Refresh** - Sync tasks from Firestore with pull gesture
+- **Theme Support** - Light/dark/system-wide theming via ThemeContext; persisted to AsyncStorage
 - **EAS Build** - Configured for Expo Application Services (development, preview, production builds)
 - **Optimistic Updates** - UI updates instantly with Firestore sync and rollback on failure
 
@@ -66,18 +67,22 @@ This project keeps native folders (`android/` and/or `ios/`) and uses `app.json`
 │   ├── Modals/            # Modal components (calendar, reminder, repeat, note)
 │   ├── (auth)/           # Auth-related components (buttons, GoogleIcon)
 ├── constants/            # App constants (list definitions)
-├── context/               # React contexts (TasksContext, CustomListsContext)
+├── context/               # React contexts (TasksContext, CustomListsContext, ThemeContext)
+├── hooks/                 # React hooks (useThemeStyles)
 ├── src/                   # Firebase, auth, and notification utilities
 │   ├── auth/             # Google Sign-In helper
 │   ├── firebase/         # Firestore CRUD operations
 │   ├── context/          # AuthContext
+│   ├── hooks/            # App hooks (useTaskNotifications)
 │   └── notifications/    # Notification service and useNotifications hook
-├── styles/               # Style files grouped by feature
-│   ├── app/              # App-level styles
-│   ├── auth/             # Auth styles
-│   ├── components/       # Component styles
-│   └── modals/           # Modal-specific styles
+├── styles/               # Theme-aware style files using Theme type
+│   ├── theme.ts         # Light/dark color palette definitions
+│   ├── app/             # App-level styles
+│   │   ├── (auth)/      # Auth screen styles (based on ThemeContext)
+│   │   └── (protected)/ # Protected screen styles (based on ThemeContext)
+│   └── components/      # Component styles
 ├── types/                # TypeScript type definitions
+├── firestore.rules      # Firebase Security Rules
 └── android/              # Native Android project
 ```
 
