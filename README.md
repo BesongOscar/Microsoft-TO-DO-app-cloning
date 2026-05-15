@@ -18,6 +18,7 @@ React Native TODO app with Firebase - featuring task management, tab-based navig
 - **Pull-to-Refresh** - Sync tasks from Firestore with pull gesture
 - **Theme Support** - Light/dark/system-wide theming via ThemeContext; persisted to AsyncStorage
 - **EAS Build** - Configured for Expo Application Services (development, preview, production builds)
+- **Internationalization (i18n)** - English and French support via i18next with device language auto-detection; persisted to AsyncStorage
 - **Optimistic Updates** - UI updates instantly with Firestore sync and rollback on failure
 
 ## Getting Started
@@ -50,6 +51,7 @@ This project keeps native folders (`android/` and/or `ios/`) and uses `app.json`
 ## File Structure
 
 ```
+├── locales/               # Translation files (en.json, fr.json)
 ├── app/                    # Expo Router screens (file-based routing)
 │   ├── (auth)/            # Auth screens (login, signup, forgotPassword, emailVerification)
 │   ├── (protected)/       # Protected screens with bottom tab navigation
@@ -70,11 +72,12 @@ This project keeps native folders (`android/` and/or `ios/`) and uses `app.json`
 ├── constants/            # App constants (list definitions)
 ├── context/               # React contexts (TasksContext, CustomListsContext, ThemeContext)
 ├── hooks/                 # React hooks (useThemeStyles)
-├── src/                   # Firebase, auth, and notification utilities
+├── src/                   # Firebase, auth, localization, and notification utilities
 │   ├── auth/             # Google Sign-In helper
 │   ├── firebase/         # Firestore CRUD operations
 │   ├── context/          # AuthContext
 │   ├── hooks/            # App hooks (useTaskNotifications)
+│   ├── i18n/             # i18next initialization and configuration
 │   └── notifications/    # Notification service and useNotifications hook
 ├── styles/               # Theme-aware style files using Theme type
 │   ├── theme.ts         # Light/dark color palette definitions

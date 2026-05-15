@@ -17,8 +17,7 @@ import CalendarPickerModal from "../Modals/CalendarPickerModal";
 import ReminderModal from "../Modals/ReminderModal";
 import RepeatModal from "../Modals/RepeatModal";
 import NoteModal from "../Modals/NoteModal";
-
-// ── Formatting helpers ────────────────────────────────────────────────────────
+import { useTranslation } from "react-i18next";
 
 const formatDueDate = (dateStr: string, timeStr?: string): string => {
   const today = new Date();
@@ -29,27 +28,28 @@ const formatDueDate = (dateStr: string, timeStr?: string): string => {
   const [year, month, day] = dateStr.split("-").map(Number);
   const due = new Date(year, month - 1, day);
 
-  let dateLabel: string;
   if (due.getTime() === today.getTime()) {
-    dateLabel = "Today";
+    return timeStr ? `${formatTime(timeStr)}` : new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
   } else if (due.getTime() === tomorrow.getTime()) {
-    dateLabel = "Tomorrow";
+    return timeStr ? `${formatTime(timeStr)}` : new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
   } else {
-    dateLabel = due.toLocaleDateString("en-US", {
+    const dateLabel = due.toLocaleDateString("en-US", {
       weekday: "short",
       month: "short",
       day: "numeric",
     });
+    if (timeStr) {
+      return `${dateLabel} ${formatTime(timeStr)}`;
+    }
+    return dateLabel;
   }
+};
 
-  if (timeStr) {
-    const [h, m] = timeStr.split(":");
-    const ampm = parseInt(h, 10) >= 12 ? "PM" : "AM";
-    const hour12 = parseInt(h, 10) % 12 || 12;
-    return `${dateLabel} at ${hour12}:${m} ${ampm}`;
-  }
-
-  return dateLabel;
+const formatTime = (timeStr: string): string => {
+  const [h, m] = timeStr.split(":");
+  const ampm = parseInt(h, 10) >= 12 ? "PM" : "AM";
+  const hour12 = parseInt(h, 10) % 12 || 12;
+  return `${hour12}:${m} ${ampm}`;
 };
 
 const formatReminder = (reminderStr: string): string => {
@@ -91,35 +91,19 @@ const formatNote = (note: string): string => {
   return oneLine.length > 40 ? `${oneLine.slice(0, 40)}…` : oneLine;
 };
 
+const formatTimeOnly = (timeStr: string): string => {
+  const [h, m] = timeStr.split(":");
+  const ampm = parseInt(h, 10) >= 12 ? "PM" : "AM";
+  const hour12 = parseInt(h, 10) % 12 || 12;
+  return `${hour12}:${m} ${ampm}`;
+};
+
 // ── Static config ─────────────────────────────────────────────────────────────
 
 interface DetailOptionConfig {
   icon: string;
   text: string;
-}
-
-const BASE_OPTIONS: DetailOptionConfig[] = [
-  { icon: "📅", text: "Add due date" },
-  { icon: "🔔", text: "Remind me" },
-  { icon: "🔄", text: "Repeat" },
-  { icon: "📝", text: "Add note" },
-];
-
-const getDetailOptions = (isFavorited: boolean): DetailOptionConfig[] => [
-  ...BASE_OPTIONS,
-  {
-    icon: "⭐",
-    text: isFavorited ? "Remove from Favorites" : "Add to Favorites",
-  },
-];
-
-// ── Component ─────────────────────────────────────────────────────────────────
-
-interface BottomPanelProps {
-  selectedTask: Task | null;
-  onClose: () => void;
-  onUpdateTask: (taskId: string, updates: Partial<Task>) => void;
-  onStarToggle: () => void;
+  key: string;
 }
 
 const BottomPanel: React.FC<BottomPanelProps> = ({
@@ -129,19 +113,33 @@ const BottomPanel: React.FC<BottomPanelProps> = ({
   onStarToggle,
 }) => {
   const styles = useThemeStyles(createBottomPanelStyles);
+  const { t } = useTranslation();
   const [modalType, setModalType] = useState<string | null>(null);
 
   if (!selectedTask) return null;
 
-  const handleOptionPress = (text: string) => {
-    if (text === "Add due date") setModalType("calendar");
-    else if (text === "Remind me") setModalType("reminder");
-    else if (text === "Repeat") setModalType("repeat");
-    else if (text === "Add note") setModalType("note");
-    else if (
-      text === "Add to Favorites" ||
-      text === "Remove from Favorites"
-    ) {
+  const BASE_OPTIONS: DetailOptionConfig[] = [
+    { icon: "📅", text: t("detail.add_due_date"), key: "calendar" },
+    { icon: "🔔", text: t("detail.remind_me"), key: "reminder" },
+    { icon: "🔄", text: t("detail.repeat"), key: "repeat" },
+    { icon: "📝", text: t("detail.add_note"), key: "note" },
+  ];
+
+  const getDetailOptions = (isFavorited: boolean): DetailOptionConfig[] => [
+    ...BASE_OPTIONS,
+    {
+      icon: "⭐",
+      text: isFavorited ? t("detail.remove_from_favorites") : t("detail.add_to_favorites"),
+      key: "favorite",
+    },
+  ];
+
+  const handleOptionPress = (option: DetailOptionConfig) => {
+    if (option.key === "calendar") setModalType("calendar");
+    else if (option.key === "reminder") setModalType("reminder");
+    else if (option.key === "repeat") setModalType("repeat");
+    else if (option.key === "note") setModalType("note");
+    else if (option.key === "favorite") {
       onStarToggle();
     }
   };
@@ -155,7 +153,6 @@ const BottomPanel: React.FC<BottomPanelProps> = ({
 
   return (
     <View style={styles.bottomPanel}>
-      {/* Header */}
       <View style={styles.taskDetailHeader}>
         <Text style={styles.taskDetailTitle} numberOfLines={2}>
           {selectedTask.text}
@@ -165,7 +162,6 @@ const BottomPanel: React.FC<BottomPanelProps> = ({
         </TouchableOpacity>
       </View>
 
-      {/* Detail option rows */}
       <ScrollView
         style={styles.taskDetailContent}
         contentContainerStyle={styles.taskDetailContentInner}
@@ -173,45 +169,39 @@ const BottomPanel: React.FC<BottomPanelProps> = ({
       >
         {getDetailOptions(selectedTask.important).map((option) => {
           let activeValue = "";
-          switch (option.text) {
-            case "Add due date":
+          switch (option.key) {
+            case "calendar":
               if (selectedTask.dueDate)
                 activeValue = formatDueDate(selectedTask.dueDate, selectedTask.dueTime);
               break;
-            case "Remind me":
+            case "reminder":
               if (selectedTask.reminder)
                 activeValue = formatReminder(selectedTask.reminder);
               break;
-            case "Repeat":
+            case "repeat":
               if (selectedTask.repeat && selectedTask.repeat !== "none")
                 activeValue = formatRepeat(selectedTask.repeat);
               break;
-            case "Add note":
+            case "note":
               if (selectedTask.note?.trim())
                 activeValue = formatNote(selectedTask.note);
               break;
           }
           return (
             <DetailOption
-              key={option.text}
+              key={option.key}
               icon={option.icon}
               text={option.text}
               activeValue={activeValue}
-              isActive={
-                option.text ===
-                (selectedTask.important
-                  ? "Remove from Favorites"
-                  : "Add to Favorites")
-              }
-              onPress={() => handleOptionPress(option.text)}
+              isActive={option.key === "favorite"}
+              onPress={() => handleOptionPress(option)}
             />
           );
         })}
       </ScrollView>
 
-      {/* Footer */}
       <View style={styles.taskDetailFooter}>
-        <Text style={styles.createdDate}>Created today</Text>
+        <Text style={styles.createdDate}>{t("detail.created_today")}</Text>
       </View>
 
       <CalendarPickerModal
