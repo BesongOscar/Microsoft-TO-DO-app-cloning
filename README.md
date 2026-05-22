@@ -9,6 +9,8 @@ React Native TODO app with Firebase - featuring task management, tab-based navig
 - **Drag & Drop Reorder** - Long-press drag handle to reorder tasks; order persists to Firestore
 - **Sorting** - Sort tasks by default order, name, due date, or importance via ListHeaderMenu
 - **Bulk Actions** - Mark all pending tasks complete or delete all completed tasks at once
+- **Dismissible Banner** - Suggestions banner that auto-hides for the day on dismissal
+- **Shared List Screens** - Reusable ListScreens component handles search, sorting, and layout for all list types
 - **Custom List Color Picker** - Choose custom colors when creating lists
 - **SectionList** - Lists tab uses SectionList to group default and custom lists
 - **Internationalization** - Full i18n with English and French; auto-detects device language
@@ -74,16 +76,18 @@ This project keeps native folders (`android/` and/or `ios/`) and uses `app.json`
 │   ├── Index/             # Components for main index screen
 │   ├── Modals/            # Modal components (calendar, reminder, repeat, note)
 │   ├── (auth)/           # Auth-related components (buttons, GoogleIcon)
+│   ├── ListScreens.tsx    # Shared list view with search, sort, bulk actions
 ├── constants/            # App constants (list definitions)
-├── context/               # React contexts (TasksContext, CustomListsContext, ThemeContext)
-├── hooks/                 # React hooks (useThemeStyles)
-├── src/                   # Firebase, auth, localization, and notification utilities
+├── context/               # React contexts (AuthContext, TasksContext, CustomListsContext, ThemeContext)
+├── hooks/                 # React hooks (useThemeStyles, useDismissibleBanner)
+├── locales/               # i18n translation files (en.json, fr.json)
+├── src/                   # Firebase, auth utilities
 │   ├── auth/             # Google Sign-In helper
 │   ├── firebase/         # Firestore CRUD operations
-│   ├── context/          # AuthContext
 │   ├── hooks/            # App hooks (useTaskNotifications)
 │   ├── i18n/             # i18next initialization and configuration
-│   └── notifications/    # Notification service and useNotifications hook
+│   ├── notifications/    # Notification service and useNotifications hook
+│   └── utils/            # Firestore data normalization helpers
 ├── styles/               # Theme-aware style files using Theme type
 │   ├── theme.ts         # Light/dark color palette definitions
 │   ├── app/             # App-level styles
