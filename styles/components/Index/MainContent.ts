@@ -6,4 +6,8 @@ export const createMainContentStyles = (theme: Theme) => StyleSheet.create({
     flex: 1,
     backgroundColor: theme.surface,
   },
+  centered: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
 });

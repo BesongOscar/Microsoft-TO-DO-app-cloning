@@ -7,12 +7,13 @@
  * Handles task filtering, drag-and-drop reorder, and empty states.
  */
 
-import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { View, StyleSheet } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { useState, useMemo, useCallback } from "react";
+import { View, ActivityIndicator } from "react-native";
 import { useThemeStyles } from "../../hooks/useThemeStyles";
+import { useTheme } from "../../context/ThemeContext";
 import { createMainContentStyles } from "../../styles/components/Index/MainContent";
 import { useAuth } from "@/context/AuthContext";
+import { useDismissibleBanner } from "../../src/hooks/useDismissibleBanner";
 import ListHeader from "../ListHeader";
 import ListHeaderMenu from "../ListHeaderMenu";
 import { SortBy } from "../../types";
@@ -45,11 +46,6 @@ const filterTasks = (tasks: Task[], list: ListItem): Task[] => {
   }
 };
 
-const getTodayDateString = (): string => {
-  const today = new Date();
-  return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-};
-
 interface MainContentProps {
   currentList: ListItem;
   tasks: Task[];
@@ -62,6 +58,7 @@ interface MainContentProps {
   onReorderTasks: (reorderedTasks: Task[]) => void;
   showReorderControls?: boolean;
   refreshing?: boolean;
+  loading?: boolean;
   onRefresh?: () => void;
   sortBy: SortBy;
   onSortChange: (sortBy: SortBy) => void;
@@ -85,42 +82,14 @@ const MainContent: React.FC<MainContentProps> = ({
   onSortChange,
   onEditList,
   onDeleteList,
+  loading = false,
 }) => {
   const styles = useThemeStyles(createMainContentStyles);
+  const { theme } = useTheme();
   const { user } = useAuth();
-  const [showBanner, setShowBanner] = useState<boolean>(true);
+  const bannerKey = user ? `suggestionBannerDismissed_${user.uid}` : "";
+  const { visible: showBanner, dismiss: handleCloseBanner } = useDismissibleBanner(bannerKey);
   const [menuVisible, setMenuVisible] = useState<boolean>(false);
-
-  useEffect(() => {
-    const loadBannerState = async () => {
-      if (!user?.uid) {
-        setShowBanner(true);
-        return;
-      }
-      const key = `suggestionBannerDismissed_${user.uid}`;
-      const stored = await AsyncStorage.getItem(key);
-      if (stored) {
-        const { date, dismissed } = JSON.parse(stored);
-        if (date === getTodayDateString() && dismissed) {
-          setShowBanner(false);
-        } else {
-          setShowBanner(true);
-        }
-      }
-    };
-    loadBannerState();
-  }, [user?.uid]);
-
-  const handleCloseBanner = async () => {
-    setShowBanner(false);
-    if (user?.uid) {
-      const key = `suggestionBannerDismissed_${user.uid}`;
-      await AsyncStorage.setItem(
-        key,
-        JSON.stringify({ date: getTodayDateString(), dismissed: true }),
-      );
-    }
-  };
 
   const filteredTasks = useMemo(
     () => filterTasks(tasks, currentList),
@@ -157,6 +126,14 @@ const MainContent: React.FC<MainContentProps> = ({
     day: "numeric",
   });
 
+  if (loading) {
+    return (
+      <View style={[styles.mainContent, styles.centered]}>
+        <ActivityIndicator size="large" color={theme.primary} />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.mainContent}>
       <ListHeader
@@ -165,7 +142,7 @@ const MainContent: React.FC<MainContentProps> = ({
         onMoreOptions={() => setMenuVisible(true)}
       />
 
-      {showBanner && (
+      {showBanner === true && (
         <SuggestionsBanner
           message={t("greeting.banner", { greeting })}
           onClose={handleCloseBanner}
@@ -192,6 +169,11 @@ const MainContent: React.FC<MainContentProps> = ({
                 ? t("tasks.no_planned_hint")
                 : t("tasks.no_tasks_add")
           }
+        />
+      ) : currentList.filterKey === "planned" && pendingTasks.length === 0 ? (
+        <EmptyState
+          title={t("tasks.all_planned_completed")}
+          message={t("tasks.no_planned_hint")}
         />
       ) : currentList.filterKey === "planned" ? (
         <PlannedTasksList

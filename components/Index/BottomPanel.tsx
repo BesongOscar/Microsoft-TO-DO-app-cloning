@@ -89,6 +89,10 @@ const formatNote = (note: string): string => {
   return oneLine.length > 40 ? `${oneLine.slice(0, 40)}…` : oneLine;
 };
 
+const isToday = (timestamp: number): boolean => {
+  return new Date(timestamp).toDateString() === new Date().toDateString();
+};
+
 const formatTimeOnly = (timeStr: string): string => {
   const [h, m] = timeStr.split(":");
   const ampm = parseInt(h, 10) >= 12 ? "PM" : "AM";
@@ -130,11 +134,11 @@ const BottomPanel: React.FC<BottomPanelProps> = ({
     { icon: "📝", text: t("detail.add_note"), key: "note" },
   ];
 
-  const getDetailOptions = (isFavorited: boolean): DetailOptionConfig[] => [
+  const getDetailOptions = (isImportant: boolean): DetailOptionConfig[] => [
     ...BASE_OPTIONS,
     {
       icon: "⭐",
-      text: isFavorited ? t("detail.remove_from_favorites") : t("detail.add_to_favorites"),
+      text: isImportant ? t("detail.remove_from_important") : t("detail.add_to_important"),
       key: "favorite",
     },
   ];
@@ -204,6 +208,19 @@ const BottomPanel: React.FC<BottomPanelProps> = ({
           );
         })}
       </ScrollView>
+
+      <View style={styles.taskDetailFooter}>
+        <Text style={styles.createdDate}>
+          {selectedTask.createdAt && !isToday(selectedTask.createdAt)
+            ? t("detail.created_on", {
+                date: new Date(selectedTask.createdAt).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                }),
+              })
+            : t("detail.created_today")}
+        </Text>
+      </View>
 
       <CalendarPickerModal
         visible={modalType === "calendar"}

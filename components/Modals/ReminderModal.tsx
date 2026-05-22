@@ -186,6 +186,23 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
     }
   };
 
+  const computeCustomDate = () => {
+    const now = new Date();
+    const customDate = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      customHour,
+      customMinute,
+    );
+    const willAdvance = customDate <= now;
+    if (willAdvance) customDate.setDate(customDate.getDate() + 1);
+    return { date: customDate, willAdvance };
+  };
+
+  const { date: customPreviewDate, willAdvance: customWillAdvance } =
+    selectedOption === "custom" ? computeCustomDate() : { date: null, willAdvance: false };
+
   const handleSave = () => {
     const now = new Date();
 
@@ -290,11 +307,13 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
             </View>
           )}
 
-          {selectedOption === "custom" && (
+          {selectedOption === "custom" && customPreviewDate && (
             <View style={styles.preview}>
               <Text style={styles.previewLabel}>{t("reminder.reminder_label")}</Text>
               <Text style={styles.previewDate}>
-                {`${String(customHour).padStart(2, "0")}:${String(customMinute).padStart(2, "0")}`}
+                {customWillAdvance
+                  ? `${t("date.tomorrow")} ${t("date.at")} ${String(customHour).padStart(2, "0")}:${String(customMinute).padStart(2, "0")}`
+                  : `${String(customHour).padStart(2, "0")}:${String(customMinute).padStart(2, "0")}`}
               </Text>
             </View>
           )}

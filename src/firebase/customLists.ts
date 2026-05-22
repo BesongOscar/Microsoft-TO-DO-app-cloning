@@ -10,10 +10,12 @@ import {
   getDocs,
   setDoc,
   deleteDoc,
+  updateDoc,
   writeBatch,
 } from "firebase/firestore";
 import { db } from "./config";
 import { CustomList } from "../../types";
+import { normalizeCustomList } from "../utils/normalize";
 
 export const firestoreGetCustomLists = async (
   // Get all custom lists for a user, returns empty array if none exist
@@ -22,11 +24,7 @@ export const firestoreGetCustomLists = async (
   const listsRef = collection(db, "customLists", userId, "userLists");
   const snapshot = await getDocs(listsRef);
 
-  return snapshot.docs.map((d) => ({
-    // Map Firestore documents to CustomList objects, using doc.id as list ID
-    id: d.id,
-    ...d.data(),
-  })) as CustomList[];
+  return snapshot.docs.map((d) => normalizeCustomList({ id: d.id, ...d.data() }));
 };
 
 export const firestoreSaveCustomLists = async (
@@ -46,6 +44,15 @@ export const firestoreSaveCustomLists = async (
   }
 
   await batch.commit();
+};
+
+export const firestoreUpdateCustomList = async (
+  userId: string,
+  listId: string,
+  updates: Partial<Omit<CustomList, "id">>,
+): Promise<void> => {
+  const listDoc = doc(db, "customLists", userId, "userLists", listId);
+  await updateDoc(listDoc, updates);
 };
 
 export const firestoreMigrateCustomListsFromLocal = async (

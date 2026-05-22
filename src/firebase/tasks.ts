@@ -17,6 +17,7 @@ import {
 } from "firebase/firestore";
 import { db } from "./config";
 import { Task } from "../../types";
+import { normalizeTask } from "../utils/normalize";
 
 // Remove undefined fields before storing to Firestore
 const cleanTask = (task: Task): Record<string, unknown> => {
@@ -49,11 +50,7 @@ export const firestoreGetTasks = async (userId: string): Promise<Task[]> => {
   const tasksRef = collection(db, "tasks", userId, "userTasks");
   const snapshot = await getDocs(tasksRef);
 
-  return snapshot.docs.map((doc) => ({
-    // Map Firestore documents to Task objects, using doc.id as task ID
-    id: doc.id,
-    ...doc.data(),
-  })) as Task[];
+  return snapshot.docs.map((doc) => normalizeTask({ id: doc.id, ...doc.data() }));
 };
 
 export const firestoreSaveTasks = async (

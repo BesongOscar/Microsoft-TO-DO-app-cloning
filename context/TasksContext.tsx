@@ -19,18 +19,21 @@ import {
 import { useTaskNotifications } from "../src/hooks/useTaskNotifications";
 import i18n from "@/src/i18n";
 
-/**
- * TasksContext - Manages global task state and Firestore persistence
- *
- * Provides task CRUD operations (add, toggle, delete, update) that sync
- * with Firestore in real-time. Handles loading states and error recovery.
- */
+// ── Data context (triggers re-render on state change) ─────────────────────
 
-interface TasksContextValue {
+interface TasksData {
   tasks: Task[];
   loading: boolean;
   refreshing: boolean;
   counts: TaskCounts;
+  selectedTaskId: string | null;
+}
+
+const TasksDataContext = createContext<TasksData | null>(null);
+
+// ── Actions context (stable callbacks, no re-render) ──────────────────────
+
+interface TasksActions {
   addTask: (text: string, listName?: string, listId?: string) => void;
   toggleTask: (taskId: string) => void;
   toggleImportant: (taskId: string) => void;
@@ -38,12 +41,12 @@ interface TasksContextValue {
   updateTask: (taskId: string, updates: Partial<Task>) => void;
   refreshTasks: () => Promise<void>;
   reorderTasks: (reorderedPendingTasks: Task[]) => void;
-  // Shared selected task ID for bottom panel across all tabs
-  selectedTaskId: string | null;
   setSelectedTaskId: (id: string | null) => void;
 }
 
-const TasksContext = createContext<TasksContextValue | null>(null);
+const TasksActionsContext = createContext<TasksActions | null>(null);
+
+// ── Provider ──────────────────────────────────────────────────────────────
 
 export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -70,9 +73,7 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
     useTaskNotifications();
 
   useEffect(() => {
-    if (authLoading) {
-      return;
-    }
+    if (authLoading) return;
 
     let cancelled = false;
 
@@ -91,7 +92,6 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
         if (cancelled) return;
 
         if (loadedTasks.length > 0) {
-          // Initialize order for pending tasks that don't have it
           const pendingTasks = loadedTasks.filter((t) => !t.completed);
           const completedTasks = loadedTasks.filter((t) => t.completed);
 
@@ -103,7 +103,6 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
             return task;
           });
 
-          // Sort pending tasks by order
           pendingWithOrder.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
           setTasks([...pendingWithOrder, ...completedTasks]);
@@ -126,18 +125,15 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
     };
   }, [authLoading, user?.uid]);
 
-  // Debounced save to Firestore - avoids rapid successive writes
   const debouncedSaveTasks = useCallback(
     (newTasks: Task[]) => {
       const currentUser = userRef.current;
       if (!currentUser) return;
 
-      // Clear any pending save
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
       }
 
-      // Debounce: wait 500ms before saving to batch rapid changes
       saveTimeoutRef.current = setTimeout(async () => {
         const uid = userRef.current?.uid;
         if (!uid) return;
@@ -153,10 +149,9 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
         }
       }, 500);
     },
-    [], // stable - reads user from ref at execution time
+    [],
   );
 
-  // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
       if (saveTimeoutRef.current) {
@@ -175,20 +170,15 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
         myDay: listName === "My Day",
         listId: listId,
         order: 0,
-        reminder: undefined,
-        dueDate: undefined,
-        dueTime: undefined,
-        repeat: undefined,
+        createdAt: Date.now(),
       };
       setTasks((prev) => {
-        // Increment order of all existing pending tasks by 1
         const updated = [
           newTask,
           ...prev.map((t) =>
             t.completed ? t : { ...t, order: (t.order ?? 0) + 1 },
           ),
         ];
-        // Schedule debounced save after state update
         setTimeout(() => debouncedSaveTasks(updated), 0);
         return updated;
       });
@@ -196,13 +186,12 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
     [debouncedSaveTasks],
   );
 
-  // Toggle the completed status of a task by ID, updates local state immediately for responsiveness, then saves the change to Firestore
   const toggleTask = useCallback(
     (taskId: string): void => {
-      const prevTask = tasksRef.current.find((t) => t.id === taskId);
-      if (!prevTask) return;
+      const prevSnapshot = { ...tasksRef.current.find((t) => t.id === taskId) } as Task | null;
+      if (!prevSnapshot) return;
 
-      const willBeCompleted = !prevTask.completed;
+      const willBeCompleted = !prevSnapshot.completed;
       let newOrder: number | undefined;
 
       if (!willBeCompleted) {
@@ -232,25 +221,24 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
           setTasks((prev) =>
             prev.map((t) =>
               t.id === taskId
-                ? { ...t, completed: prevTask.completed, order: prevTask.order }
+                ? { ...t, completed: prevSnapshot.completed, order: prevSnapshot.order }
                 : t,
             ),
           );
         });
       }
 
-      onTaskToggled(prevTask, willBeCompleted);
+      onTaskToggled(prevSnapshot, willBeCompleted);
     },
     [user, onTaskToggled],
   );
 
-  // Toggle the important status of a task by ID, updates local state immediately for responsiveness, then saves the change to Firestore
   const toggleImportant = useCallback(
     (taskId: string): void => {
-      const prevTask = tasksRef.current.find((t) => t.id === taskId);
-      if (!prevTask) return;
+      const prevSnapshot = { ...tasksRef.current.find((t) => t.id === taskId) } as Task | null;
+      if (!prevSnapshot) return;
 
-      const newImportant = !prevTask.important;
+      const newImportant = !prevSnapshot.important;
 
       setTasks((prev) =>
         prev.map((t) =>
@@ -265,7 +253,7 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
           console.warn("Failed to toggle important in Firestore:", e);
           setTasks((prev) =>
             prev.map((t) =>
-              t.id === taskId ? { ...t, important: prevTask.important } : t,
+              t.id === taskId ? { ...t, important: prevSnapshot.important } : t,
             ),
           );
         });
@@ -274,7 +262,6 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
     [user],
   );
 
-  // Delete a task by ID, removes it from local state immediately for responsiveness, then deletes it from Firestore
   const deleteTask = useCallback(
     (taskId: string): void => {
       const prevTask = tasksRef.current.find((t) => t.id === taskId);
@@ -298,7 +285,6 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
     [user, onTaskDeleted],
   );
 
-  // Update a task by ID with given partial updates, merges updates into existing task, updates local state immediately for responsiveness, then saves changes to Firestore, also handles scheduling or canceling notifications based on reminder changes
   const updateTask = useCallback(
     (taskId: string, updates: Partial<Task>): void => {
       const prevTask = tasksRef.current.find((t) => t.id === taskId);
@@ -327,14 +313,12 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
     [user, onTaskUpdated],
   );
 
-  // Manually refresh tasks from Firestore, used for pull-to-refresh or error recovery, shows refreshing state while loading, replaces local state with remote data to ensure consistency
   const refreshTasks = useCallback(async (): Promise<void> => {
     if (!user) return;
     setRefreshing(true);
     try {
       const loadedTasks = await firestoreGetTasks(user.uid);
 
-      // Initialize order for pending tasks that don't have it
       const pendingTasks = loadedTasks.filter((t) => !t.completed);
       const completedTasks = loadedTasks.filter((t) => t.completed);
 
@@ -346,7 +330,6 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
         return task;
       });
 
-      // Sort pending tasks by order
       pendingWithOrder.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
       setTasks([...pendingWithOrder, ...completedTasks]);
@@ -363,7 +346,6 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [user?.uid]);
 
   const reorderTasks = useCallback(
-    // Reorder pending tasks after drag-and-drop, assigns order based on new positions
     (reorderedPendingTasks: Task[]): void => {
       const updatedPending = reorderedPendingTasks.map((task, index) => ({
         ...task,
@@ -373,7 +355,6 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
       setTasks((prev) => {
         const completedTasks = prev.filter((t) => t.completed);
         const newTasks = [...updatedPending, ...completedTasks];
-        // Save after state update
         debouncedSaveTasks(newTasks);
         return newTasks;
       });
@@ -381,7 +362,7 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
     [debouncedSaveTasks],
   );
 
-  const counts = useMemo<TaskCounts>( // Compute task counts for different categories (My Day, Important, Completed, Planned, All) based on the current task list, used for displaying badges and summaries in the UI, memoized to avoid unnecessary recalculations on every render
+  const counts = useMemo<TaskCounts>(
     () => ({
       myDay: tasks.filter((t) => t.myDay && !t.completed).length,
       important: tasks.filter((t) => t.important && !t.completed).length,
@@ -394,33 +375,49 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
     [tasks],
   );
 
-  const value: TasksContextValue = {
-    tasks,
-    loading,
-    refreshing,
-    counts,
-    addTask,
-    toggleTask,
-    toggleImportant,
-    deleteTask,
-    updateTask,
-    refreshTasks,
-    reorderTasks,
-    selectedTaskId,
-    setSelectedTaskId,
-  };
+  const dataValue = useMemo<TasksData>(
+    () => ({ tasks, loading, refreshing, counts, selectedTaskId }),
+    [tasks, loading, refreshing, counts, selectedTaskId],
+  );
+
+  const actionsValue = useMemo<TasksActions>(
+    () => ({
+      addTask,
+      toggleTask,
+      toggleImportant,
+      deleteTask,
+      updateTask,
+      refreshTasks,
+      reorderTasks,
+      setSelectedTaskId,
+    }),
+    [addTask, toggleTask, toggleImportant, deleteTask, updateTask, refreshTasks, reorderTasks, setSelectedTaskId],
+  );
 
   return (
-    <TasksContext.Provider value={value}>{children}</TasksContext.Provider>
+    <TasksDataContext.Provider value={dataValue}>
+      <TasksActionsContext.Provider value={actionsValue}>
+        {children}
+      </TasksActionsContext.Provider>
+    </TasksDataContext.Provider>
   );
 };
 
-export const useTasks = (): TasksContextValue => {
-  const ctx = useContext(TasksContext);
-  if (!ctx) {
-    throw new Error("useTasks must be used inside a <TasksProvider>");
-  }
+export const useTasksData = (): TasksData => {
+  const ctx = useContext(TasksDataContext);
+  if (!ctx) throw new Error("useTasksData must be inside <TasksProvider>");
   return ctx;
 };
 
-export default TasksContext;
+export const useTasksActions = (): TasksActions => {
+  const ctx = useContext(TasksActionsContext);
+  if (!ctx) throw new Error("useTasksActions must be inside <TasksProvider>");
+  return ctx;
+};
+
+export const useTasks = (): TasksData & TasksActions => ({
+  ...useTasksData(),
+  ...useTasksActions(),
+});
+
+

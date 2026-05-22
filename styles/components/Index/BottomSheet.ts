@@ -2,7 +2,7 @@ import { StyleSheet, Dimensions } from "react-native";
 import type { Theme } from "../../theme";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
-export const SHEET_HEIGHT = Math.min(400, SCREEN_HEIGHT * 0.6);
+export const SHEET_HEIGHT = Math.min(480, SCREEN_HEIGHT * 0.7);
 
 export const createBottomSheetStyles = (theme: Theme) => StyleSheet.create({
   container: {

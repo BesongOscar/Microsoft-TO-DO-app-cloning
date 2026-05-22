@@ -12,6 +12,7 @@ import { useAuth } from "@/context/AuthContext";
 import {
   firestoreGetCustomLists,
   firestoreSaveCustomLists,
+  firestoreUpdateCustomList,
 } from "@/src/firebase/customLists";
 
 /**
@@ -73,8 +74,7 @@ export const CustomListsProvider: React.FC<{ children: React.ReactNode }> = ({
         id: `list-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
         name: name.trim(),
         icon,
-        color,
-        taskCount: 0,
+        color: "#0078d4",
         createdAt: Date.now(),
       };
       const previous = customListsRef.current;
@@ -105,8 +105,8 @@ export const CustomListsProvider: React.FC<{ children: React.ReactNode }> = ({
       );
       setCustomLists(updated);
       if (user) {
-        firestoreSaveCustomLists(user.uid, updated).catch((e) => {
-          console.warn("Failed to save custom lists to Firestore:", e);
+        firestoreUpdateCustomList(user.uid, id, updates).catch((e) => {
+          console.warn("Failed to update custom list in Firestore:", e);
           setCustomLists(previous);
           Alert.alert(
             "Save Failed",

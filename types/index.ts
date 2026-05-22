@@ -16,6 +16,7 @@ export interface Task {
   repeatEndDate?: string;
   listId?: string;
   order?: number;
+  createdAt?: number;
 }
 
 // ─── Shared list fields ───────────────────────────────────────────────────────
@@ -56,7 +57,6 @@ export interface TaskCounts {
 
 // ─── Custom List ──────────────────────────────────────────────────────────────
 export interface CustomList extends ListFields {
-  taskCount: number;
   createdAt?: number;
 }
 

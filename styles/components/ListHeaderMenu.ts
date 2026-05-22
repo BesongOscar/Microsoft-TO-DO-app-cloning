@@ -1,17 +1,18 @@
 import { StyleSheet } from "react-native";
 import { fontReg, fontSemi, androidPoppinsExtras } from "../common";
+import type { Theme } from "../theme";
 
-export const listHeaderMenuStyles = StyleSheet.create({
-    overlay: {
+export const createListHeaderMenuStyles = (theme: Theme) => StyleSheet.create({
+  overlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.35)",
     justifyContent: "flex-end",
   },
   sheet: {
-    backgroundColor: "#ffffff",
+    backgroundColor: theme.surface,
     borderTopLeftRadius: 14,
     borderTopRightRadius: 14,
-    paddingBottom: 20, // safe area bottom
+    paddingBottom: 20,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: -4 },
     shadowOpacity: 0.1,
@@ -22,14 +23,14 @@ export const listHeaderMenuStyles = StyleSheet.create({
     width: 36,
     height: 4,
     borderRadius: 2,
-    backgroundColor: "#c8c6c4",
+    backgroundColor: theme.border,
     alignSelf: "center",
     marginTop: 8,
     marginBottom: 4,
   },
   sectionTitle: {
     fontSize: 13,
-    color: "#8a8886",
+    color: theme.textMuted,
     fontFamily: fontSemi,
     textTransform: "uppercase",
     letterSpacing: 0.5,
@@ -51,23 +52,23 @@ export const listHeaderMenuStyles = StyleSheet.create({
   },
   menuItemText: {
     fontSize: 15,
-    color: "#323130",
+    color: theme.text,
     fontFamily: fontReg,
     flex: 1,
     ...androidPoppinsExtras,
   },
   menuItemDestructive: {
-    color: "#d13438",
+    color: theme.error,
   },
   checkmark: {
     fontSize: 16,
-    color: "#0078d4",
+    color: theme.primary,
     marginLeft: "auto",
     fontWeight: "bold",
   },
   divider: {
     height: 1,
-    backgroundColor: "#f3f2f1",
+    backgroundColor: theme.border,
     marginHorizontal: 20,
     marginVertical: 4,
   },
@@ -76,13 +77,13 @@ export const listHeaderMenuStyles = StyleSheet.create({
     marginHorizontal: 20,
     marginTop: 8,
     borderTopWidth: 1,
-    borderTopColor: "#f3f2f1",
+    borderTopColor: theme.border,
     alignItems: "center",
   },
   cancelText: {
     fontSize: 15,
-    color: "#605e5c",
+    color: theme.textSecondary,
     fontFamily: fontSemi,
     ...androidPoppinsExtras,
   },
-})
+});
