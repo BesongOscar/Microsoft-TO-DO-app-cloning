@@ -5,7 +5,7 @@
  * Supports: myDay, important, completed, all, planned, tasks, listId
  */
 
-import { Task, ListItem } from "../types";
+import { Task, ListItem } from "../../types";
 
 export const filterTasks = (tasks: Task[], list: ListItem): Task[] => {
   switch (list.filterKey) {

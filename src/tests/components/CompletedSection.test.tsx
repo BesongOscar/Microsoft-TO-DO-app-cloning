@@ -24,9 +24,11 @@ jest.mock("react-i18next", () => ({
 
 jest.mock("../../../components/TaskItem", () => {
   const { View, Text } = jest.requireActual("react-native");
-  return ({ task }: { task: Task }) => (
+  const MockTaskItem = ({ task }: { task: Task }) => (
     <View><Text>{task.text}</Text></View>
   );
+  MockTaskItem.displayName = "MockTaskItem";
+  return MockTaskItem;
 });
 
 const baseCallbacks = {

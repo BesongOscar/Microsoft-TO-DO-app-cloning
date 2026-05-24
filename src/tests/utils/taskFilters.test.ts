@@ -78,7 +78,7 @@ describe("filterTasks", () => {
   });
 
   it("returns empty array when no tasks match", () => {
-    const result = filterTasks(tasks, makeList({ filterKey: "myDay", id: "none" }));
+    filterTasks(tasks, makeList({ filterKey: "myDay", id: "none" }));
     const noMyDay = tasks.filter((t) => !t.myDay);
     expect(noMyDay.map((t) => t.id)).toEqual(["2", "3", "5", "6", "7"]);
   });

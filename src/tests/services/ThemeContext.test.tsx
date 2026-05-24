@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { TouchableOpacity } from "react-native";
 import { render, fireEvent, waitFor, screen } from "@testing-library/react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ThemeProvider, useTheme } from "../../../context/ThemeContext";
@@ -34,23 +34,12 @@ function Consumer({ onRender }: { onRender: (ctx: ThemeContextType) => void }) {
 }
 
 function Controls() {
-  const { theme, themeMode, isDark, setThemeMode } = useTheme() as unknown as ThemeContextType;
+  const { setThemeMode } = useTheme() as unknown as ThemeContextType;
   return (
     <>
       <TouchableOpacity testID="set-light" onPress={() => setThemeMode("light")} />
       <TouchableOpacity testID="set-dark" onPress={() => setThemeMode("dark")} />
       <TouchableOpacity testID="set-system" onPress={() => setThemeMode("system")} />
-    </>
-  );
-}
-
-function DataDisplay() {
-  const { theme, themeMode, isDark } = useTheme() as unknown as ThemeContextType;
-  return (
-    <>
-      <Text testID="themeMode">{themeMode}</Text>
-      <Text testID="isDark">{String(isDark)}</Text>
-      <Text testID="primary">{theme.primary}</Text>
     </>
   );
 }

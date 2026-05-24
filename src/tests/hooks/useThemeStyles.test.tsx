@@ -1,7 +1,7 @@
 import { renderHook } from "@testing-library/react-native";
 import { ThemeProvider } from "../../../context/ThemeContext";
 import { useThemeStyles } from "../../hooks/useThemeStyles";
-import { lightTheme, darkTheme } from "../../../styles/theme";
+import { lightTheme } from "../../../styles/theme";
 
 jest.mock("@react-native-async-storage/async-storage", () => ({
   getItem: jest.fn(() => Promise.resolve(null)),
@@ -39,7 +39,7 @@ describe("useThemeStyles", () => {
       { wrapper },
     );
     const firstResult = result.current;
-    rerender();
+    rerender(() => useThemeStyles(factory));
     expect(result.current).toBe(firstResult);
     expect(factory).toHaveBeenCalledTimes(1);
   });
