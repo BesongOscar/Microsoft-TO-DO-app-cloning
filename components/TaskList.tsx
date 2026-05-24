@@ -66,7 +66,7 @@ interface DraggableTaskItemProps {
   setHoverIndex: (i: number | null) => void;
 }
 
-const DraggableTaskItem = React.memo<DraggableTaskItemProps>(({
+const DraggableTaskItem = /*#__PURE__*/ React.memo<DraggableTaskItemProps>(({
   task, index, pendingTasks, draggingIndex, hoverIndex,
   onReorderTasks, onToggleTask, onSelectTask, onStarToggle, onEdit, onDelete,
   setDraggingIndex, setHoverIndex,
@@ -172,6 +172,7 @@ const DraggableTaskItem = React.memo<DraggableTaskItemProps>(({
 
   return true;
 });
+DraggableTaskItem.displayName = 'DraggableTaskItem';
 
 const TasksList: React.FC<TasksListProps> = ({
   pendingTasks,

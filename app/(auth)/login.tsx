@@ -198,7 +198,7 @@ export default function Login() {
       />
 
       <Text style={styles.linkText}>
-        Don't have an account?{" "}
+        Don&apos;t have an account?{" "}
         <Link href="/signup" style={styles.link}>
           Signup
         </Link>
