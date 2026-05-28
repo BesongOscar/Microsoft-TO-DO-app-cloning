@@ -10,8 +10,10 @@ import BottomSheet from "../../components/Index/BottomSheet";
 import BottomPanel from "@/components/Index/BottomPanel"; 
 import { fontSemi, androidPoppinsExtras } from "@/styles/common";
 import { useTranslation } from 'react-i18next';
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function ProtectedLayout() {
+  const insets = useSafeAreaInsets();
   const { user, loading } = useAuth();
   const {
     tasks,
@@ -46,6 +48,7 @@ export default function ProtectedLayout() {
             backgroundColor: theme.tabBarBackground,
             borderTopWidth: 1,
             borderTopColor: theme.border,
+            paddingBottom: insets.bottom > 0 ? insets.bottom : 10,
           },
         }}
       >

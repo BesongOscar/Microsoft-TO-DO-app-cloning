@@ -6,10 +6,16 @@ export const createAddTaskInputStyles = (theme: Theme) => StyleSheet.create({
   addTaskContainer: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 15,
+    paddingHorizontal: 5,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: theme.surfaceSecondary,
+    marginHorizontal: 12,
+    marginVertical: 10,
+    backgroundColor: theme.surface,
+    borderWidth: 1,
+    borderTopWidth: 1,
+    borderColor: theme.surfaceSecondary,
+    borderRadius: 10,
   },
   addTaskButton: {
     width: 25,

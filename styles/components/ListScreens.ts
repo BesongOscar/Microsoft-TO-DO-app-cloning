@@ -20,7 +20,7 @@ export const createListScreensStyles = (theme: Theme) => StyleSheet.create({
     fontSize: 16,
     fontFamily: "Poppins-Regular",
     marginLeft: 8,
-    paddingVertical: 4,
+    paddingVertical: 5,
   },
   cancelButton: {
     color: "#fff",
@@ -29,8 +29,7 @@ export const createListScreensStyles = (theme: Theme) => StyleSheet.create({
     marginLeft: 12,
   },
   headerRightRow: {
-    flexDirection: "row",
-    marginRight: 10 
+    flexDirection: "row", 
   },
   headerIcon: {
     marginRight: 12,
