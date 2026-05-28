@@ -127,7 +127,11 @@ export default function Profile() {
   }[] = [
     { mode: "light", icon: "sunny", label: t("profile.theme_light") },
     { mode: "dark", icon: "moon", label: t("profile.theme_dark") },
-    { mode: "system", icon: "settings-outline", label: t("profile.theme_system") },
+    {
+      mode: "system",
+      icon: "settings-outline",
+      label: t("profile.theme_system"),
+    },
   ] as const;
 
   return (
@@ -157,134 +161,140 @@ export default function Profile() {
               <Ionicons name="camera" size={16} color="#fff" />
             </View>
           </TouchableOpacity>
-          {uploading && <Text style={styles.uploadingText}>{t("profile.uploading")}</Text>}
+          {uploading && (
+            <Text style={styles.uploadingText}>{t("profile.uploading")}</Text>
+          )}
         </View>
       </View>
 
-      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} >
-      
+      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+        {/* Account */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t("profile.account")}</Text>
 
-      {/* Account */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t("profile.account")}</Text>
+          {isEditingName ? (
+            <View style={styles.editNameContainer}>
+              <TextInput
+                style={styles.editNameInput}
+                value={editedName}
+                onChangeText={setEditedName}
+                placeholder={t("profile.add_name")}
+                placeholderTextColor={theme.placeholderTextColor}
+                autoFocus
+              />
+              <TouchableOpacity
+                onPress={handleSaveName}
+                style={styles.saveButton}
+              >
+                <Ionicons name="checkmark" size={24} color={theme.primary} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setIsEditingName(false)}
+                style={styles.cancelButton}
+              >
+                <Ionicons name="close" size={24} color={theme.textMuted} />
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <TouchableOpacity
+              style={styles.infoRow}
+              onPress={() => {
+                setEditedName(userProfile?.name || "");
+                setIsEditingName(true);
+              }}
+            >
+              <Ionicons name="person" size={24} color={theme.primary} />
+              <View style={styles.infoText}>
+                <Text style={styles.infoLabel}>{t("profile.name")}</Text>
+                <Text style={styles.infoValue}>
+                  {userProfile?.name || t("profile.add_name")}
+                </Text>
+              </View>
+              <Ionicons name="pencil" size={20} color={theme.textMuted} />
+            </TouchableOpacity>
+          )}
 
-        {isEditingName ? (
-          <View style={styles.editNameContainer}>
-            <TextInput
-              style={styles.editNameInput}
-              value={editedName}
-              onChangeText={setEditedName}
-              placeholder={t("profile.add_name")}
-              placeholderTextColor={theme.placeholderTextColor}
-              autoFocus
-            />
-            <TouchableOpacity
-              onPress={handleSaveName}
-              style={styles.saveButton}
-            >
-              <Ionicons name="checkmark" size={24} color={theme.primary} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => setIsEditingName(false)}
-              style={styles.cancelButton}
-            >
-              <Ionicons name="close" size={24} color={theme.textMuted} />
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <TouchableOpacity
-            style={styles.infoRow}
-            onPress={() => {
-              setEditedName(userProfile?.name || "");
-              setIsEditingName(true);
-            }}
-          >
-            <Ionicons name="person" size={24} color={theme.primary} />
+          <View style={styles.infoRow}>
+            <Ionicons name="mail" size={24} color={theme.primary} />
             <View style={styles.infoText}>
-              <Text style={styles.infoLabel}>{t("profile.name")}</Text>
+              <Text style={styles.infoLabel}>{t("profile.email")}</Text>
               <Text style={styles.infoValue}>
-                {userProfile?.name || t("profile.add_name")}
+                {user.email || "Not logged in"}
               </Text>
             </View>
-            <Ionicons name="pencil" size={20} color={theme.textMuted} />
-          </TouchableOpacity>
-        )}
-
-        <View style={styles.infoRow}>
-          <Ionicons name="mail" size={24} color={theme.primary} />
-          <View style={styles.infoText}>
-            <Text style={styles.infoLabel}>{t("profile.email")}</Text>
-            <Text style={styles.infoValue}>
-              {user.email || "Not logged in"}
-            </Text>
           </View>
         </View>
-      </View>
 
-      {/* Theme */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t("profile.appearance")}</Text>
-        <View style={styles.themeRow}>
-          {themeOptions.map(({ mode, icon, label }) => (
-            <TouchableOpacity
-              key={mode}
-              style={[
-                styles.themeOption,
-                themeMode === mode && styles.themeOptionActive,
-              ]}
-              onPress={() => setThemeMode(mode)}
-              activeOpacity={0.7}
-            >
-              <Ionicons
-                name={icon}
-                size={20}
-                color={themeMode === mode ? theme.primary : theme.textSecondary}
-              />
-              <Text
+        {/* Theme */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t("profile.appearance")}</Text>
+          <View style={styles.themeRow}>
+            {themeOptions.map(({ mode, icon, label }) => (
+              <TouchableOpacity
+                key={mode}
                 style={[
-                  styles.themeOptionText,
-                  themeMode === mode && styles.themeOptionTextActive,
+                  styles.themeOption,
+                  themeMode === mode && styles.themeOptionActive,
                 ]}
+                onPress={() => setThemeMode(mode)}
+                activeOpacity={0.7}
               >
-                {label}
+                <Ionicons
+                  name={icon}
+                  size={20}
+                  color={
+                    themeMode === mode ? theme.primary : theme.textSecondary
+                  }
+                />
+                <Text
+                  style={[
+                    styles.themeOptionText,
+                    themeMode === mode && styles.themeOptionTextActive,
+                  ]}
+                >
+                  {label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        {/* Language */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t("profile.language")}</Text>
+          {SUPPORTED_LANGUAGES.map((lang) => (
+            <TouchableOpacity
+              key={lang.code}
+              style={styles.menuItem}
+              onPress={() => handleLanguageChange(lang.code)}
+            >
+              <Text style={{ flex: 1, fontSize: 16, color: theme.text }}>
+                {lang.label}
               </Text>
+              {i18n.language === lang.code && (
+                <Ionicons name="checkmark" size={20} color={theme.primary} />
+              )}
             </TouchableOpacity>
           ))}
         </View>
-      </View>
 
-        {/* Language */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t("profile.language")}</Text>
-        {SUPPORTED_LANGUAGES.map((lang) => (
-          <TouchableOpacity
-            key={lang.code}
-            style={styles.menuItem}
-            onPress={() => handleLanguageChange(lang.code)}
-          >
-            <Text style={{ flex: 1, fontSize: 16, color: theme.text }}>
-              {lang.label}
-            </Text>
-            {i18n.language === lang.code && (
-              <Ionicons name="checkmark" size={20} color={theme.primary} />
-            )}
+        {/* Actions */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t("profile.actions")}</Text>
+          <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
+            <Ionicons name="log-out" size={24} color={theme.error} />
+            <Text style={styles.menuText}>{t("profile.logout")}</Text>
+            <Ionicons
+              name="chevron-forward"
+              size={24}
+              color={theme.textMuted}
+            />
           </TouchableOpacity>
-        ))}
-      </View>
+        </View>
 
-      {/* Actions */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t("profile.actions")}</Text>
-        <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
-          <Ionicons name="log-out" size={24} color={theme.error} />
-          <Text style={styles.menuText}>{t("profile.logout")}</Text>
-          <Ionicons name="chevron-forward" size={24} color={theme.textMuted} />
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>{t("profile.version")}</Text>
-      </View>
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>{t("profile.version")}</Text>
+        </View>
       </ScrollView>
     </View>
   );

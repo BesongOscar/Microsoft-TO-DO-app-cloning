@@ -15,7 +15,8 @@ const myDayList: ListItem = {
 export default function MyDayScreen() {
   const { userProfile } = useAuth();
   const { tasks, addTask } = useTasks();
-  const greeting = "Hi " + (userProfile?.name?.split(" ")[0] || "there") + " 👋";
+  const greeting =
+    "Hi " + (userProfile?.name?.split(" ")[0] || "there") + " 👋";
 
   return (
     <ListScreens

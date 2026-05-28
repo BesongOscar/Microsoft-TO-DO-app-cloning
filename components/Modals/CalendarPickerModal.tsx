@@ -6,13 +6,7 @@
  */
 
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Modal,
-  StyleSheet,
-} from "react-native";
+import { View, Text, TouchableOpacity, Modal, StyleSheet } from "react-native";
 import { useThemeStyles } from "../../src/hooks/useThemeStyles";
 import { createCalendarPickerModalStyles } from "../../styles/components/Modals/CalendarPickerModal";
 import TimePicker from "../TimePicker";
@@ -35,8 +29,18 @@ interface CalendarPickerModalProps {
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTHS = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
 import { parseDateString } from "../../src/utils/date";
@@ -61,7 +65,8 @@ const CalendarPickerModal: React.FC<CalendarPickerModalProps> = ({
   );
 
   const [showTimePicker, setShowTimePicker] = useState<boolean>(false);
-  const [timeManuallySet, setTimeManuallySet] = useState<boolean>(!!currentTime);
+  const [timeManuallySet, setTimeManuallySet] =
+    useState<boolean>(!!currentTime);
   const [selectedHour, setSelectedHour] = useState<number>(
     currentTime ? parseInt(currentTime.split(":")[0], 10) : 12,
   );
@@ -188,13 +193,19 @@ const CalendarPickerModal: React.FC<CalendarPickerModalProps> = ({
           {/* Calendar */}
           <View style={styles.calendarContainer}>
             <View style={styles.header}>
-              <TouchableOpacity onPress={goToPrevMonth} style={styles.navButton}>
+              <TouchableOpacity
+                onPress={goToPrevMonth}
+                style={styles.navButton}
+              >
                 <Text style={styles.navText}>‹</Text>
               </TouchableOpacity>
               <Text style={styles.monthYear}>
                 {MONTHS[viewDate.getMonth()]} {viewDate.getFullYear()}
               </Text>
-              <TouchableOpacity onPress={goToNextMonth} style={styles.navButton}>
+              <TouchableOpacity
+                onPress={goToNextMonth}
+                style={styles.navButton}
+              >
                 <Text style={styles.navText}>›</Text>
               </TouchableOpacity>
             </View>
@@ -249,7 +260,9 @@ const CalendarPickerModal: React.FC<CalendarPickerModalProps> = ({
                       {`${String(selectedHour).padStart(2, "0")}:${String(selectedMinute).padStart(2, "0")}`}
                     </Text>
                     <TouchableOpacity onPress={handleRemoveTime}>
-                      <Text style={styles.removeTimeText}>{t("detail.remove_time")}</Text>
+                      <Text style={styles.removeTimeText}>
+                        {t("detail.remove_time")}
+                      </Text>
                     </TouchableOpacity>
                   </TouchableOpacity>
                 ) : (
@@ -257,7 +270,9 @@ const CalendarPickerModal: React.FC<CalendarPickerModalProps> = ({
                     style={styles.setTimeButton}
                     onPress={() => setShowTimePicker(true)}
                   >
-                    <Text style={styles.setTimeText}>{t("detail.set_time")}</Text>
+                    <Text style={styles.setTimeText}>
+                      {t("detail.set_time")}
+                    </Text>
                   </TouchableOpacity>
                 )}
               </View>

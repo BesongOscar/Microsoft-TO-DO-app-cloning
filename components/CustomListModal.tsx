@@ -1,6 +1,6 @@
 /**
  * CustomListModal - Modal for creating and editing custom lists
- * 
+ *
  * Provides icon picker (emoji grid) and color swatch selector.
  * Supports both create and edit modes via initialData prop.
  * Uses ThemeContext for theming support.
@@ -111,7 +111,12 @@ const CustomListModal: React.FC<CustomListModalProps> = ({
 
           <ScrollView style={modalCommonStyles.modalBody}>
             <View style={customListModalStyles.listPreview}>
-              <View style={[customListModalStyles.listPreviewColor, { backgroundColor: color }]} />
+              <View
+                style={[
+                  customListModalStyles.listPreviewColor,
+                  { backgroundColor: color },
+                ]}
+              />
               <Text style={customListModalStyles.listPreviewIcon}>{icon}</Text>
               <Text style={customListModalStyles.listPreviewName}>
                 {name || t("lists.list_name")}
@@ -148,23 +153,23 @@ const CustomListModal: React.FC<CustomListModalProps> = ({
               ))}
             </View>
 
-              <Text style={customListModalStyles.inputLabel}>
-                {t("lists.list_color")}
-              </Text>
-              <View style={customListModalStyles.colorGrid}>
-                {customListColors.map((colorOption, i) => (
-                  <TouchableOpacity
-                    key={i}
-                    style={[
-                      customListModalStyles.colorOption,
-                      { backgroundColor: colorOption },
-                      color === colorOption &&
-                        customListModalStyles.colorOptionSelected,
-                    ]}
-                    onPress={() => setColor(colorOption)}
-                  />
-                ))}
-              </View>
+            <Text style={customListModalStyles.inputLabel}>
+              {t("lists.list_color")}
+            </Text>
+            <View style={customListModalStyles.colorGrid}>
+              {customListColors.map((colorOption, i) => (
+                <TouchableOpacity
+                  key={i}
+                  style={[
+                    customListModalStyles.colorOption,
+                    { backgroundColor: colorOption },
+                    color === colorOption &&
+                      customListModalStyles.colorOptionSelected,
+                  ]}
+                  onPress={() => setColor(colorOption)}
+                />
+              ))}
+            </View>
 
             {/* {initialData && onDelete && (
               <TouchableOpacity

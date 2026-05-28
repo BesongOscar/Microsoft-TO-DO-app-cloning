@@ -92,7 +92,7 @@ export default function EmailVerification() {
 
   return (
     <SafeAreaView edges={["top"]} style={styles.container}>
-      <ArrowBack/>
+      <ArrowBack />
       <View style={styles.imageContainer}>
         <View
           style={[
@@ -116,7 +116,11 @@ export default function EmailVerification() {
       </Text>
 
       {isChecking ? (
-        <ActivityIndicator size="large" color={theme.primary} style={styles.button} />
+        <ActivityIndicator
+          size="large"
+          color={theme.primary}
+          style={styles.button}
+        />
       ) : (
         <TouchableOpacity style={styles.verifyButton} onPress={handleContinue}>
           <Text style={styles.verifyButtonText}>I verified my email</Text>

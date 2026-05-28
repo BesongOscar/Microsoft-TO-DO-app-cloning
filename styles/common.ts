@@ -11,5 +11,3 @@ export const fontBold = "Poppins-Bold";
  */
 export const androidPoppinsExtras: TextStyle =
   Platform.OS === "android" ? { fontWeight: "normal" } : {};
-
-

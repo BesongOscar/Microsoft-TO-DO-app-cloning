@@ -68,7 +68,8 @@ const MainContent: React.FC<MainContentProps> = ({
   const { theme } = useTheme();
   const { user } = useAuth();
   const bannerKey = user ? `suggestionBannerDismissed_${user.uid}` : "";
-  const { visible: showBanner, dismiss: handleCloseBanner } = useDismissibleBanner(bannerKey);
+  const { visible: showBanner, dismiss: handleCloseBanner } =
+    useDismissibleBanner(bannerKey);
   const [menuVisible, setMenuVisible] = useState<boolean>(false);
 
   const filteredTasks = useMemo(

@@ -31,7 +31,10 @@ import { Task } from "../types";
 import { useTranslation } from "react-i18next";
 
 // Enable LayoutAnimation on Android
-if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
+if (
+  Platform.OS === "android" &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
@@ -66,113 +69,134 @@ interface DraggableTaskItemProps {
   setHoverIndex: (i: number | null) => void;
 }
 
-const DraggableTaskItem = /*#__PURE__*/ React.memo<DraggableTaskItemProps>(({
-  task, index, pendingTasks, draggingIndex, hoverIndex,
-  onReorderTasks, onToggleTask, onSelectTask, onStarToggle, onEdit, onDelete,
-  setDraggingIndex, setHoverIndex,
-}) => {
-  const { theme } = useTheme();
-  const indexRef = useRef(index);
-  indexRef.current = index;
+const DraggableTaskItem = /*#__PURE__*/ React.memo<DraggableTaskItemProps>(
+  ({
+    task,
+    index,
+    pendingTasks,
+    draggingIndex,
+    hoverIndex,
+    onReorderTasks,
+    onToggleTask,
+    onSelectTask,
+    onStarToggle,
+    onEdit,
+    onDelete,
+    setDraggingIndex,
+    setHoverIndex,
+  }) => {
+    const { theme } = useTheme();
+    const indexRef = useRef(index);
+    indexRef.current = index;
 
-  const pendingTasksRef = useRef(pendingTasks);
-  pendingTasksRef.current = pendingTasks;
+    const pendingTasksRef = useRef(pendingTasks);
+    pendingTasksRef.current = pendingTasks;
 
-  const onReorderTasksRef = useRef(onReorderTasks);
-  onReorderTasksRef.current = onReorderTasks;
+    const onReorderTasksRef = useRef(onReorderTasks);
+    onReorderTasksRef.current = onReorderTasks;
 
-  const dragStartY = useRef(0);
-  const dragHoverIndex = useRef<number | null>(null);
+    const dragStartY = useRef(0);
+    const dragHoverIndex = useRef<number | null>(null);
 
-  const panResponder = useMemo(
-    () =>
-      PanResponder.create({
-        onStartShouldSetPanResponder: () => true,
-        onMoveShouldSetPanResponder: () => true,
+    const panResponder = useMemo(
+      () =>
+        PanResponder.create({
+          onStartShouldSetPanResponder: () => true,
+          onMoveShouldSetPanResponder: () => true,
 
-        onPanResponderGrant: (evt) => {
-          dragStartY.current = evt.nativeEvent.pageY;
-          const idx = indexRef.current;
-          dragHoverIndex.current = idx;
-          setDraggingIndex(idx);
-          setHoverIndex(idx);
-        },
+          onPanResponderGrant: (evt) => {
+            dragStartY.current = evt.nativeEvent.pageY;
+            const idx = indexRef.current;
+            dragHoverIndex.current = idx;
+            setDraggingIndex(idx);
+            setHoverIndex(idx);
+          },
 
-        onPanResponderMove: (evt) => {
-          const dy = evt.nativeEvent.pageY - dragStartY.current;
-          const rawTarget = indexRef.current + Math.round(dy / ITEM_HEIGHT);
-          const clampedTarget = Math.max(
-            0,
-            Math.min(pendingTasksRef.current.length - 1, rawTarget),
-          );
-          dragHoverIndex.current = clampedTarget;
-          setHoverIndex(clampedTarget);
-        },
+          onPanResponderMove: (evt) => {
+            const dy = evt.nativeEvent.pageY - dragStartY.current;
+            const rawTarget = indexRef.current + Math.round(dy / ITEM_HEIGHT);
+            const clampedTarget = Math.max(
+              0,
+              Math.min(pendingTasksRef.current.length - 1, rawTarget),
+            );
+            dragHoverIndex.current = clampedTarget;
+            setHoverIndex(clampedTarget);
+          },
 
-        onPanResponderRelease: () => {
-          const di = indexRef.current;
-          const hi = dragHoverIndex.current;
-          if (hi !== null && di !== hi) {
-            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-            const reordered = [...pendingTasksRef.current];
-            const [moved] = reordered.splice(di, 1);
-            reordered.splice(hi, 0, moved);
-            onReorderTasksRef.current(reordered);
-          }
-          dragHoverIndex.current = null;
-          setDraggingIndex(null);
-          setHoverIndex(null);
-        },
+          onPanResponderRelease: () => {
+            const di = indexRef.current;
+            const hi = dragHoverIndex.current;
+            if (hi !== null && di !== hi) {
+              LayoutAnimation.configureNext(
+                LayoutAnimation.Presets.easeInEaseOut,
+              );
+              const reordered = [...pendingTasksRef.current];
+              const [moved] = reordered.splice(di, 1);
+              reordered.splice(hi, 0, moved);
+              onReorderTasksRef.current(reordered);
+            }
+            dragHoverIndex.current = null;
+            setDraggingIndex(null);
+            setHoverIndex(null);
+          },
 
-        onPanResponderTerminate: () => {
-          dragHoverIndex.current = null;
-          setDraggingIndex(null);
-          setHoverIndex(null);
-        },
-      }),
-    [], // created once per component instance
-  );
+          onPanResponderTerminate: () => {
+            dragHoverIndex.current = null;
+            setDraggingIndex(null);
+            setHoverIndex(null);
+          },
+        }),
+      [], // created once per component instance
+    );
 
-  const isActive = draggingIndex === index;
-  const isHoverTarget = hoverIndex === index && draggingIndex !== index;
+    const isActive = draggingIndex === index;
+    const isHoverTarget = hoverIndex === index && draggingIndex !== index;
 
-  return (
-    <View
-      style={isHoverTarget ? { borderTopWidth: 2, borderTopColor: theme.primary } : undefined}
-    >
-      <TaskItem
-        task={task}
-        onToggle={() => onToggleTask(task.id)}
-        onSelect={() => onSelectTask(task.id)}
-        onEdit={onEdit}
-        onDelete={onDelete}
-        isActive={isActive}
-        gripPanHandlers={panResponder.panHandlers}
-      />
-    </View>
-  );
-}, (prev, next) => {
-  if (prev.task.id !== next.task.id) return false;
-  if (prev.task.text !== next.task.text) return false;
-  if (prev.task.completed !== next.task.completed) return false;
-  if (prev.task.important !== next.task.important) return false;
-  if (prev.task.myDay !== next.task.myDay) return false;
-  if (prev.task.dueDate !== next.task.dueDate) return false;
-  if (prev.task.listId !== next.task.listId) return false;
+    return (
+      <View
+        style={
+          isHoverTarget
+            ? { borderTopWidth: 2, borderTopColor: theme.primary }
+            : undefined
+        }
+      >
+        <TaskItem
+          task={task}
+          onToggle={() => onToggleTask(task.id)}
+          onSelect={() => onSelectTask(task.id)}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          isActive={isActive}
+          gripPanHandlers={panResponder.panHandlers}
+        />
+      </View>
+    );
+  },
+  (prev, next) => {
+    if (prev.task.id !== next.task.id) return false;
+    if (prev.task.text !== next.task.text) return false;
+    if (prev.task.completed !== next.task.completed) return false;
+    if (prev.task.important !== next.task.important) return false;
+    if (prev.task.myDay !== next.task.myDay) return false;
+    if (prev.task.dueDate !== next.task.dueDate) return false;
+    if (prev.task.listId !== next.task.listId) return false;
 
-  const prevIsActive = prev.draggingIndex === prev.index;
-  const nextIsActive = next.draggingIndex === next.index;
-  const prevIsHover = prev.hoverIndex === prev.index && prev.draggingIndex !== prev.index;
-  const nextIsHover = next.hoverIndex === next.index && next.draggingIndex !== next.index;
+    const prevIsActive = prev.draggingIndex === prev.index;
+    const nextIsActive = next.draggingIndex === next.index;
+    const prevIsHover =
+      prev.hoverIndex === prev.index && prev.draggingIndex !== prev.index;
+    const nextIsHover =
+      next.hoverIndex === next.index && next.draggingIndex !== next.index;
 
-  if (prevIsActive !== nextIsActive) return false;
-  if (prevIsHover !== nextIsHover) return false;
+    if (prevIsActive !== nextIsActive) return false;
+    if (prevIsHover !== nextIsHover) return false;
 
-  if (prev.index !== next.index) return false;
+    if (prev.index !== next.index) return false;
 
-  return true;
-});
-DraggableTaskItem.displayName = 'DraggableTaskItem';
+    return true;
+  },
+);
+DraggableTaskItem.displayName = "DraggableTaskItem";
 
 const TasksList: React.FC<TasksListProps> = ({
   pendingTasks,

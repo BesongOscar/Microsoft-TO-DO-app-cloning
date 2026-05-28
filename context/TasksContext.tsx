@@ -125,32 +125,27 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
     };
   }, [authLoading, user?.uid]);
 
-  const debouncedSaveTasks = useCallback(
-    (newTasks: Task[]) => {
-      const currentUser = userRef.current;
-      if (!currentUser) return;
+  const debouncedSaveTasks = useCallback((newTasks: Task[]) => {
+    const currentUser = userRef.current;
+    if (!currentUser) return;
 
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current);
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    saveTimeoutRef.current = setTimeout(async () => {
+      const uid = userRef.current?.uid;
+      if (!uid) return;
+      try {
+        await firestoreSaveTasks(uid, newTasks);
+      } catch (e) {
+        console.warn("Failed to save tasks to Firestore:", e);
+        Alert.alert(i18n.t("errors.save_failed"), "", [
+          { text: i18n.t("common.ok") },
+        ]);
       }
-
-      saveTimeoutRef.current = setTimeout(async () => {
-        const uid = userRef.current?.uid;
-        if (!uid) return;
-        try {
-          await firestoreSaveTasks(uid, newTasks);
-        } catch (e) {
-          console.warn("Failed to save tasks to Firestore:", e);
-          Alert.alert(
-            i18n.t("errors.save_failed"),
-            "",
-            [{ text: i18n.t("common.ok") }],
-          );
-        }
-      }, 500);
-    },
-    [],
-  );
+    }, 500);
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -188,7 +183,9 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const toggleTask = useCallback(
     (taskId: string): void => {
-      const prevSnapshot = { ...tasksRef.current.find((t) => t.id === taskId) } as Task | null;
+      const prevSnapshot = {
+        ...tasksRef.current.find((t) => t.id === taskId),
+      } as Task | null;
       if (!prevSnapshot) return;
 
       const willBeCompleted = !prevSnapshot.completed;
@@ -221,7 +218,11 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
           setTasks((prev) =>
             prev.map((t) =>
               t.id === taskId
-                ? { ...t, completed: prevSnapshot.completed, order: prevSnapshot.order }
+                ? {
+                    ...t,
+                    completed: prevSnapshot.completed,
+                    order: prevSnapshot.order,
+                  }
                 : t,
             ),
           );
@@ -235,7 +236,9 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const toggleImportant = useCallback(
     (taskId: string): void => {
-      const prevSnapshot = { ...tasksRef.current.find((t) => t.id === taskId) } as Task | null;
+      const prevSnapshot = {
+        ...tasksRef.current.find((t) => t.id === taskId),
+      } as Task | null;
       if (!prevSnapshot) return;
 
       const newImportant = !prevSnapshot.important;
@@ -274,11 +277,9 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
             if (prev.some((t) => t.id === taskId)) return prev;
             return [...prev, prevTask];
           });
-          Alert.alert(
-            i18n.t("errors.delete_failed"),
-            "",
-            [{ text: i18n.t("common.ok") }],
-          );
+          Alert.alert(i18n.t("errors.delete_failed"), "", [
+            { text: i18n.t("common.ok") },
+          ]);
         });
       }
     },
@@ -302,11 +303,9 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
         firestoreUpdateTask(user.uid, taskId, updates).catch((e) => {
           console.warn("Failed to update task in Firestore:", e);
           setTasks((prev) => prev.map((t) => (t.id === taskId ? prevTask : t)));
-          Alert.alert(
-            i18n.t("errors.update_failed"),
-            "",
-            [{ text: i18n.t("common.ok") }],
-          );
+          Alert.alert(i18n.t("errors.update_failed"), "", [
+            { text: i18n.t("common.ok") },
+          ]);
         });
       }
     },
@@ -335,11 +334,9 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
       setTasks([...pendingWithOrder, ...completedTasks]);
     } catch (e) {
       console.warn("Failed to refresh tasks:", e);
-      Alert.alert(
-        i18n.t("errors.refresh_failed"),
-        "",
-        [{ text: i18n.t("common.ok") }],
-      );
+      Alert.alert(i18n.t("errors.refresh_failed"), "", [
+        { text: i18n.t("common.ok") },
+      ]);
     } finally {
       setRefreshing(false);
     }
@@ -391,7 +388,16 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
       reorderTasks,
       setSelectedTaskId,
     }),
-    [addTask, toggleTask, toggleImportant, deleteTask, updateTask, refreshTasks, reorderTasks, setSelectedTaskId],
+    [
+      addTask,
+      toggleTask,
+      toggleImportant,
+      deleteTask,
+      updateTask,
+      refreshTasks,
+      reorderTasks,
+      setSelectedTaskId,
+    ],
   );
 
   return (
@@ -419,5 +425,3 @@ export const useTasks = (): TasksData & TasksActions => ({
   ...useTasksData(),
   ...useTasksActions(),
 });
-
-

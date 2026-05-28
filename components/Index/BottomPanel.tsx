@@ -6,7 +6,13 @@
  */
 
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+} from "react-native";
 import { useThemeStyles } from "../../src/hooks/useThemeStyles";
 import { createBottomPanelStyles } from "../../styles/components/Index/BottomPanel";
 import DetailOption from "../DetailOption";
@@ -27,9 +33,21 @@ const formatDueDate = (dateStr: string, timeStr?: string): string => {
   const due = new Date(year, month - 1, day);
 
   if (due.getTime() === today.getTime()) {
-    return timeStr ? `${formatTime(timeStr)}` : new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+    return timeStr
+      ? `${formatTime(timeStr)}`
+      : new Date().toLocaleDateString("en-US", {
+          weekday: "short",
+          month: "short",
+          day: "numeric",
+        });
   } else if (due.getTime() === tomorrow.getTime()) {
-    return timeStr ? `${formatTime(timeStr)}` : new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+    return timeStr
+      ? `${formatTime(timeStr)}`
+      : new Date().toLocaleDateString("en-US", {
+          weekday: "short",
+          month: "short",
+          day: "numeric",
+        });
   } else {
     const dateLabel = due.toLocaleDateString("en-US", {
       weekday: "short",
@@ -62,7 +80,8 @@ const formatReminder = (reminderStr: string): string => {
   });
 
   if (date.toDateString() === now.toDateString()) return `Today at ${timeStr}`;
-  if (date.toDateString() === tomorrow.toDateString()) return `Tomorrow at ${timeStr}`;
+  if (date.toDateString() === tomorrow.toDateString())
+    return `Tomorrow at ${timeStr}`;
 
   return date.toLocaleDateString("en-US", {
     weekday: "short",
@@ -138,7 +157,9 @@ const BottomPanel: React.FC<BottomPanelProps> = ({
     ...BASE_OPTIONS,
     {
       icon: "⭐",
-      text: isImportant ? t("detail.remove_from_important") : t("detail.add_to_important"),
+      text: isImportant
+        ? t("detail.remove_from_important")
+        : t("detail.add_to_important"),
       key: "favorite",
     },
   ];
@@ -181,7 +202,10 @@ const BottomPanel: React.FC<BottomPanelProps> = ({
           switch (option.key) {
             case "calendar":
               if (selectedTask.dueDate)
-                activeValue = formatDueDate(selectedTask.dueDate, selectedTask.dueTime);
+                activeValue = formatDueDate(
+                  selectedTask.dueDate,
+                  selectedTask.dueTime,
+                );
               break;
             case "reminder":
               if (selectedTask.reminder)
@@ -213,10 +237,13 @@ const BottomPanel: React.FC<BottomPanelProps> = ({
         <Text style={styles.createdDate}>
           {selectedTask.createdAt && !isToday(selectedTask.createdAt)
             ? t("detail.created_on", {
-                date: new Date(selectedTask.createdAt).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                }),
+                date: new Date(selectedTask.createdAt).toLocaleDateString(
+                  "en-US",
+                  {
+                    month: "short",
+                    day: "numeric",
+                  },
+                ),
               })
             : t("detail.created_today")}
         </Text>

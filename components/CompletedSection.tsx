@@ -1,6 +1,6 @@
 /**
  * CompletedSection - Renders the "Completed" task section
- * 
+ *
  * Only renders if there are completed tasks. Displays a header
  * with count and a list of completed TaskItems.
  */

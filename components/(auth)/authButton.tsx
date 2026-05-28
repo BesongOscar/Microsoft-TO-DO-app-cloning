@@ -1,6 +1,6 @@
 /**
  * AuthButton - Reusable button for auth screens
- * 
+ *
  * Supports custom colors, icons (like GoogleIcon), and disabled state.
  * Used in login, signup, and other auth flows.
  */

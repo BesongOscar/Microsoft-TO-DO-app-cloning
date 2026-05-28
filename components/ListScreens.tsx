@@ -1,6 +1,6 @@
 /**
  * ListScreens - Shared screen component for list views
- * 
+ *
  * Handles search, sorting, and rendering of tasks for any list.
  * Used by Lists/[listId], myDay, Planned, and other list screens.
  * Supports bulk actions (clear completed, mark all done).
@@ -39,7 +39,17 @@ export default function ListScreens({
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const styles = useThemeStyles(createListScreensStyles);
-  const { toggleTask, toggleImportant, deleteTask, updateTask, reorderTasks, refreshing, refreshTasks, setSelectedTaskId, loading } = useTasks();
+  const {
+    toggleTask,
+    toggleImportant,
+    deleteTask,
+    updateTask,
+    reorderTasks,
+    refreshing,
+    refreshTasks,
+    setSelectedTaskId,
+    loading,
+  } = useTasks();
 
   const [searchMode, setSearchMode] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");

@@ -47,7 +47,10 @@ export default function ForgotPassword() {
         ],
       );
     } catch (error: unknown) {
-      Alert.alert("Error", error instanceof Error ? error.message : "Failed to send reset email");
+      Alert.alert(
+        "Error",
+        error instanceof Error ? error.message : "Failed to send reset email",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -55,7 +58,7 @@ export default function ForgotPassword() {
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
-      <ArrowBack/>
+      <ArrowBack />
       <View style={styles.imageContainer}>
         <View
           style={[

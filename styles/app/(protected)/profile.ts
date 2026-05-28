@@ -1,5 +1,10 @@
 import { StyleSheet } from "react-native";
-import { fontReg, fontSemi, fontBold, androidPoppinsExtras } from "../../common";
+import {
+  fontReg,
+  fontSemi,
+  fontBold,
+  androidPoppinsExtras,
+} from "../../common";
 import type { Theme } from "../../theme";
 
 export const createProfileStyles = (theme: Theme) =>

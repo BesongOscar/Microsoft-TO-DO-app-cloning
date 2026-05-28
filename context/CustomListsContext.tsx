@@ -17,7 +17,7 @@ import {
 
 /**
  * CustomListsContext - Manages user-created task lists (e.g., "Work", "Personal")
- * 
+ *
  * Handles CRUD for custom lists, synced to Firestore. Unlike built-in lists
  * (My Day, Important, Planned), these are user-defined with custom names/icons.
  */
@@ -151,7 +151,8 @@ export const CustomListsProvider: React.FC<{ children: React.ReactNode }> = ({
 
 export const useCustomLists = () => {
   const ctx = useContext(CustomListsContext);
-  if (!ctx) throw new Error("useCustomLists must be inside CustomListsProvider");
+  if (!ctx)
+    throw new Error("useCustomLists must be inside CustomListsProvider");
   return ctx;
 };
 

@@ -1,6 +1,6 @@
 /**
  * DetailOption - Option row in BottomPanel
- * 
+ *
  * Displays an icon, label, and optional active value.
  * Used for due date, reminder, repeat, and note options.
  */
@@ -29,10 +29,12 @@ const DetailOption: React.FC<DetailOptionProps> = ({
   return (
     <TouchableOpacity style={styles.detailOption} onPress={onPress}>
       {/* Icon */}
-      <Text style={[isActive ? styles.detailIconActive : styles.detailIcon]}>{icon}</Text>
+      <Text style={[isActive ? styles.detailIconActive : styles.detailIcon]}>
+        {icon}
+      </Text>
       {/* Label + Optional current-value subtitle */}
       <View style={{}}>
-        <Text style={[isActive? styles.detailTextActive : styles.detailText]}>
+        <Text style={[isActive ? styles.detailTextActive : styles.detailText]}>
           {text}
         </Text>
         {activeValue ? (

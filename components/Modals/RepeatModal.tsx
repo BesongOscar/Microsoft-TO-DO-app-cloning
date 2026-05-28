@@ -1,6 +1,6 @@
 /**
  * RepeatModal - Recurrence rule configuration modal
- * 
+ *
  * Supports: daily, weekly (with multi-day selection), monthly
  * (specific day or last day), yearly. Configurable end date.
  */
@@ -114,7 +114,8 @@ const RepeatModal: React.FC<RepeatModalProps> = ({
       case "daily":
         return `${t("repeat.every_day")}${timeSuffix}`;
       case "weekly": {
-        if (selectedDays.length === 0) return `${t("repeat.every_week")}${timeSuffix}`;
+        if (selectedDays.length === 0)
+          return `${t("repeat.every_week")}${timeSuffix}`;
         const dayNames = selectedDays.sort().map((d) => DAY_LABELS[d]);
         return `${t("repeat.repeat_on")} ${dayNames.join(", ")}${timeSuffix}`;
       }
@@ -198,7 +199,10 @@ const RepeatModal: React.FC<RepeatModalProps> = ({
                 >
                   {option.label}
                   {option.value !== "none" && timeSuffix && (
-                    <Text style={styles.timeHint}> {t("date.at")} {dueTime}</Text>
+                    <Text style={styles.timeHint}>
+                      {" "}
+                      {t("date.at")} {dueTime}
+                    </Text>
                   )}
                 </Text>
                 {selectedRepeat === option.value && (
@@ -246,7 +250,9 @@ const RepeatModal: React.FC<RepeatModalProps> = ({
                   ]}
                   onPress={() => setIsLastDay(false)}
                 >
-                  <Text style={styles.monthlyOptionText}>{t("repeat.day_of_month")}</Text>
+                  <Text style={styles.monthlyOptionText}>
+                    {t("repeat.day_of_month")}
+                  </Text>
                   {!isLastDay && (
                     <View style={styles.dayNumberRow}>
                       <TouchableOpacity
@@ -274,7 +280,9 @@ const RepeatModal: React.FC<RepeatModalProps> = ({
                   ]}
                   onPress={() => setIsLastDay(true)}
                 >
-                  <Text style={styles.monthlyOptionText}>{t("repeat.last_day")}</Text>
+                  <Text style={styles.monthlyOptionText}>
+                    {t("repeat.last_day")}
+                  </Text>
                   {isLastDay && <Text style={styles.checkmark}>✓</Text>}
                 </TouchableOpacity>
               </View>
@@ -282,7 +290,9 @@ const RepeatModal: React.FC<RepeatModalProps> = ({
 
             {selectedRepeat !== "none" && (
               <View style={styles.endRepeatContainer}>
-                <Text style={styles.sectionLabel}>{t("repeat.end_repeat")}</Text>
+                <Text style={styles.sectionLabel}>
+                  {t("repeat.end_repeat")}
+                </Text>
                 <TouchableOpacity
                   style={[
                     styles.endRepeatOption,
@@ -358,7 +368,9 @@ const RepeatModal: React.FC<RepeatModalProps> = ({
           </ScrollView>
 
           <View style={styles.preview}>
-            <Text style={styles.previewLabel}>{t("repeat.selected_label")}</Text>
+            <Text style={styles.previewLabel}>
+              {t("repeat.selected_label")}
+            </Text>
             <Text style={styles.previewDate}>
               {getRepeatLabel()}
               {endRepeatType === "onDate" &&

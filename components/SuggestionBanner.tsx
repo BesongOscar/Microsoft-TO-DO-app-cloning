@@ -8,7 +8,10 @@ interface SuggestionsBannerProps {
   onClose: () => void;
 }
 
-const SuggestionsBanner: React.FC<SuggestionsBannerProps> = ({ message, onClose }) => {
+const SuggestionsBanner: React.FC<SuggestionsBannerProps> = ({
+  message,
+  onClose,
+}) => {
   const styles = useThemeStyles(createSuggestionBannerStyles);
   return (
     <View style={styles.suggestionsBanner}>

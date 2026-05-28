@@ -22,7 +22,6 @@ import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { welcomeStyles as styles } from "../../styles/app/(auth)/welcome";
 
-
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 /**
  * AsyncStorage key written when onboarding is completed or skipped.
@@ -120,7 +119,7 @@ export default function OnboardingScreen() {
         scrollEnabled={false} // controlled programmatically via Next button
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-          { useNativeDriver: false }
+          { useNativeDriver: false },
         )}
         scrollEventThrottle={16}
       />

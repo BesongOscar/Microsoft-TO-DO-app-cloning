@@ -1,6 +1,6 @@
 /**
  * ReminderModal - Task reminder scheduling modal
- * 
+ *
  * Offers preset reminder options (15min, 1hr, custom time, etc.)
  * powered by expo-notifications. Requires notification permission.
  */
@@ -71,17 +71,51 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
 
     // "At due time" — only if date+time both set
     if (dueDate && dueTime) {
-      options.push({ label: t("reminder.at_due_time"), value: "atDueTime", description: `${dueDate} ${t("date.at")} ${dueTime}` });
+      options.push({
+        label: t("reminder.at_due_time"),
+        value: "atDueTime",
+        description: `${dueDate} ${t("date.at")} ${dueTime}`,
+      });
     }
 
     if (dueDate) {
       const target = getTargetDateTime();
       options.push(
-        { label: t("reminder.15_min"), value: "15min", description: formatRelativeTime(new Date(target.getTime() - 15 * 60000)) },
-        { label: t("reminder.30_min"), value: "30min", description: formatRelativeTime(new Date(target.getTime() - 30 * 60000)) },
-        { label: t("reminder.1_hour"), value: "1hour", description: formatRelativeTime(new Date(target.getTime() - 60 * 60000)) },
-        { label: t("reminder.2_hours"), value: "2hours", description: formatRelativeTime(new Date(target.getTime() - 120 * 60000)) },
-        { label: t("reminder.1_day"), value: "1day", description: formatRelativeTime(new Date(target.getTime() - 24 * 60 * 60000)) },
+        {
+          label: t("reminder.15_min"),
+          value: "15min",
+          description: formatRelativeTime(
+            new Date(target.getTime() - 15 * 60000),
+          ),
+        },
+        {
+          label: t("reminder.30_min"),
+          value: "30min",
+          description: formatRelativeTime(
+            new Date(target.getTime() - 30 * 60000),
+          ),
+        },
+        {
+          label: t("reminder.1_hour"),
+          value: "1hour",
+          description: formatRelativeTime(
+            new Date(target.getTime() - 60 * 60000),
+          ),
+        },
+        {
+          label: t("reminder.2_hours"),
+          value: "2hours",
+          description: formatRelativeTime(
+            new Date(target.getTime() - 120 * 60000),
+          ),
+        },
+        {
+          label: t("reminder.1_day"),
+          value: "1day",
+          description: formatRelativeTime(
+            new Date(target.getTime() - 24 * 60 * 60000),
+          ),
+        },
       );
     }
     options.push(
@@ -201,7 +235,9 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
   };
 
   const { date: customPreviewDate, willAdvance: customWillAdvance } =
-    selectedOption === "custom" ? computeCustomDate() : { date: null, willAdvance: false };
+    selectedOption === "custom"
+      ? computeCustomDate()
+      : { date: null, willAdvance: false };
 
   const handleSave = () => {
     const now = new Date();
@@ -298,18 +334,26 @@ const ReminderModal: React.FC<ReminderModalProps> = ({
           </ScrollView>
 
           {/* Preview */}
-          {selectedOption && selectedOption !== "custom" && selectedOption !== "" && (
-            <View style={styles.preview}>
-              <Text style={styles.previewLabel}>{t("reminder.reminder_label")}</Text>
-              <Text style={styles.previewDate}>
-                {formatRelativeTime(new Date(getReminderTime(selectedOption)!))}
-              </Text>
-            </View>
-          )}
+          {selectedOption &&
+            selectedOption !== "custom" &&
+            selectedOption !== "" && (
+              <View style={styles.preview}>
+                <Text style={styles.previewLabel}>
+                  {t("reminder.reminder_label")}
+                </Text>
+                <Text style={styles.previewDate}>
+                  {formatRelativeTime(
+                    new Date(getReminderTime(selectedOption)!),
+                  )}
+                </Text>
+              </View>
+            )}
 
           {selectedOption === "custom" && customPreviewDate && (
             <View style={styles.preview}>
-              <Text style={styles.previewLabel}>{t("reminder.reminder_label")}</Text>
+              <Text style={styles.previewLabel}>
+                {t("reminder.reminder_label")}
+              </Text>
               <Text style={styles.previewDate}>
                 {customWillAdvance
                   ? `${t("date.tomorrow")} ${t("date.at")} ${String(customHour).padStart(2, "0")}:${String(customMinute).padStart(2, "0")}`

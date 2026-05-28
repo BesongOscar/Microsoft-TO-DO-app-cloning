@@ -1,6 +1,6 @@
 /**
  * AddTaskInput - Text input for creating new tasks
- * 
+ *
  * Simple input field with submit button. Trims whitespace and
  * prevents empty tasks from being added.
  */
@@ -10,7 +10,7 @@ import { View, TextInput, TouchableOpacity, Text } from "react-native";
 import { useThemeStyles } from "../src/hooks/useThemeStyles";
 import { useTheme } from "../context/ThemeContext";
 import { createAddTaskInputStyles } from "../styles/components/AddTaskInput";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 
 interface AddTaskInputProps {
   onAddTask: (text: string) => void;
@@ -33,7 +33,7 @@ const AddTaskInput: React.FC<AddTaskInputProps> = ({ onAddTask }) => {
     <View style={styles.addTaskContainer}>
       <TextInput
         style={styles.addTaskInput}
-        placeholder={t('tasks.add_placeholder')}
+        placeholder={t("tasks.add_placeholder")}
         placeholderTextColor={theme.placeholderTextColor}
         value={taskText}
         onChangeText={setTaskText}

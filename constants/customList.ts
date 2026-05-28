@@ -1,6 +1,6 @@
 /**
  * customList constants - Emoji and color options for custom list icons
- * 
+ *
  * Used by CustomListModal for the icon and color picker UI.
  * EMOJI_OPTIONS: 24 emoji choices
  * customListColors: 10 color swatches

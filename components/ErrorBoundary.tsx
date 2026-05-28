@@ -46,7 +46,9 @@ class ErrorBoundary extends Component<Props, State> {
   };
 
   public render(): ReactNode {
-    const theme: Theme = (this.context as React.ContextType<typeof ThemeContext>)?.theme ?? lightTheme;
+    const theme: Theme =
+      (this.context as React.ContextType<typeof ThemeContext>)?.theme ??
+      lightTheme;
     const styles = createErrorBoundaryStyles(theme);
 
     if (this.state.hasError) {

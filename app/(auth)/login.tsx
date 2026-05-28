@@ -47,7 +47,10 @@ export default function Login() {
       setIsLoading(true);
       await login(email, password);
     } catch (error: unknown) {
-      Alert.alert("Login Failed", error instanceof Error ? error.message : "An error occurred");
+      Alert.alert(
+        "Login Failed",
+        error instanceof Error ? error.message : "An error occurred",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -87,7 +90,9 @@ export default function Login() {
         </View>
       </View>
       <Text style={styles.title}>Welcome Back</Text>
-      <Text style={styles.subtitle}>Sign in to have access to your account</Text>
+      <Text style={styles.subtitle}>
+        Sign in to have access to your account
+      </Text>
 
       <Formik
         initialValues={{
@@ -134,7 +139,11 @@ export default function Login() {
               <View
                 style={{ flexDirection: "row", alignItems: "center", flex: 1 }}
               >
-                <Ionicons name="lock-closed" size={20} color={theme.textMuted} />
+                <Ionicons
+                  name="lock-closed"
+                  size={20}
+                  color={theme.textMuted}
+                />
                 <TextInput
                   placeholder="Password"
                   style={styles.input}

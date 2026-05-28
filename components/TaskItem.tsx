@@ -145,7 +145,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
             <TouchableOpacity
               style={styles.gripIcon}
               activeOpacity={0.6}
-               accessibilityLabel={t("tasks.drag_reorder")}
+              accessibilityLabel={t("tasks.drag_reorder")}
               accessibilityRole="button"
             >
               <Ionicons name="reorder-two" size={20} color={theme.textMuted} />
@@ -160,7 +160,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
           onLongPress={handleLongPress}
           delayLongPress={200}
           activeOpacity={0.7}
-           accessibilityLabel={`Task: ${task.text}${task.completed ? `, ${t("tasks.completed").toLowerCase()}` : ""}${task.important ? ", important" : ""}`}
+          accessibilityLabel={`Task: ${task.text}${task.completed ? `, ${t("tasks.completed").toLowerCase()}` : ""}${task.important ? ", important" : ""}`}
           accessibilityRole="button"
         >
           <View style={{ flex: 1 }}>
@@ -209,7 +209,9 @@ const TaskItem: React.FC<TaskItemProps> = ({
           onPress={onToggle}
           activeOpacity={0.7}
           accessibilityLabel={
-            task.completed ? t("tasks.mark_incomplete") : t("tasks.mark_complete")
+            task.completed
+              ? t("tasks.mark_incomplete")
+              : t("tasks.mark_complete")
           }
           accessibilityRole="checkbox"
         >

@@ -1,6 +1,6 @@
 /**
  * GoogleIcon - Renders official Google "G" logo as SVG
- * 
+ *
  * Used in auth buttons for Google OAuth sign-in.
  * Follows Google's brand guidelines for colors and shape.
  */

@@ -51,7 +51,10 @@ export default function Signup() {
       await signup(email, password, name);
       router.push("/emailVerification");
     } catch (error: unknown) {
-      Alert.alert("Signup Failed", error instanceof Error ? error.message : "An error occurred");
+      Alert.alert(
+        "Signup Failed",
+        error instanceof Error ? error.message : "An error occurred",
+      );
     }
   };
 
@@ -154,7 +157,11 @@ export default function Signup() {
               <View
                 style={{ flexDirection: "row", alignItems: "center", flex: 1 }}
               >
-                <Ionicons name="lock-closed" size={20} color={theme.textMuted} />
+                <Ionicons
+                  name="lock-closed"
+                  size={20}
+                  color={theme.textMuted}
+                />
                 <TextInput
                   placeholder="Password"
                   style={styles.input}
@@ -186,7 +193,11 @@ export default function Signup() {
               <View
                 style={{ flexDirection: "row", alignItems: "center", flex: 1 }}
               >
-                <Ionicons name="lock-closed" size={20} color={theme.textMuted} />
+                <Ionicons
+                  name="lock-closed"
+                  size={20}
+                  color={theme.textMuted}
+                />
                 <TextInput
                   placeholder="Confirm Password"
                   style={styles.input}

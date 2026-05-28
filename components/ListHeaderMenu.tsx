@@ -1,19 +1,13 @@
 /**
  * ListHeaderMenu - Dropdown menu for list-level actions
- * 
+ *
  * Provides sort options (default, name, due date, importance),
  * bulk actions (mark all done, clear completed), and list edit/delete.
  * Uses i18n translations and theme-aware styles.
  */
 
 import React from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Modal,
-  Pressable,
-} from "react-native";
+import { View, Text, TouchableOpacity, Modal, Pressable } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useThemeStyles } from "../src/hooks/useThemeStyles";
 import { useTheme } from "../context/ThemeContext";
@@ -53,11 +47,15 @@ const ListHeaderMenu: React.FC<ListHeaderMenuProps> = ({
   const { t } = useTranslation();
   const isCustomList = currentList.filterKey === "listId";
 
-  const SORT_OPTIONS: { key: SortBy; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
-    { key: "order",     label: t("listMenu.default_order"), icon: "list-outline" },
-    { key: "name",      label: t("listMenu.name"),          icon: "text-outline" },
-    { key: "dueDate",   label: t("listMenu.due_date"),      icon: "calendar-outline" },
-    { key: "important", label: t("listMenu.importance"),    icon: "star-outline" },
+  const SORT_OPTIONS: {
+    key: SortBy;
+    label: string;
+    icon: keyof typeof Ionicons.glyphMap;
+  }[] = [
+    { key: "order", label: t("listMenu.default_order"), icon: "list-outline" },
+    { key: "name", label: t("listMenu.name"), icon: "text-outline" },
+    { key: "dueDate", label: t("listMenu.due_date"), icon: "calendar-outline" },
+    { key: "important", label: t("listMenu.importance"), icon: "star-outline" },
   ];
 
   return (
@@ -90,7 +88,12 @@ const ListHeaderMenu: React.FC<ListHeaderMenuProps> = ({
               />
               <Text style={styles.menuItemText}>{option.label}</Text>
               {sortBy === option.key && (
-                <Ionicons name="checkmark" size={18} color={theme.primary} style={styles.checkmark} />
+                <Ionicons
+                  name="checkmark"
+                  size={18}
+                  color={theme.primary}
+                  style={styles.checkmark}
+                />
               )}
             </TouchableOpacity>
           ))}
@@ -100,7 +103,10 @@ const ListHeaderMenu: React.FC<ListHeaderMenuProps> = ({
 
           <TouchableOpacity
             style={[styles.menuItem, pendingCount === 0 && { opacity: 0.4 }]}
-            onPress={() => { onMarkAllComplete(); onClose(); }}
+            onPress={() => {
+              onMarkAllComplete();
+              onClose();
+            }}
             disabled={pendingCount === 0}
             activeOpacity={0.7}
           >
@@ -117,7 +123,10 @@ const ListHeaderMenu: React.FC<ListHeaderMenuProps> = ({
 
           <TouchableOpacity
             style={[styles.menuItem, completedCount === 0 && { opacity: 0.4 }]}
-            onPress={() => { onDeleteCompleted(); onClose(); }}
+            onPress={() => {
+              onDeleteCompleted();
+              onClose();
+            }}
             disabled={completedCount === 0}
             activeOpacity={0.7}
           >
@@ -139,7 +148,10 @@ const ListHeaderMenu: React.FC<ListHeaderMenuProps> = ({
 
               <TouchableOpacity
                 style={styles.menuItem}
-                onPress={() => { onEditList(); onClose(); }}
+                onPress={() => {
+                  onEditList();
+                  onClose();
+                }}
                 activeOpacity={0.7}
               >
                 <Ionicons
@@ -148,13 +160,18 @@ const ListHeaderMenu: React.FC<ListHeaderMenuProps> = ({
                   color={theme.text}
                   style={styles.menuIcon}
                 />
-                <Text style={styles.menuItemText}>{t("listMenu.edit_list")}</Text>
+                <Text style={styles.menuItemText}>
+                  {t("listMenu.edit_list")}
+                </Text>
               </TouchableOpacity>
 
               {onDeleteList && (
                 <TouchableOpacity
                   style={styles.menuItem}
-                  onPress={() => { onDeleteList(); onClose(); }}
+                  onPress={() => {
+                    onDeleteList();
+                    onClose();
+                  }}
                   activeOpacity={0.7}
                 >
                   <Ionicons
@@ -163,7 +180,9 @@ const ListHeaderMenu: React.FC<ListHeaderMenuProps> = ({
                     color={theme.error}
                     style={styles.menuIcon}
                   />
-                  <Text style={[styles.menuItemText, styles.menuItemDestructive]}>
+                  <Text
+                    style={[styles.menuItemText, styles.menuItemDestructive]}
+                  >
                     {t("listMenu.delete_list")}
                   </Text>
                 </TouchableOpacity>

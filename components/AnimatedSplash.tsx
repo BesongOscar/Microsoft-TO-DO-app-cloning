@@ -13,13 +13,7 @@
  */
 
 import React, { useEffect, useRef } from "react";
-import {
-  View,
-  Image,
-  Animated,
-  StyleSheet,
-  Dimensions,
-} from "react-native";
+import { View, Image, Animated, StyleSheet, Dimensions } from "react-native";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const LOGO_SIZE = SCREEN_WIDTH * 0.4; // 40% of screen width

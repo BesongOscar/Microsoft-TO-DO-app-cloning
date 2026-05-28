@@ -55,7 +55,9 @@ const Sidebar: React.FC<SidebarProps> = ({
           section.key === "custom" ? (
             <View style={styles.listsSection}>
               <View style={styles.listsSectionHeader}>
-                <Text style={styles.listsSectionTitle}>{t("lists.custom_lists")}</Text>
+                <Text style={styles.listsSectionTitle}>
+                  {t("lists.custom_lists")}
+                </Text>
                 <TouchableOpacity onPress={() => onAddCustomList?.()}>
                   <Text style={styles.addListButton}>+</Text>
                 </TouchableOpacity>
@@ -64,7 +66,9 @@ const Sidebar: React.FC<SidebarProps> = ({
           ) : (
             <View style={styles.listsSection}>
               <View style={styles.listsSectionHeader}>
-                <Text style={styles.listsSectionTitle}>{t("lists.default_lists")}</Text>
+                <Text style={styles.listsSectionTitle}>
+                  {t("lists.default_lists")}
+                </Text>
               </View>
             </View>
           )

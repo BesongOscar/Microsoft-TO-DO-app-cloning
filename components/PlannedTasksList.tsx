@@ -47,12 +47,17 @@ export const getDateCategory = (
   const diffTime = taskDate.getTime() - today.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-  if (diffDays < 0)  return { category: i18n.t('date.overdue'),   isOverdue: true  };
-  if (diffDays === 0) return { category: i18n.t('date.today'),    isOverdue: false };
-  if (diffDays === 1) return { category: i18n.t('date.tomorrow'), isOverdue: false };
-  if (diffDays <= 7)  return { category: i18n.t('date.this_week'),isOverdue: false };
-  if (diffDays <= 14) return { category: i18n.t('date.next_week'),isOverdue: false };
-  return              { category: i18n.t('date.later'),           isOverdue: false };
+  if (diffDays < 0)
+    return { category: i18n.t("date.overdue"), isOverdue: true };
+  if (diffDays === 0)
+    return { category: i18n.t("date.today"), isOverdue: false };
+  if (diffDays === 1)
+    return { category: i18n.t("date.tomorrow"), isOverdue: false };
+  if (diffDays <= 7)
+    return { category: i18n.t("date.this_week"), isOverdue: false };
+  if (diffDays <= 14)
+    return { category: i18n.t("date.next_week"), isOverdue: false };
+  return { category: i18n.t("date.later"), isOverdue: false };
 };
 
 /**
@@ -76,8 +81,8 @@ export const groupTasksByDate = (tasks: Task[]): TaskGroup[] => {
   const pendingTasks = tasks.filter((t) => !t.completed);
   const completedTasks = tasks.filter((t) => t.completed);
 
-  
-  pendingTasks.forEach((task) => { // ignore completed tasks in this loop since they all go in the same "Completed" bucket at the end
+  pendingTasks.forEach((task) => {
+    // ignore completed tasks in this loop since they all go in the same "Completed" bucket at the end
     if (!task.dueDate) return; // tasks without a due date don't belong here
 
     const { category, isOverdue } = getDateCategory(task.dueDate);
@@ -92,18 +97,22 @@ export const groupTasksByDate = (tasks: Task[]): TaskGroup[] => {
 
   // Render sections in a meaningful chronological order
   const orderedCategories = [
-    i18n.t('date.today'),
-    i18n.t('date.tomorrow'),
-    i18n.t('date.this_week'),
-    i18n.t('date.next_week'),
-    i18n.t('date.later'),
+    i18n.t("date.today"),
+    i18n.t("date.tomorrow"),
+    i18n.t("date.this_week"),
+    i18n.t("date.next_week"),
+    i18n.t("date.later"),
   ];
 
   const result: TaskGroup[] = [];
 
   // Overdue tasks always appear first so the user can't miss them
   if (overdueTasks.length > 0) {
-    result.push({ title: i18n.t('date.overdue'), tasks: overdueTasks, isOverdue: true });
+    result.push({
+      title: i18n.t("date.overdue"),
+      tasks: overdueTasks,
+      isOverdue: true,
+    });
   }
 
   orderedCategories.forEach((category) => {
@@ -118,7 +127,7 @@ export const groupTasksByDate = (tasks: Task[]): TaskGroup[] => {
 
   // Completed tasks are always last, grouped together regardless of due date
   if (completedTasks.length > 0) {
-    result.push({ title: i18n.t('date.completed'), tasks: completedTasks });
+    result.push({ title: i18n.t("date.completed"), tasks: completedTasks });
   }
 
   return result;
@@ -170,10 +179,7 @@ const PlannedTasksList: React.FC<PlannedTasksListProps> = ({
               ]}
             >
               {group.title}
-              <Text style={styles.sectionCount}>
-                {" "}
-                ({group.tasks.length})
-              </Text>
+              <Text style={styles.sectionCount}> ({group.tasks.length})</Text>
             </Text>
           </View>
 

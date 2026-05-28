@@ -7,22 +7,17 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useTasks } from "../../context/TasksContext";
 import { useTheme } from "../../context/ThemeContext";
 import BottomSheet from "../../components/Index/BottomSheet";
-import BottomPanel from "@/components/Index/BottomPanel"; 
+import BottomPanel from "@/components/Index/BottomPanel";
 import { fontSemi, androidPoppinsExtras } from "@/styles/common";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function ProtectedLayout() {
   const insets = useSafeAreaInsets();
   const { user, loading } = useAuth();
-  const {
-    tasks,
-    updateTask,
-    selectedTaskId,
-    setSelectedTaskId,
-  } = useTasks();
+  const { tasks, updateTask, selectedTaskId, setSelectedTaskId } = useTasks();
   const { theme, isDark } = useTheme();
-    const { t } = useTranslation();
+  const { t } = useTranslation();
   const selectedTask = tasks.find((t) => t.id === selectedTaskId) ?? null;
 
   if (loading) {
@@ -39,7 +34,10 @@ export default function ProtectedLayout() {
 
   return (
     <>
-      <StatusBar style={isDark ? "light" : "dark"} backgroundColor={theme.headerBackground} />
+      <StatusBar
+        style={isDark ? "light" : "dark"}
+        backgroundColor={theme.headerBackground}
+      />
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: theme.primary,
@@ -67,7 +65,7 @@ export default function ProtectedLayout() {
               color: "#fff",
               ...androidPoppinsExtras,
             },
-            tabBarLabel: t('navigation.my_day'),
+            tabBarLabel: t("navigation.my_day"),
             tabBarLabelStyle: {
               fontSize: 12,
               fontFamily: fontSemi,
@@ -86,7 +84,7 @@ export default function ProtectedLayout() {
           name="Lists"
           options={{
             headerShown: false,
-            tabBarLabel: t('navigation.lists'),
+            tabBarLabel: t("navigation.lists"),
             tabBarLabelStyle: {
               fontSize: 12,
               fontFamily: fontSemi,
@@ -116,7 +114,7 @@ export default function ProtectedLayout() {
               color: "#fff",
               ...androidPoppinsExtras,
             },
-            tabBarLabel: t('navigation.planned'),
+            tabBarLabel: t("navigation.planned"),
             tabBarLabelStyle: {
               fontSize: 12,
               fontFamily: fontSemi,
@@ -136,7 +134,7 @@ export default function ProtectedLayout() {
           name="profile"
           options={{
             headerShown: false,
-            tabBarLabel: t('navigation.profile'),
+            tabBarLabel: t("navigation.profile"),
             tabBarLabelStyle: {
               fontSize: 12,
               fontFamily: fontSemi,

@@ -1,6 +1,6 @@
 /**
  * BottomSheet - Draggable slide-up panel for task details
- * 
+ *
  * PanResponder-based drag to dismiss, animated slide-in/slide-out.
  * Shared across all tabs from the protected layout.
  * Wraps BottomPanel content with dismiss gesture handling.
@@ -15,7 +15,10 @@ import {
   Keyboard,
 } from "react-native";
 import { useThemeStyles } from "../../src/hooks/useThemeStyles";
-import { createBottomSheetStyles, SHEET_HEIGHT } from "../../styles/components/Index/BottomSheet";
+import {
+  createBottomSheetStyles,
+  SHEET_HEIGHT,
+} from "../../styles/components/Index/BottomSheet";
 
 interface BottomSheetProps {
   visible: boolean;
@@ -23,7 +26,11 @@ interface BottomSheetProps {
   children: React.ReactNode;
 }
 
-const BottomSheet: React.FC<BottomSheetProps> = ({ visible, onClose, children }) => {
+const BottomSheet: React.FC<BottomSheetProps> = ({
+  visible,
+  onClose,
+  children,
+}) => {
   const styles = useThemeStyles(createBottomSheetStyles);
   const [mounted, setMounted] = useState(false);
   const translateY = useRef(new Animated.Value(SHEET_HEIGHT)).current;
@@ -49,7 +56,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({ visible, onClose, children })
           }).start();
         }
       },
-    })
+    }),
   ).current;
 
   useEffect(() => {
@@ -108,14 +115,11 @@ const BottomSheet: React.FC<BottomSheetProps> = ({ visible, onClose, children })
   return (
     <View style={styles.container}>
       <TouchableWithoutFeedback onPress={closeSheet}>
-        <Animated.View style={[styles.backdrop, { opacity: backdropOpacity }]} />
+        <Animated.View
+          style={[styles.backdrop, { opacity: backdropOpacity }]}
+        />
       </TouchableWithoutFeedback>
-      <Animated.View
-        style={[
-          styles.sheet,
-          { transform: [{ translateY }] },
-        ]}
-      >
+      <Animated.View style={[styles.sheet, { transform: [{ translateY }] }]}>
         <View {...panResponder.panHandlers} style={styles.handleContainer}>
           <View style={styles.handle} />
         </View>
